@@ -1,5 +1,6 @@
 *.pdf
 .DS_Store
+dist/
 en.json
 node_modules/
 RESUME_UPDATE_PLAN.md

@@ -1,7 +1,6 @@
-const { PDFDocument, rgb } = require("pdf-lib");
-const fs = require("fs");
-const path = require("path");
-const fontkit = require("@pdf-lib/fontkit");
+import { PDFDocument, rgb, type PDFFont } from "pdf-lib";
+import fontkit from "@pdf-lib/fontkit";
+import type { ResumeData, SkillsData } from "../types/resume";
 
 const PAGE_WIDTH = 595.28;
 const PAGE_HEIGHT = 841.89;
@@ -13,36 +12,9 @@ const RIGHT_COLUMN_WIDTH = 110;
 const RIGHT_COLUMN_X = PAGE_WIDTH - RIGHT_MARGIN - RIGHT_COLUMN_WIDTH;
 const EXPERIENCE_TITLE_MAX_WIDTH = RIGHT_COLUMN_X - LEFT_MARGIN - 10;
 
-const language = process.argv[2];
-
-if (!language) {
-  throw new Error("Укажи язык: node cv.js ru");
-}
-
-const getDataPath = (primaryName, fallbackName) => {
-  const primaryPath = path.join(__dirname, primaryName);
-
-  if (fs.existsSync(primaryPath)) {
-    return primaryPath;
-  }
-
-  const fallbackPath = path.join(__dirname, fallbackName);
-
-  if (fs.existsSync(fallbackPath)) {
-    return fallbackPath;
-  }
-
-  throw new Error(
-    `Не найден ни ${primaryName}, ни ${fallbackName}. Добавь приватный файл или example-версию.`
-  );
-};
-
-const resumeData = require(getDataPath(`${language}.json`, `${language}.example.json`));
-const skillsData = require(getDataPath("skills.json", "skills.example.json"));
-
-function interleaveArrays(columns) {
-  const result = [];
-  const maxRows = Math.max(...columns.map((column) => column.length));
+function interleaveArrays(columns: string[][]): string[] {
+  const result: string[] = [];
+  const maxRows = Math.max(...columns.map((column) => column.length), 0);
 
   for (let rowIndex = 0; rowIndex < maxRows; rowIndex += 1) {
     columns.forEach((column) => {
@@ -55,7 +27,7 @@ function interleaveArrays(columns) {
   return result;
 }
 
-function wrapText(text, maxWidth, font, size) {
+function wrapText(text: unknown, maxWidth: number, font: PDFFont, size: number): string[] {
   const normalizedText = String(text ?? "").replace(/\s+/g, " ").trim();
 
   if (!normalizedText) {
@@ -63,7 +35,7 @@ function wrapText(text, maxWidth, font, size) {
   }
 
   const words = normalizedText.split(" ");
-  const lines = [];
+  const lines: string[] = [];
   let currentLine = words[0];
 
   for (let index = 1; index < words.length; index += 1) {
@@ -83,7 +55,7 @@ function wrapText(text, maxWidth, font, size) {
   return lines;
 }
 
-function getHeaderContactText(header) {
+function getHeaderContactText(header: ResumeData["header"]): string {
   if (Array.isArray(header?.contacts)) {
     return header.contacts
       .map((item) => String(item ?? "").trim())
@@ -94,7 +66,7 @@ function getHeaderContactText(header) {
   return String(header?.contact ?? "").trim();
 }
 
-function getLanguagesText(section) {
+function getLanguagesText(section: ResumeData["sections"]["languages"]): string {
   if (Array.isArray(section?.items)) {
     return section.items
       .map((item) => {
@@ -114,31 +86,28 @@ function getLanguagesText(section) {
   return String(section?.content ?? "").trim();
 }
 
-function getVisibleTaskTexts(tasks) {
+function getVisibleTaskTexts(tasks: ResumeData["sections"]["experience"]["jobs"][number]["tasks"]): string[] {
   return (tasks ?? [])
-    .filter((task) => {
-      if (typeof task === "string") {
-        return true;
-      }
-
-      return !task?.hidden;
-    })
-    .map((task) => (typeof task === "string" ? task : String(task?.text ?? "").trim()))
+    .filter((task) => !task.hidden)
+    .map((task) => String(task.text ?? "").trim())
     .filter(Boolean);
 }
 
-(async () => {
+interface CreateResumePdfParams {
+  resumeData: ResumeData;
+  skillsData: SkillsData;
+  fontBytes: ArrayBuffer;
+}
+
+export async function createResumePdf({
+  resumeData,
+  skillsData,
+  fontBytes,
+}: CreateResumePdfParams): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create();
   pdfDoc.registerFontkit(fontkit);
 
-  const fontPath = "fonts/helvetica_regular.otf";
-  if (!fs.existsSync(fontPath)) {
-    throw new Error(`Шрифт не найден по пути: ${fontPath}`);
-  }
-
-  const fontBytes = fs.readFileSync(fontPath);
   const font = await pdfDoc.embedFont(fontBytes);
-
   let page = pdfDoc.addPage([PAGE_WIDTH, PAGE_HEIGHT]);
   let yPosition = TOP_Y;
 
@@ -147,7 +116,7 @@ function getVisibleTaskTexts(tasks) {
     yPosition = TOP_Y;
   };
 
-  const ensureSpace = (requiredHeight) => {
+  const ensureSpace = (requiredHeight: number) => {
     if (yPosition - requiredHeight < BOTTOM_MARGIN) {
       addPage();
     }
@@ -163,8 +132,18 @@ function getVisibleTaskTexts(tasks) {
   };
 
   const drawWrappedText = (
-    content,
-    {
+    content: string | string[],
+    options: {
+      x?: number;
+      size?: number;
+      lineHeight?: number;
+      maxWidth?: number;
+      paragraphGap?: number;
+      bullet?: boolean;
+      bulletIndent?: number;
+    } = {}
+  ) => {
+    const {
       x = LEFT_MARGIN,
       size = 10,
       lineHeight = 12,
@@ -172,8 +151,7 @@ function getVisibleTaskTexts(tasks) {
       paragraphGap = 0,
       bullet = false,
       bulletIndent = 0.5,
-    } = {}
-  ) => {
+    } = options;
     const blocks = Array.isArray(content) ? content : [content];
     const bulletPrefix = "• ";
     const bulletOffset = bullet
@@ -207,7 +185,7 @@ function getVisibleTaskTexts(tasks) {
     });
   };
 
-  const drawSectionTitle = (title) => {
+  const drawSectionTitle = (title: string) => {
     ensureSpace(20);
 
     page.drawText(title, {
@@ -223,7 +201,10 @@ function getVisibleTaskTexts(tasks) {
     yPosition -= 15;
   };
 
-  const drawRightAlignedText = (text, { rightX, y, size = 10 }) => {
+  const drawRightAlignedText = (
+    text: string,
+    { rightX, y, size = 10 }: { rightX: number; y: number; size?: number }
+  ) => {
     const normalizedText = String(text ?? "").trim();
 
     if (!normalizedText) {
@@ -239,24 +220,38 @@ function getVisibleTaskTexts(tasks) {
     });
   };
 
-  const drawEducationLikeSection = (section) => {
+  const drawEducationLikeSection = (
+    section:
+      | ResumeData["sections"]["education"]
+      | ResumeData["sections"]["certificates"]
+      | ResumeData["sections"]["additionalEducation"]
+      | undefined
+  ) => {
     if (!section) {
       return;
     }
 
-    const entries = (section.entries || section.degrees || section.items || []).filter(
+    const source = section as unknown as {
+      title: string;
+      entries?: Array<Record<string, unknown>>;
+      degrees?: Array<Record<string, unknown>>;
+      items?: Array<Record<string, unknown>>;
+    };
+    const entries = (source.entries || source.degrees || source.items || []).filter(
       (entry) => !entry.hidden
     );
+
     if (!entries.length) {
       return;
     }
 
-    drawSectionTitle(section.title);
+    drawSectionTitle(source.title);
 
     entries.forEach((entry) => {
-      const mainLine = entry.course || entry.title || "";
-      const secondaryLine = entry.institution || entry.subtitle || "";
-      const year = entry.year || "";
+      const source = entry as { course?: string; title?: string; institution?: string; subtitle?: string; year?: string };
+      const mainLine = source.course || source.title || "";
+      const secondaryLine = source.institution || source.subtitle || "";
+      const year = source.year || "";
       const mainLineMaxWidth = year
         ? RIGHT_COLUMN_X - LEFT_MARGIN - 10
         : PAGE_WIDTH - LEFT_MARGIN - RIGHT_MARGIN - 10;
@@ -296,7 +291,7 @@ function getVisibleTaskTexts(tasks) {
     });
   };
 
-  const drawSimpleSection = (section) => {
+  const drawSimpleSection = (section?: { title: string; content: string }) => {
     if (!section || !section.content) {
       return;
     }
@@ -396,17 +391,16 @@ function getVisibleTaskTexts(tasks) {
     content: getLanguagesText(resumeData.sections.languages),
   });
 
-  const skillsTitle = resumeData.sections.skills.title;
-  drawSectionTitle(skillsTitle);
+  drawSectionTitle(resumeData.sections.skills.title);
 
-  const skills = interleaveArrays(skillsData.list);
+  const interleavedSkills = interleaveArrays(skillsData.list);
   const skillsPerRow = 5;
   const rowHeight = 12;
 
-  for (let index = 0; index < skills.length; index += skillsPerRow) {
+  for (let index = 0; index < interleavedSkills.length; index += skillsPerRow) {
     ensureSpace(rowHeight);
 
-    const rowSkills = skills.slice(index, index + skillsPerRow);
+    const rowSkills = interleavedSkills.slice(index, index + skillsPerRow);
 
     rowSkills.forEach((skill, columnIndex) => {
       page.drawText(`• ${skill}`, {
@@ -420,8 +414,5 @@ function getVisibleTaskTexts(tasks) {
     yPosition -= rowHeight;
   }
 
-  const pdfBytes = await pdfDoc.save();
-  fs.writeFileSync(`Pavel_Merkulov_CV_${language}.pdf`, pdfBytes);
-
-  console.log("PDF создан!");
-})();
+  return pdfDoc.save();
+}

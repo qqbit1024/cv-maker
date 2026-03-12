@@ -13,47 +13,83 @@
       "title": "Professional Experience",
       "jobs": [
         {
+          "hidden": false,
           "title": "<Role Title>",
           "company": "<Company>",
           "period": "<Mon YYYY - Mon YYYY>",
           "tasks": [
-            "<What you built + why + outcome.>",
-            "<Strong technical / ownership bullet.>",
-            "<Optimization / architecture / system complexity / automation.>",
-            "<Integrations / performance / reliability / CI/CD.>",
-            "<Metric or measurable outcome, if available.>"
+            {
+              "text": "<What you built + why + outcome.>",
+              "hidden": false
+            },
+            {
+              "text": "<Strong technical / ownership bullet.>",
+              "hidden": false
+            },
+            {
+              "text": "<Optimization / architecture / system complexity / automation.>",
+              "hidden": false
+            },
+            {
+              "text": "<Integrations / performance / reliability / CI/CD.>",
+              "hidden": false
+            },
+            {
+              "text": "<Metric or measurable outcome, if available.>",
+              "hidden": false
+            }
           ],
-          "_commentedTasks": [
-            "Technology stack: <add the stack for this role if you want to show it in the resume>"
-          ]
+          "notes": "Technology stack: <add the stack for this role if you want to show it in the resume>"
         },
         {
+          "hidden": false,
           "title": "<Role Title>",
           "company": "<Company>",
           "period": "<Mon YYYY - Mon YYYY>",
           "tasks": [
-            "<What you built + why + outcome.>",
-            "<Strong technical / ownership bullet.>",
-            "<Optimization / architecture / system complexity / automation.>",
-            "<Integrations / performance / reliability / CI/CD.>"
+            {
+              "text": "<What you built + why + outcome.>",
+              "hidden": false
+            },
+            {
+              "text": "<Strong technical / ownership bullet.>",
+              "hidden": false
+            },
+            {
+              "text": "<Optimization / architecture / system complexity / automation.>",
+              "hidden": false
+            },
+            {
+              "text": "<Integrations / performance / reliability / CI/CD.>",
+              "hidden": false
+            }
           ],
-          "_commentedTasks": [
-            "Technology stack: <add the stack for this role if you want to show it in the resume>"
-          ]
+          "notes": "Technology stack: <add the stack for this role if you want to show it in the resume>"
         },
         {
+          "hidden": false,
           "title": "<Role Title>",
           "company": "<Company>",
           "period": "<Mon YYYY - Mon YYYY>",
           "tasks": [
-            "<What you built + why + outcome.>",
-            "<Strong technical / ownership bullet.>",
-            "<Optimization / architecture / system complexity / automation.>",
-            "<Integrations / performance / reliability / CI/CD.>"
+            {
+              "text": "<What you built + why + outcome.>",
+              "hidden": false
+            },
+            {
+              "text": "<Strong technical / ownership bullet.>",
+              "hidden": false
+            },
+            {
+              "text": "<Optimization / architecture / system complexity / automation.>",
+              "hidden": false
+            },
+            {
+              "text": "<Integrations / performance / reliability / CI/CD.>",
+              "hidden": false
+            }
           ],
-          "_commentedTasks": [
-            "Technology stack: <add the stack for this role if you want to show it in the resume>"
-          ]
+          "notes": "Technology stack: <add the stack for this role if you want to show it in the resume>"
         }
       ]
     },
@@ -68,14 +104,16 @@
         }
       ]
     },
-    "_commentedCertificates": {
+    "certificates": {
       "title": "Courses",
       "items": [
         {
-          "course": "<Course / certificate 1>"
+          "course": "<Course / certificate 1>",
+          "hidden": false
         },
         {
-          "course": "<Course / certificate 2>"
+          "course": "<Course / certificate 2>",
+          "hidden": false
         }
       ]
     },

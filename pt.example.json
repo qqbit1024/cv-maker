@@ -1,0 +1,128 @@
+{
+  "header": {
+    "name": "<Nome completo>",
+    "title": "<Título da função>",
+    "contact": "<Cidade, País> | <Telefone> | Email: <email@example.com> | Telegram: <@telegram> | GitHub: <github>"
+  },
+  "sections": {
+    "summary": {
+      "title": "Resumo",
+      "content": "<Resumo curto: 3-4 frases sobre experiência, stack principal, tipos de produto, escopo de responsabilidade e 1-2 resultados fortes.>"
+    },
+    "experience": {
+      "title": "Experiência profissional",
+      "jobs": [
+        {
+          "hidden": false,
+          "title": "<Título da função>",
+          "company": "<Empresa>",
+          "period": "<MMM AAAA - MMM AAAA>",
+          "tasks": [
+            {
+              "text": "<O que construíste + porquê + resultado.>",
+              "hidden": false
+            },
+            {
+              "text": "<Ponto forte técnico / de ownership.>",
+              "hidden": false
+            },
+            {
+              "text": "<Otimização / arquitetura / complexidade do sistema / automação.>",
+              "hidden": false
+            },
+            {
+              "text": "<Integrações / desempenho / fiabilidade / CI/CD.>",
+              "hidden": false
+            },
+            {
+              "text": "<Métrica ou resultado mensurável, se houver.>",
+              "hidden": false
+            }
+          ],
+          "notes": "Stack tecnológico: <adiciona o stack desta função se quiseres mostrá-lo no CV>"
+        },
+        {
+          "hidden": false,
+          "title": "<Título da função>",
+          "company": "<Empresa>",
+          "period": "<MMM AAAA - MMM AAAA>",
+          "tasks": [
+            {
+              "text": "<O que construíste + porquê + resultado.>",
+              "hidden": false
+            },
+            {
+              "text": "<Ponto forte técnico / de ownership.>",
+              "hidden": false
+            },
+            {
+              "text": "<Otimização / arquitetura / complexidade do sistema / automação.>",
+              "hidden": false
+            },
+            {
+              "text": "<Integrações / desempenho / fiabilidade / CI/CD.>",
+              "hidden": false
+            }
+          ],
+          "notes": "Stack tecnológico: <adiciona o stack desta função se quiseres mostrá-lo no CV>"
+        },
+        {
+          "hidden": false,
+          "title": "<Título da função>",
+          "company": "<Empresa>",
+          "period": "<MMM AAAA - MMM AAAA>",
+          "tasks": [
+            {
+              "text": "<O que construíste + porquê + resultado.>",
+              "hidden": false
+            },
+            {
+              "text": "<Ponto forte técnico / de ownership.>",
+              "hidden": false
+            },
+            {
+              "text": "<Otimização / arquitetura / complexidade do sistema / automação.>",
+              "hidden": false
+            },
+            {
+              "text": "<Integrações / desempenho / fiabilidade / CI/CD.>",
+              "hidden": false
+            }
+          ],
+          "notes": "Stack tecnológico: <adiciona o stack desta função se quiseres mostrá-lo no CV>"
+        }
+      ]
+    },
+    "education": {
+      "title": "Educação",
+      "entries": [
+        {
+          "course": "<Universidade>, <Grau>, <Programa>, <Anos>"
+        },
+        {
+          "course": "<Educação adicional / minor / especialização, anos>"
+        }
+      ]
+    },
+    "certificates": {
+      "title": "Cursos",
+      "items": [
+        {
+          "course": "<Curso / certificado 1>",
+          "hidden": false
+        },
+        {
+          "course": "<Curso / certificado 2>",
+          "hidden": false
+        }
+      ]
+    },
+    "languages": {
+      "title": "Idiomas",
+      "content": "<Idioma>: <Nível>, <Idioma>: <Nível>"
+    },
+    "skills": {
+      "title": "Competências"
+    }
+  }
+}

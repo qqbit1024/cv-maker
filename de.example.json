@@ -1,0 +1,128 @@
+{
+  "header": {
+    "name": "<Vollständiger Name>",
+    "title": "<Rollenbezeichnung>",
+    "contact": "<Stadt, Land> | <Telefon> | E-Mail: <email@example.com> | Telegram: <@telegram> | GitHub: <github>"
+  },
+  "sections": {
+    "summary": {
+      "title": "Zusammenfassung",
+      "content": "<Kurze Zusammenfassung: 3-4 Sätze zu Erfahrung, Kern-Stack, Produkttypen, Verantwortungsbereich und 1-2 starken Ergebnissen.>"
+    },
+    "experience": {
+      "title": "Berufserfahrung",
+      "jobs": [
+        {
+          "hidden": false,
+          "title": "<Rollenbezeichnung>",
+          "company": "<Unternehmen>",
+          "period": "<MMM JJJJ - MMM JJJJ>",
+          "tasks": [
+            {
+              "text": "<Was du gebaut hast + warum + Ergebnis.>",
+              "hidden": false
+            },
+            {
+              "text": "<Starker technischer / Ownership-Punkt.>",
+              "hidden": false
+            },
+            {
+              "text": "<Optimierung / Architektur / Systemkomplexität / Automatisierung.>",
+              "hidden": false
+            },
+            {
+              "text": "<Integrationen / Performance / Zuverlässigkeit / CI/CD.>",
+              "hidden": false
+            },
+            {
+              "text": "<Metrik oder messbares Ergebnis, falls vorhanden.>",
+              "hidden": false
+            }
+          ],
+          "notes": "Technologie-Stack: <füge hier den Stack dieser Rolle hinzu, wenn du ihn im Lebenslauf zeigen willst>"
+        },
+        {
+          "hidden": false,
+          "title": "<Rollenbezeichnung>",
+          "company": "<Unternehmen>",
+          "period": "<MMM JJJJ - MMM JJJJ>",
+          "tasks": [
+            {
+              "text": "<Was du gebaut hast + warum + Ergebnis.>",
+              "hidden": false
+            },
+            {
+              "text": "<Starker technischer / Ownership-Punkt.>",
+              "hidden": false
+            },
+            {
+              "text": "<Optimierung / Architektur / Systemkomplexität / Automatisierung.>",
+              "hidden": false
+            },
+            {
+              "text": "<Integrationen / Performance / Zuverlässigkeit / CI/CD.>",
+              "hidden": false
+            }
+          ],
+          "notes": "Technologie-Stack: <füge hier den Stack dieser Rolle hinzu, wenn du ihn im Lebenslauf zeigen willst>"
+        },
+        {
+          "hidden": false,
+          "title": "<Rollenbezeichnung>",
+          "company": "<Unternehmen>",
+          "period": "<MMM JJJJ - MMM JJJJ>",
+          "tasks": [
+            {
+              "text": "<Was du gebaut hast + warum + Ergebnis.>",
+              "hidden": false
+            },
+            {
+              "text": "<Starker technischer / Ownership-Punkt.>",
+              "hidden": false
+            },
+            {
+              "text": "<Optimierung / Architektur / Systemkomplexität / Automatisierung.>",
+              "hidden": false
+            },
+            {
+              "text": "<Integrationen / Performance / Zuverlässigkeit / CI/CD.>",
+              "hidden": false
+            }
+          ],
+          "notes": "Technologie-Stack: <füge hier den Stack dieser Rolle hinzu, wenn du ihn im Lebenslauf zeigen willst>"
+        }
+      ]
+    },
+    "education": {
+      "title": "Ausbildung",
+      "entries": [
+        {
+          "course": "<Universität>, <Abschluss>, <Studiengang>, <Jahre>"
+        },
+        {
+          "course": "<Zusätzliche Ausbildung / Minor / Spezialisierung, Jahre>"
+        }
+      ]
+    },
+    "certificates": {
+      "title": "Kurse",
+      "items": [
+        {
+          "course": "<Kurs / Zertifikat 1>",
+          "hidden": false
+        },
+        {
+          "course": "<Kurs / Zertifikat 2>",
+          "hidden": false
+        }
+      ]
+    },
+    "languages": {
+      "title": "Sprachen",
+      "content": "<Sprache>: <Niveau>, <Sprache>: <Niveau>"
+    },
+    "skills": {
+      "title": "Fähigkeiten"
+    }
+  }
+}
