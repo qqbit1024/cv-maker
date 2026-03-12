@@ -1,0 +1,7 @@
+*.pdf
+.DS_Store
+en.json
+node_modules/
+RESUME_UPDATE_PLAN.md
+ru.json
+skills.json

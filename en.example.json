@@ -1,0 +1,90 @@
+{
+  "header": {
+    "name": "<Full Name>",
+    "title": "<Role Title>",
+    "contact": "<City, Country> | <Phone> | Email: <email@example.com> | Telegram: <@telegram> | GitHub: <github>"
+  },
+  "sections": {
+    "summary": {
+      "title": "Summary",
+      "content": "<Short summary: 3-4 sentences covering experience, core stack, product types, scope of responsibility, and 1-2 strong outcomes.>"
+    },
+    "experience": {
+      "title": "Professional Experience",
+      "jobs": [
+        {
+          "title": "<Role Title>",
+          "company": "<Company>",
+          "period": "<Mon YYYY - Mon YYYY>",
+          "tasks": [
+            "<What you built + why + outcome.>",
+            "<Strong technical / ownership bullet.>",
+            "<Optimization / architecture / system complexity / automation.>",
+            "<Integrations / performance / reliability / CI/CD.>",
+            "<Metric or measurable outcome, if available.>"
+          ],
+          "_commentedTasks": [
+            "Technology stack: <add the stack for this role if you want to show it in the resume>"
+          ]
+        },
+        {
+          "title": "<Role Title>",
+          "company": "<Company>",
+          "period": "<Mon YYYY - Mon YYYY>",
+          "tasks": [
+            "<What you built + why + outcome.>",
+            "<Strong technical / ownership bullet.>",
+            "<Optimization / architecture / system complexity / automation.>",
+            "<Integrations / performance / reliability / CI/CD.>"
+          ],
+          "_commentedTasks": [
+            "Technology stack: <add the stack for this role if you want to show it in the resume>"
+          ]
+        },
+        {
+          "title": "<Role Title>",
+          "company": "<Company>",
+          "period": "<Mon YYYY - Mon YYYY>",
+          "tasks": [
+            "<What you built + why + outcome.>",
+            "<Strong technical / ownership bullet.>",
+            "<Optimization / architecture / system complexity / automation.>",
+            "<Integrations / performance / reliability / CI/CD.>"
+          ],
+          "_commentedTasks": [
+            "Technology stack: <add the stack for this role if you want to show it in the resume>"
+          ]
+        }
+      ]
+    },
+    "education": {
+      "title": "Education",
+      "entries": [
+        {
+          "course": "<University>, <Degree>, <Program>, <Years>"
+        },
+        {
+          "course": "<Additional education / minor / specialization, years>"
+        }
+      ]
+    },
+    "_commentedCertificates": {
+      "title": "Courses",
+      "items": [
+        {
+          "course": "<Course / certificate 1>"
+        },
+        {
+          "course": "<Course / certificate 2>"
+        }
+      ]
+    },
+    "languages": {
+      "title": "Languages",
+      "content": "<Language>: <Level>, <Language>: <Level>"
+    },
+    "skills": {
+      "title": "Skills"
+    }
+  }
+}
