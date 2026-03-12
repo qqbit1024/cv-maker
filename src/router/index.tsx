@@ -1,10 +1,17 @@
 import { createBrowserRouter } from "react-router-dom";
 import HomePage from "../pages/HomePage";
 
-export const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <HomePage />,
-  },
-]);
+const normalizedBasePath = import.meta.env.BASE_URL.replace(/\/$/, "");
+const basename = normalizedBasePath || "/";
 
+export const router = createBrowserRouter(
+  [
+    {
+      path: "/",
+      element: <HomePage />,
+    },
+  ],
+  {
+    basename,
+  }
+);
