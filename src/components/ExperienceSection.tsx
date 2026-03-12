@@ -311,6 +311,7 @@ export default function ExperienceSection({
   return (
     <SectionCard
       title={t.experience}
+      description={t.experienceDescription}
       actions={
         <button type="button" className="button--small button--with-icon" onClick={() => onAddJob("jobs")}>
           <Plus className="button__icon" strokeWidth={2} />

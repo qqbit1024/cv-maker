@@ -6,14 +6,30 @@ export interface UIText {
   appLead: string;
   interfaceLanguage: string;
   interfaceLanguageMenuLabel: string;
+  switchToDarkTheme: string;
+  switchToLightTheme: string;
+  headerDescription: string;
+  summaryDescription: string;
+  experienceDescription: string;
+  educationDescription: string;
+  certificatesDescription: string;
+  languagesDescription: string;
+  skillsDescription: string;
   resumeLanguage: string;
   resumeLanguageHint: string;
   addResumeLanguage: string;
+  duplicateResumeLanguage: string;
+  renameResumeLanguage: string;
   deleteResumeLanguage: string;
   createResumeLanguageTitle: string;
+  duplicateResumeLanguageTitle: string;
+  renameResumeLanguageTitle: string;
   resumeLanguageName: string;
   resumeLanguageNamePlaceholder: string;
   createResumeLanguage: string;
+  duplicateResumeLanguageConfirm: string;
+  renameResumeLanguageConfirm: string;
+  duplicateResumeLanguageDefaultName: (label: string) => string;
   fieldProgress: (completed: number, total: number) => string;
   files: string;
   import: string;
@@ -31,6 +47,8 @@ export interface UIText {
   pdfFileNameHint: string;
   generating: string;
   downloadPdf: (languageLabel: string) => string;
+  autosave: string;
+  autosaveSaved: string;
   lastAction: string;
   snapshot: string;
   jobs: string;
@@ -107,7 +125,9 @@ export interface UIText {
   resetConfirm: string;
   resetDone: string;
   resumeLanguageAdded: (label: string) => string;
+  resumeLanguageDuplicated: (label: string) => string;
   resumeLanguageExists: (label: string) => string;
+  resumeLanguageRenamed: (label: string) => string;
   resumeLanguageDeleted: (label: string) => string;
   cannotDeleteLastResumeLanguage: string;
   deleteResumeLanguageConfirm: (label: string) => string;
@@ -123,15 +143,31 @@ const ruText: UIText = {
       "Работает целиком в браузере. Импортируй приватные JSON с диска, редактируй всё локально и скачивай PDF без бэкенда.",
     interfaceLanguage: "Язык приложения",
     interfaceLanguageMenuLabel: "Выбрать язык приложения",
+    switchToDarkTheme: "Включить тёмную тему",
+    switchToLightTheme: "Включить светлую тему",
+    headerDescription: "Имя, роль и контакты, которые попадут в шапку PDF.",
+    summaryDescription: "Короткое позиционирование: стек, опыт, фокус и то, что ищешь.",
+    experienceDescription: "Основные места работы, достижения, скрытые пункты и заметки.",
+    educationDescription: "Основное образование и дополнительные записи для этой версии резюме.",
+    certificatesDescription: "Курсы и сертификаты, которые хочешь хранить в текущем CV.",
+    languagesDescription: "Языки и уровни владения для итогового блока в PDF.",
+    skillsDescription: "Сетка навыков в том порядке, в котором они попадут в шаблон.",
     resumeLanguage: "Языки резюме и прогресс",
     resumeLanguageHint: "Нажми на язык, чтобы переключиться на него в редакторе, или добавь новый через +.",
     addResumeLanguage: "Добавить язык резюме",
+    duplicateResumeLanguage: "Дублировать язык резюме",
+    renameResumeLanguage: "Переименовать язык резюме",
     deleteResumeLanguage: "Удалить язык резюме",
     createResumeLanguageTitle: "Новый язык резюме",
+    duplicateResumeLanguageTitle: "Дублировать язык резюме",
+    renameResumeLanguageTitle: "Переименовать язык резюме",
     resumeLanguageName: "Название языка",
     resumeLanguageNamePlaceholder: "Например: Deutsch или Serbian",
     createResumeLanguage: "Добавить",
-    fieldProgress: (completed, total) => `${completed} из ${total} полей заполнено`,
+    duplicateResumeLanguageConfirm: "Дублировать",
+    renameResumeLanguageConfirm: "Сохранить",
+    duplicateResumeLanguageDefaultName: (label) => `${label} копия`,
+    fieldProgress: (completed, total) => `${completed}/${total}`,
     files: "Файлы",
     import: "Импорт",
     export: "Экспорт",
@@ -148,6 +184,8 @@ const ruText: UIText = {
     pdfFileNameHint: "Можно изменить имя перед скачиванием. Расширение .pdf добавится автоматически.",
     generating: "Генерирую PDF...",
     downloadPdf: (languageLabel) => `Скачать PDF (${languageLabel})`,
+    autosave: "Автосохранение",
+    autosaveSaved: "Сохранено локально",
     lastAction: "Последнее действие",
     snapshot: "Сводка",
     jobs: "Места работы",
@@ -225,7 +263,9 @@ const ruText: UIText = {
       "Вернуть редактор к шаблонным данным? Локальное состояние в браузере будет заменено.",
     resetDone: "Шаблонные данные восстановлены.",
     resumeLanguageAdded: (label) => `Добавлен язык резюме: ${label}.`,
+    resumeLanguageDuplicated: (label) => `Создан дубликат языка резюме: ${label}.`,
     resumeLanguageExists: (label) => `Язык резюме уже существует: ${label}.`,
+    resumeLanguageRenamed: (label) => `Язык резюме переименован: ${label}.`,
     resumeLanguageDeleted: (label) => `Удалён язык резюме: ${label}.`,
     cannotDeleteLastResumeLanguage: "Нельзя удалить последний язык резюме.",
     deleteResumeLanguageConfirm: (label) => `Удалить язык резюме «${label}»?`,
@@ -241,15 +281,31 @@ const enText: UIText = {
       "Runs entirely in the browser. Import private JSON files from disk, edit everything locally, and download PDF files without a backend.",
     interfaceLanguage: "Interface language",
     interfaceLanguageMenuLabel: "Choose interface language",
+    switchToDarkTheme: "Switch to dark theme",
+    switchToLightTheme: "Switch to light theme",
+    headerDescription: "Name, role, and contacts that will appear in the PDF header.",
+    summaryDescription: "Short positioning: stack, experience, focus, and what you are looking for.",
+    experienceDescription: "Main jobs, achievement bullets, hidden items, and working notes.",
+    educationDescription: "Core education and extra entries for this resume version.",
+    certificatesDescription: "Courses and certificates you want to keep in this CV version.",
+    languagesDescription: "Languages and proficiency levels for the final PDF block.",
+    skillsDescription: "Skill grid in the same order it will appear in the template.",
     resumeLanguage: "Resume languages and progress",
     resumeLanguageHint: "Click a language to switch the editor to it, or add a new one with +.",
     addResumeLanguage: "Add resume language",
+    duplicateResumeLanguage: "Duplicate resume language",
+    renameResumeLanguage: "Rename resume language",
     deleteResumeLanguage: "Delete resume language",
     createResumeLanguageTitle: "New resume language",
+    duplicateResumeLanguageTitle: "Duplicate resume language",
+    renameResumeLanguageTitle: "Rename resume language",
     resumeLanguageName: "Language name",
     resumeLanguageNamePlaceholder: "For example: Deutsch or Serbian",
     createResumeLanguage: "Add",
-    fieldProgress: (completed, total) => `${completed} of ${total} fields completed`,
+    duplicateResumeLanguageConfirm: "Duplicate",
+    renameResumeLanguageConfirm: "Save",
+    duplicateResumeLanguageDefaultName: (label) => `${label} copy`,
+    fieldProgress: (completed, total) => `${completed}/${total}`,
     files: "Files",
     import: "Import",
     export: "Export",
@@ -266,6 +322,8 @@ const enText: UIText = {
     pdfFileNameHint: "You can change the filename before download. The .pdf extension will be added automatically.",
     generating: "Generating PDF...",
     downloadPdf: (languageLabel) => `Download PDF (${languageLabel})`,
+    autosave: "Autosave",
+    autosaveSaved: "Saved locally",
     lastAction: "Last action",
     snapshot: "Snapshot",
     jobs: "Jobs",
@@ -343,7 +401,9 @@ const enText: UIText = {
       "Restore the editor to template data? Local browser state will be replaced.",
     resetDone: "Template data restored.",
     resumeLanguageAdded: (label) => `Added resume language: ${label}.`,
+    resumeLanguageDuplicated: (label) => `Duplicated resume language: ${label}.`,
     resumeLanguageExists: (label) => `Resume language already exists: ${label}.`,
+    resumeLanguageRenamed: (label) => `Renamed resume language: ${label}.`,
     resumeLanguageDeleted: (label) => `Deleted resume language: ${label}.`,
     cannotDeleteLastResumeLanguage: "You cannot delete the last resume language.",
     deleteResumeLanguageConfirm: (label) => `Delete resume language "${label}"?`,
@@ -356,6 +416,8 @@ const deText: UIText = {
   ...enText,
   interfaceLanguage: "Sprache der Anwendung",
   interfaceLanguageMenuLabel: "Sprache der Anwendung wählen",
+  switchToDarkTheme: "Dunkles Design aktivieren",
+  switchToLightTheme: "Helles Design aktivieren",
   resumeLanguage: "Sprachen des Lebenslaufs und Fortschritt",
   resumeLanguageHint:
     "Klicke auf eine Sprache, um im Editor zu ihr zu wechseln, oder füge mit + eine neue hinzu.",
@@ -365,7 +427,7 @@ const deText: UIText = {
   resumeLanguageName: "Sprachname",
   resumeLanguageNamePlaceholder: "Zum Beispiel: Deutsch oder Serbisch",
   createResumeLanguage: "Hinzufügen",
-  fieldProgress: (completed, total) => `${completed} von ${total} Feldern ausgefüllt`,
+  fieldProgress: (completed, total) => `${completed}/${total}`,
   files: "Dateien",
   import: "Importieren",
   export: "Exportieren",
@@ -469,6 +531,8 @@ const esText: UIText = {
   ...enText,
   interfaceLanguage: "Idioma de la aplicación",
   interfaceLanguageMenuLabel: "Elegir idioma de la aplicación",
+  switchToDarkTheme: "Activar tema oscuro",
+  switchToLightTheme: "Activar tema claro",
   resumeLanguage: "Idiomas del CV y progreso",
   resumeLanguageHint:
     "Haz clic en un idioma para cambiar el editor a ese idioma o añade uno nuevo con +.",
@@ -478,7 +542,7 @@ const esText: UIText = {
   resumeLanguageName: "Nombre del idioma",
   resumeLanguageNamePlaceholder: "Por ejemplo: Deutsch o Serbian",
   createResumeLanguage: "Añadir",
-  fieldProgress: (completed, total) => `${completed} de ${total} campos completados`,
+  fieldProgress: (completed, total) => `${completed}/${total}`,
   files: "Archivos",
   import: "Importar",
   export: "Exportar",
@@ -581,6 +645,8 @@ const itText: UIText = {
   ...enText,
   interfaceLanguage: "Lingua dell'applicazione",
   interfaceLanguageMenuLabel: "Scegli la lingua dell'applicazione",
+  switchToDarkTheme: "Attiva tema scuro",
+  switchToLightTheme: "Attiva tema chiaro",
   resumeLanguage: "Lingue del CV e progresso",
   resumeLanguageHint:
     "Fai clic su una lingua per passare a quella lingua nell'editor oppure aggiungine una nuova con +.",
@@ -590,7 +656,7 @@ const itText: UIText = {
   resumeLanguageName: "Nome della lingua",
   resumeLanguageNamePlaceholder: "Per esempio: Deutsch o Serbian",
   createResumeLanguage: "Aggiungi",
-  fieldProgress: (completed, total) => `${completed} di ${total} campi completati`,
+  fieldProgress: (completed, total) => `${completed}/${total}`,
   files: "File",
   import: "Importa",
   export: "Esporta",
@@ -693,6 +759,8 @@ const ptText: UIText = {
   ...enText,
   interfaceLanguage: "Idioma da aplicação",
   interfaceLanguageMenuLabel: "Escolher idioma da aplicação",
+  switchToDarkTheme: "Ativar tema escuro",
+  switchToLightTheme: "Ativar tema claro",
   resumeLanguage: "Idiomas do currículo e progresso",
   resumeLanguageHint:
     "Clica num idioma para mudar o editor para ele ou adiciona um novo com +.",
@@ -702,7 +770,7 @@ const ptText: UIText = {
   resumeLanguageName: "Nome do idioma",
   resumeLanguageNamePlaceholder: "Por exemplo: Deutsch ou Serbian",
   createResumeLanguage: "Adicionar",
-  fieldProgress: (completed, total) => `${completed} de ${total} campos preenchidos`,
+  fieldProgress: (completed, total) => `${completed}/${total}`,
   files: "Ficheiros",
   import: "Importar",
   export: "Exportar",
@@ -805,6 +873,8 @@ const srText: UIText = {
   ...enText,
   interfaceLanguage: "Језик апликације",
   interfaceLanguageMenuLabel: "Изабери језик апликације",
+  switchToDarkTheme: "Укључи тамну тему",
+  switchToLightTheme: "Укључи светлу тему",
   resumeLanguage: "Језици резимеа и напредак",
   resumeLanguageHint:
     "Кликни на језик да пребациш едитор на њега или додај нови помоћу +.",
@@ -814,7 +884,7 @@ const srText: UIText = {
   resumeLanguageName: "Назив језика",
   resumeLanguageNamePlaceholder: "На пример: Deutsch или Serbian",
   createResumeLanguage: "Додај",
-  fieldProgress: (completed, total) => `${completed} од ${total} поља попуњено`,
+  fieldProgress: (completed, total) => `${completed}/${total}`,
   files: "Датотеке",
   import: "Увези",
   export: "Извези",
@@ -995,11 +1065,17 @@ export function getResumeLanguageLabel(
   uiLanguage: InterfaceLanguageCode,
   customLabels: Record<string, string> = {}
 ): string {
+  const customLabel = String(customLabels[language] ?? "").trim();
+
+  if (customLabel) {
+    return customLabel;
+  }
+
   if (language === "ru" || language === "en") {
     return getLanguageLabel(language, uiLanguage);
   }
 
-  return customLabels[language] ?? language;
+  return language;
 }
 
 export function getInterfaceLanguageOptions(uiLanguage: InterfaceLanguageCode) {

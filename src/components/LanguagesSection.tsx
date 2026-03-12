@@ -34,6 +34,7 @@ export default function LanguagesSection({
   return (
     <SectionCard
       title={t.languages}
+      description={t.languagesDescription}
       actions={
         <button type="button" className="button--small button--with-icon" onClick={onAddLanguage}>
           <Plus className="button__icon" strokeWidth={2} />

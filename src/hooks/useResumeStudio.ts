@@ -20,6 +20,7 @@ import type {
   ResumeLanguageCode,
   ResumeProgressItem,
   SkillsData,
+  ThemeMode,
 } from "../types/resume";
 import { downloadBlob, readJsonFile } from "../utils/files";
 import {
@@ -43,6 +44,22 @@ import {
   normalizeSkills,
   STORAGE_KEY,
 } from "../utils/resumeState";
+
+const THEME_STORAGE_KEY = "resume-studio-theme-v1";
+
+function getInitialTheme(): ThemeMode {
+  if (typeof window === "undefined") {
+    return "light";
+  }
+
+  const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
+
+  if (storedTheme === "light" || storedTheme === "dark") {
+    return storedTheme;
+  }
+
+  return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
 
 type JobCollectionKey = "jobs" | "_commentedJobs";
 type TaskCollectionKey = "tasks" | "_commentedTasks";
@@ -133,6 +150,7 @@ function findCertificateSourceIndex(
 export function useResumeStudio() {
   const initialState = loadState();
   const [uiLanguage, setUiLanguage] = useState<InterfaceLanguageCode>("ru");
+  const [theme, setTheme] = useState<ThemeMode>(getInitialTheme);
   const [activeLanguage, setActiveLanguage] = useState<ResumeLanguageCode>(
     initialState.resumes.ru ? "ru" : (Object.keys(initialState.resumes)[0] ?? "ru")
   );
@@ -148,9 +166,17 @@ export function useResumeStudio() {
   const [pendingImportTarget, setPendingImportTarget] = useState<ImportTarget | null>(null);
   const [isCreateResumeLanguageModalOpen, setIsCreateResumeLanguageModalOpen] = useState(false);
   const [newResumeLanguageName, setNewResumeLanguageName] = useState("");
+  const [pendingResumeLanguageDuplicate, setPendingResumeLanguageDuplicate] =
+    useState<ResumeLanguageCode | null>(null);
+  const [duplicateResumeLanguageName, setDuplicateResumeLanguageName] = useState("");
+  const [pendingResumeLanguageRename, setPendingResumeLanguageRename] =
+    useState<ResumeLanguageCode | null>(null);
+  const [renameResumeLanguageName, setRenameResumeLanguageName] = useState("");
   const [pendingResumeLanguageDeletion, setPendingResumeLanguageDeletion] =
     useState<ResumeLanguageCode | null>(null);
+  const [didAutoSave, setDidAutoSave] = useState(false);
   const importInputRef = useRef<HTMLInputElement | null>(null);
+  const hasInitializedAutoSaveRef = useRef(false);
   const t = uiText[uiLanguage];
 
   useEffect(() => {
@@ -163,12 +189,27 @@ export function useResumeStudio() {
           resumeLanguageLabels,
         })
     );
+
+    if (!hasInitializedAutoSaveRef.current) {
+      hasInitializedAutoSaveRef.current = true;
+      return;
+    }
+
+    setDidAutoSave(true);
+    const timeoutId = window.setTimeout(() => setDidAutoSave(false), 1400);
+    return () => window.clearTimeout(timeoutId);
   }, [resumes, skills, pdfFileNames, resumeLanguageLabels]);
 
   useEffect(() => {
     document.title = "cv-maker";
     document.documentElement.lang = uiLanguage;
   }, [uiLanguage]);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+    window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+  }, [theme]);
 
   useEffect(() => {
     if (!resumes[activeLanguage]) {
@@ -207,6 +248,29 @@ export function useResumeStudio() {
     ),
   }));
 
+  const hasResumeLanguageLabelCollision = (
+    label: string,
+    ignoredLanguage?: ResumeLanguageCode
+  ) => {
+    const normalizedLabel = label.trim().toLowerCase();
+
+    if (!normalizedLabel) {
+      return false;
+    }
+
+    return Object.keys(resumes).some((language) => {
+      if (language === ignoredLanguage) {
+        return false;
+      }
+
+      return (
+        getResumeLanguageLabel(language, uiLanguage, resumeLanguageLabels)
+          .trim()
+          .toLowerCase() === normalizedLabel
+      );
+    });
+  };
+
   const updateResume = (
     language: ResumeLanguageCode,
     updater: (current: ResumeData) => ResumeData
@@ -219,6 +283,10 @@ export function useResumeStudio() {
 
   const updateActiveResume = (updater: (current: ResumeData) => ResumeData) => {
     updateResume(activeLanguage, updater);
+  };
+
+  const toggleTheme = () => {
+    setTheme((current) => (current === "light" ? "dark" : "light"));
   };
 
   const updateHeader = (field: "name" | "title", value: string) => {
@@ -979,12 +1047,7 @@ export function useResumeStudio() {
       return;
     }
 
-    const normalizedLabel = nextLabel.toLowerCase();
-    const existingLabels = Object.keys(resumes).map((language) =>
-      getResumeLanguageLabel(language, uiLanguage, resumeLanguageLabels).trim().toLowerCase()
-    );
-
-    if (existingLabels.includes(normalizedLabel)) {
+    if (hasResumeLanguageLabelCollision(nextLabel)) {
       setStatus(t.resumeLanguageExists(nextLabel));
       return;
     }
@@ -1010,6 +1073,89 @@ export function useResumeStudio() {
     setIsCreateResumeLanguageModalOpen(false);
     setNewResumeLanguageName("");
     setStatus(t.resumeLanguageAdded(nextLabel));
+  };
+
+  const openDuplicateResumeLanguageModal = (languageToDuplicate: ResumeLanguageCode) => {
+    const sourceLabel = getResumeLanguageLabel(
+      languageToDuplicate,
+      uiLanguage,
+      resumeLanguageLabels
+    );
+    setDuplicateResumeLanguageName(t.duplicateResumeLanguageDefaultName(sourceLabel));
+    setPendingResumeLanguageDuplicate(languageToDuplicate);
+  };
+
+  const closeDuplicateResumeLanguageModal = () => {
+    setDuplicateResumeLanguageName("");
+    setPendingResumeLanguageDuplicate(null);
+  };
+
+  const duplicateResumeLanguage = () => {
+    const sourceLanguage = pendingResumeLanguageDuplicate;
+    const nextLabel = duplicateResumeLanguageName.trim();
+
+    if (!sourceLanguage || !nextLabel) {
+      return;
+    }
+
+    if (hasResumeLanguageLabelCollision(nextLabel)) {
+      setStatus(t.resumeLanguageExists(nextLabel));
+      return;
+    }
+
+    const nextLanguageCode = createResumeLanguageCode(nextLabel, Object.keys(resumes));
+    const nextResume = clone(resumes[sourceLanguage]);
+
+    setResumes((current) => ({
+      ...current,
+      [nextLanguageCode]: nextResume,
+    }));
+    setPdfFileNames((current) => ({
+      ...current,
+      [nextLanguageCode]: getDefaultPdfFileName(nextLanguageCode),
+    }));
+    setResumeLanguageLabels((current) => ({
+      ...current,
+      [nextLanguageCode]: nextLabel,
+    }));
+    setActiveLanguage(nextLanguageCode);
+    setDuplicateResumeLanguageName("");
+    setPendingResumeLanguageDuplicate(null);
+    setStatus(t.resumeLanguageDuplicated(nextLabel));
+  };
+
+  const openRenameResumeLanguageModal = (languageToRename: ResumeLanguageCode) => {
+    setRenameResumeLanguageName(
+      getResumeLanguageLabel(languageToRename, uiLanguage, resumeLanguageLabels)
+    );
+    setPendingResumeLanguageRename(languageToRename);
+  };
+
+  const closeRenameResumeLanguageModal = () => {
+    setRenameResumeLanguageName("");
+    setPendingResumeLanguageRename(null);
+  };
+
+  const renameResumeLanguage = () => {
+    const languageToRename = pendingResumeLanguageRename;
+    const nextLabel = renameResumeLanguageName.trim();
+
+    if (!languageToRename || !nextLabel) {
+      return;
+    }
+
+    if (hasResumeLanguageLabelCollision(nextLabel, languageToRename)) {
+      setStatus(t.resumeLanguageExists(nextLabel));
+      return;
+    }
+
+    setResumeLanguageLabels((current) => ({
+      ...current,
+      [languageToRename]: nextLabel,
+    }));
+    setPendingResumeLanguageRename(null);
+    setRenameResumeLanguageName("");
+    setStatus(t.resumeLanguageRenamed(nextLabel));
   };
 
   const requestDeleteResumeLanguage = (languageToDelete: ResumeLanguageCode) => {
@@ -1103,6 +1249,8 @@ export function useResumeStudio() {
     t,
     uiLanguage,
     setUiLanguage,
+    theme,
+    toggleTheme,
     activeLanguage,
     setActiveLanguage,
     resumes,
@@ -1123,10 +1271,23 @@ export function useResumeStudio() {
     newResumeLanguageName,
     setNewResumeLanguageName,
     addResumeLanguage,
+    pendingResumeLanguageDuplicate,
+    duplicateResumeLanguageName,
+    setDuplicateResumeLanguageName,
+    openDuplicateResumeLanguageModal,
+    closeDuplicateResumeLanguageModal,
+    duplicateResumeLanguage,
+    pendingResumeLanguageRename,
+    renameResumeLanguageName,
+    setRenameResumeLanguageName,
+    openRenameResumeLanguageModal,
+    closeRenameResumeLanguageModal,
+    renameResumeLanguage,
     pendingResumeLanguageDeletion,
     requestDeleteResumeLanguage,
     closeDeleteResumeLanguageModal,
     confirmDeleteResumeLanguage,
+    didAutoSave,
     importInputRef,
     contactItems,
     hiddenJobs,

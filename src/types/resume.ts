@@ -1,4 +1,5 @@
 export type InterfaceLanguageCode = "ru" | "en" | "de" | "es" | "it" | "pt" | "sr";
+export type ThemeMode = "light" | "dark";
 export type BuiltInResumeLanguageCode = "ru" | "en";
 export type ResumeLanguageCode = string;
 export type ModalType = "import" | "export" | null;

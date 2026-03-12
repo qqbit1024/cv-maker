@@ -95,6 +95,7 @@ export default function SkillsSection({
   return (
     <SectionCard
       title={t.skills}
+      description={t.skillsDescription}
       actions={
         <>
           <button type="button" className="button--small button--with-icon" onClick={onAddRow}>

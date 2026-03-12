@@ -44,23 +44,26 @@ export default function HomePage() {
         <AppSidebar
           t={studio.t}
           uiLanguage={studio.uiLanguage}
+          theme={studio.theme}
           activeLanguage={studio.activeLanguage}
           activeLanguageLabel={studio.activeResumeLanguageLabel}
           interfaceLanguageOptions={studio.interfaceLanguageOptions}
           resumeProgressItems={studio.resumeProgressItems}
-          status={studio.status}
           pdfFileName={studio.pdfFileName}
           totalJobs={studio.jobs.length}
           totalEducation={studio.resume.sections.education.entries.length}
           totalSkills={studio.totalSkills}
+          didAutoSave={studio.didAutoSave}
           onChangeUiLanguage={(language) => studio.setUiLanguage(language)}
+          onToggleTheme={studio.toggleTheme}
           onChangeResumeLanguage={(language) => studio.setActiveLanguage(language)}
           onChangePdfFileName={studio.updatePdfFileName}
           onOpenCreateResumeLanguage={studio.openCreateResumeLanguageModal}
+          onDuplicateResumeLanguage={studio.openDuplicateResumeLanguageModal}
+          onRenameResumeLanguage={studio.openRenameResumeLanguageModal}
           onDeleteResumeLanguage={studio.requestDeleteResumeLanguage}
           onOpenImport={() => studio.setModalType("import")}
           onOpenExport={() => studio.setModalType("export")}
-          onReset={studio.resetToExamples}
           onDownloadPdf={studio.downloadPdf}
           isGenerating={studio.isGenerating}
         />
@@ -125,6 +128,7 @@ export default function HomePage() {
           <EntriesSection
             t={studio.t}
             panelTitle={studio.t.education}
+            description={studio.t.educationDescription}
             title={studio.resume.sections.education.title}
             exampleTitle={studio.defaultResume.sections.education.title}
             entryLabel={studio.t.entry}
@@ -163,6 +167,7 @@ export default function HomePage() {
           <EntriesSection
             t={studio.t}
             panelTitle={studio.t.certificates}
+            description={studio.t.certificatesDescription}
             title={studio.certificates.title}
             exampleTitle={studio.defaultResume.sections.certificates.title}
             entryLabel={studio.t.certificateEntry}
@@ -258,6 +263,34 @@ export default function HomePage() {
           onChange={studio.setNewResumeLanguageName}
           onConfirm={studio.addResumeLanguage}
           onClose={studio.closeCreateResumeLanguageModal}
+        />
+      ) : null}
+
+      {studio.pendingResumeLanguageDuplicate ? (
+        <InputModal
+          title={studio.t.duplicateResumeLanguageTitle}
+          label={studio.t.resumeLanguageName}
+          placeholder={studio.t.resumeLanguageNamePlaceholder}
+          value={studio.duplicateResumeLanguageName}
+          confirmLabel={studio.t.duplicateResumeLanguageConfirm}
+          closeLabel={studio.t.closeModal}
+          onChange={studio.setDuplicateResumeLanguageName}
+          onConfirm={studio.duplicateResumeLanguage}
+          onClose={studio.closeDuplicateResumeLanguageModal}
+        />
+      ) : null}
+
+      {studio.pendingResumeLanguageRename ? (
+        <InputModal
+          title={studio.t.renameResumeLanguageTitle}
+          label={studio.t.resumeLanguageName}
+          placeholder={studio.t.resumeLanguageNamePlaceholder}
+          value={studio.renameResumeLanguageName}
+          confirmLabel={studio.t.renameResumeLanguageConfirm}
+          closeLabel={studio.t.closeModal}
+          onChange={studio.setRenameResumeLanguageName}
+          onConfirm={studio.renameResumeLanguage}
+          onClose={studio.closeRenameResumeLanguageModal}
         />
       ) : null}
 

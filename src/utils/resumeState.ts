@@ -323,14 +323,15 @@ export function normalizeState(state?: Partial<ResumeStudioState>): ResumeStudio
   );
   const resumeLanguageLabels = Object.keys(resumes).reduce<Record<ResumeLanguageCode, string>>(
     (result, language) => {
-      if (isBuiltInResumeLanguage(language)) {
+      const nextLabel = String(state?.resumeLanguageLabels?.[language] ?? "").trim();
+
+      if (!nextLabel) {
         return result;
       }
 
-      const nextLabel = String(state?.resumeLanguageLabels?.[language] ?? language).trim();
       return {
         ...result,
-        [language]: nextLabel || language,
+        [language]: nextLabel,
       };
     },
     {}

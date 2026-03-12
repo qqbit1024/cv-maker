@@ -34,7 +34,7 @@ export default function HeaderSection({
   onRemoveContact,
 }: HeaderSectionProps) {
   return (
-    <SectionCard title={t.header}>
+    <SectionCard title={t.header} description={t.headerDescription}>
       <div className="field-grid">
         <Field label={t.name} value={name} onChange={onChangeName} autoClearValue={exampleName} />
         <Field

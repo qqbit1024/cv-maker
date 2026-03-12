@@ -8,6 +8,7 @@ import type { UIText } from "../i18n/uiText";
 interface EntriesSectionProps {
   t: UIText;
   panelTitle: string;
+  description: string;
   title: string;
   exampleTitle: string;
   entryLabel: (index: number) => string;
@@ -100,6 +101,7 @@ function EntryCard({
 export default function EntriesSection({
   t,
   panelTitle,
+  description,
   title,
   exampleTitle,
   entryLabel,
@@ -125,6 +127,7 @@ export default function EntriesSection({
   return (
     <SectionCard
       title={panelTitle}
+      description={description}
       actions={
         <button
           type="button"

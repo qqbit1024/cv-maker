@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, Copy, Moon, Pencil, Plus, Sun, Trash2 } from "lucide-react";
 import IconButton from "./IconButton";
 import type { UIText } from "../i18n/uiText";
 import type {
@@ -7,28 +7,32 @@ import type {
   LanguageOption,
   ResumeLanguageCode,
   ResumeProgressItem,
+  ThemeMode,
 } from "../types/resume";
 
 interface AppSidebarProps {
   t: UIText;
   uiLanguage: InterfaceLanguageCode;
+  theme: ThemeMode;
   activeLanguage: ResumeLanguageCode;
   activeLanguageLabel: string;
   interfaceLanguageOptions: LanguageOption[];
   resumeProgressItems: ResumeProgressItem[];
-  status: string;
   pdfFileName: string;
   totalJobs: number;
   totalEducation: number;
   totalSkills: number;
+  didAutoSave: boolean;
   onChangeUiLanguage: (language: InterfaceLanguageCode) => void;
+  onToggleTheme: () => void;
   onChangeResumeLanguage: (language: ResumeLanguageCode) => void;
   onChangePdfFileName: (value: string) => void;
   onOpenCreateResumeLanguage: () => void;
+  onDuplicateResumeLanguage: (language: ResumeLanguageCode) => void;
+  onRenameResumeLanguage: (language: ResumeLanguageCode) => void;
   onDeleteResumeLanguage: (language: ResumeLanguageCode) => void;
   onOpenImport: () => void;
   onOpenExport: () => void;
-  onReset: () => void;
   onDownloadPdf: () => void;
   isGenerating: boolean;
 }
@@ -36,23 +40,26 @@ interface AppSidebarProps {
 export default function AppSidebar({
   t,
   uiLanguage,
+  theme,
   activeLanguage,
   activeLanguageLabel,
   interfaceLanguageOptions,
   resumeProgressItems,
-  status,
   pdfFileName,
   totalJobs,
   totalEducation,
   totalSkills,
+  didAutoSave,
   onChangeUiLanguage,
+  onToggleTheme,
   onChangeResumeLanguage,
   onChangePdfFileName,
   onOpenCreateResumeLanguage,
+  onDuplicateResumeLanguage,
+  onRenameResumeLanguage,
   onDeleteResumeLanguage,
   onOpenImport,
   onOpenExport,
-  onReset,
   onDownloadPdf,
   isGenerating,
 }: AppSidebarProps) {
@@ -66,52 +73,61 @@ export default function AppSidebar({
       <div className={`brand-card${isLanguageMenuOpen ? " brand-card--raised" : ""}`}>
         <div className="brand-card__top">
           <h1 className="brand-card__name">{t.appName}</h1>
-          <div className="locale-menu" aria-label={t.interfaceLanguage}>
-            <button
-              type="button"
-              className={`locale-menu__trigger${
-                isLanguageMenuOpen ? " locale-menu__trigger--open" : ""
-              }`}
-              aria-haspopup="menu"
-              aria-expanded={isLanguageMenuOpen}
-              aria-label={t.interfaceLanguageMenuLabel}
-              onClick={() => setIsLanguageMenuOpen((current) => !current)}
-            >
-              <span className="locale-menu__leading">
-                <span className="locale-menu__flag" aria-hidden="true">
-                  {activeInterfaceLanguageOption?.flag}
+          <div className="brand-card__controls">
+            <IconButton
+              icon={theme === "light" ? Sun : Moon}
+              label={theme === "light" ? t.switchToDarkTheme : t.switchToLightTheme}
+              className="theme-toggle"
+              tone="ghost"
+              onClick={onToggleTheme}
+            />
+            <div className="locale-menu" aria-label={t.interfaceLanguage}>
+              <button
+                type="button"
+                className={`locale-menu__trigger${
+                  isLanguageMenuOpen ? " locale-menu__trigger--open" : ""
+                }`}
+                aria-haspopup="menu"
+                aria-expanded={isLanguageMenuOpen}
+                aria-label={t.interfaceLanguageMenuLabel}
+                onClick={() => setIsLanguageMenuOpen((current) => !current)}
+              >
+                <span className="locale-menu__leading">
+                  <span className="locale-menu__flag" aria-hidden="true">
+                    {activeInterfaceLanguageOption?.flag}
+                  </span>
                 </span>
-              </span>
-              <span className="locale-menu__caret" aria-hidden="true">
-                <ChevronDown strokeWidth={2} />
-              </span>
-            </button>
+                <span className="locale-menu__caret" aria-hidden="true">
+                  <ChevronDown strokeWidth={2} />
+                </span>
+              </button>
 
-            {isLanguageMenuOpen ? (
-              <div className="locale-menu__dropdown" role="menu">
-                {interfaceLanguageOptions.map((option) => (
-                  <button
-                    key={option.code}
-                    type="button"
-                    className={`locale-menu__option${
-                      option.code === uiLanguage ? " locale-menu__option--active" : ""
-                    }`}
-                    role="menuitemradio"
-                    aria-checked={option.code === uiLanguage}
-                    aria-label={option.label}
-                  onClick={() => {
-                      onChangeUiLanguage(option.code);
-                      setIsLanguageMenuOpen(false);
-                    }}
-                  >
-                    <span className="locale-menu__option-flag" aria-hidden="true">
-                      {option.flag}
-                    </span>
-                    <span>{option.nativeLabel}</span>
-                  </button>
-                ))}
-              </div>
-            ) : null}
+              {isLanguageMenuOpen ? (
+                <div className="locale-menu__dropdown" role="menu">
+                  {interfaceLanguageOptions.map((option) => (
+                    <button
+                      key={option.code}
+                      type="button"
+                      className={`locale-menu__option${
+                        option.code === uiLanguage ? " locale-menu__option--active" : ""
+                      }`}
+                      role="menuitemradio"
+                      aria-checked={option.code === uiLanguage}
+                      aria-label={option.label}
+                      onClick={() => {
+                        onChangeUiLanguage(option.code);
+                        setIsLanguageMenuOpen(false);
+                      }}
+                    >
+                      <span className="locale-menu__option-flag" aria-hidden="true">
+                        {option.flag}
+                      </span>
+                      <span>{option.nativeLabel}</span>
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+            </div>
           </div>
         </div>
       </div>
@@ -142,7 +158,6 @@ export default function AppSidebar({
               >
                 <div className="resume-progress__row">
                   <strong>{item.label}</strong>
-                  <span>{item.percent}%</span>
                 </div>
                 <div className="resume-progress__meta">
                   {t.fieldProgress(item.completed, item.total)}
@@ -152,16 +167,38 @@ export default function AppSidebar({
                 </div>
               </button>
 
-              <IconButton
-                icon={Trash2}
-                label={t.deleteResumeLanguage}
-                className="resume-progress__delete"
-                tone="ghost"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onDeleteResumeLanguage(item.language);
-                }}
-              />
+              <div className="resume-progress__actions">
+                <IconButton
+                  icon={Copy}
+                  label={t.duplicateResumeLanguage}
+                  className="resume-progress__action"
+                  tone="ghost"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onDuplicateResumeLanguage(item.language);
+                  }}
+                />
+                <IconButton
+                  icon={Pencil}
+                  label={t.renameResumeLanguage}
+                  className="resume-progress__action"
+                  tone="ghost"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onRenameResumeLanguage(item.language);
+                  }}
+                />
+                <IconButton
+                  icon={Trash2}
+                  label={t.deleteResumeLanguage}
+                  className="resume-progress__action"
+                  tone="ghost"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onDeleteResumeLanguage(item.language);
+                  }}
+                />
+              </div>
             </div>
           ))}
         </div>
@@ -176,9 +213,11 @@ export default function AppSidebar({
           <button type="button" onClick={onOpenExport}>
             {t.export}
           </button>
-          <button type="button" className="button--ghost" onClick={onReset}>
-            {t.reset}
-          </button>
+        </div>
+        <div className={`autosave-indicator${didAutoSave ? " autosave-indicator--active" : ""}`}>
+          <span className="autosave-indicator__dot" aria-hidden="true" />
+          <span className="autosave-indicator__label">{t.autosave}</span>
+          <span className="autosave-indicator__value">{t.autosaveSaved}</span>
         </div>
       </div>
 
