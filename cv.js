@@ -55,6 +55,28 @@ function interleaveArrays(columns) {
   return result;
 }
 
+function getSkillItems(skillsData) {
+  if (Array.isArray(skillsData.items)) {
+    return skillsData.items
+      .map((item) => String(item ?? "").trim())
+      .filter(Boolean);
+  }
+
+  return interleaveArrays(skillsData.list ?? [])
+    .map((item) => String(item ?? "").trim())
+    .filter(Boolean);
+}
+
+function getSkillsColumnCount(skillsData) {
+  const normalizedColumns = Number(skillsData.columns);
+
+  if (Number.isInteger(normalizedColumns) && normalizedColumns >= 3 && normalizedColumns <= 6) {
+    return normalizedColumns;
+  }
+
+  return 5;
+}
+
 function wrapText(text, maxWidth, font, size) {
   const normalizedText = String(text ?? "").replace(/\s+/g, " ").trim();
 
@@ -399,9 +421,11 @@ function getVisibleTaskTexts(tasks) {
   const skillsTitle = resumeData.sections.skills.title;
   drawSectionTitle(skillsTitle);
 
-  const skills = interleaveArrays(skillsData.list);
-  const skillsPerRow = 5;
+  const skills = getSkillItems(skillsData);
+  const skillsPerRow = getSkillsColumnCount(skillsData);
   const rowHeight = 12;
+  const availableWidth = PAGE_WIDTH - LEFT_MARGIN - RIGHT_MARGIN;
+  const columnWidth = availableWidth / skillsPerRow;
 
   for (let index = 0; index < skills.length; index += skillsPerRow) {
     ensureSpace(rowHeight);
@@ -410,7 +434,7 @@ function getVisibleTaskTexts(tasks) {
 
     rowSkills.forEach((skill, columnIndex) => {
       page.drawText(`• ${skill}`, {
-        x: 20 + columnIndex * 115,
+        x: LEFT_MARGIN + columnIndex * columnWidth,
         y: yPosition,
         size: 9,
         font,

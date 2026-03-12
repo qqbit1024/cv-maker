@@ -2,7 +2,7 @@ import { useRef } from "react";
 import type { ChangeEventHandler, FocusEventHandler } from "react";
 
 interface FieldProps {
-  label: string;
+  label?: string;
   value: string;
   onChange: (value: string) => void;
   multiline?: boolean;
@@ -12,7 +12,7 @@ interface FieldProps {
 }
 
 export default function Field({
-  label,
+  label = "",
   value,
   onChange,
   multiline = false,
@@ -53,7 +53,7 @@ export default function Field({
 
   return (
     <label className="field">
-      <span className="field__label">{label}</span>
+      {label ? <span className="field__label">{label}</span> : null}
       {multiline ? (
         <textarea
           className={className}

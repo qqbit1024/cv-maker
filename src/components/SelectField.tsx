@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { useEffect, useRef, useState } from "react";
 
 interface SelectFieldProps {
-  label: string;
+  label?: string;
   value: string;
   options: string[];
   placeholder: string;
@@ -11,7 +11,7 @@ interface SelectFieldProps {
 }
 
 export default function SelectField({
-  label,
+  label = "",
   value,
   options,
   placeholder,
@@ -80,7 +80,7 @@ export default function SelectField({
       ref={rootRef}
       className={`field select-menu${isOpen ? " select-menu--open" : ""}`}
     >
-      <span className="field__label">{label}</span>
+      {label ? <span className="field__label">{label}</span> : null}
 
       <button
         ref={triggerRef}

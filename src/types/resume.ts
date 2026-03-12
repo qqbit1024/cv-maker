@@ -1,4 +1,14 @@
-export type InterfaceLanguageCode = "ru" | "en" | "de" | "es" | "it" | "pt" | "sr";
+export type InterfaceLanguageCode =
+  | "ru"
+  | "en"
+  | "de"
+  | "es"
+  | "it"
+  | "pt"
+  | "sr"
+  | "fr"
+  | "pl"
+  | "uk";
 export type ThemeMode = "light" | "dark";
 export type BuiltInResumeLanguageCode = "ru" | "en";
 export type ResumeLanguageCode = string;
@@ -91,7 +101,8 @@ export interface ResumeData {
 }
 
 export interface SkillsData {
-  list: string[][];
+  items: string[];
+  columns: number;
 }
 
 export interface ResumeStudioState {

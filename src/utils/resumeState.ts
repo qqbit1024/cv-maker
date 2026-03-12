@@ -1,10 +1,13 @@
 import deExample from "../../de.example.json";
 import enExample from "../../en.example.json";
 import esExample from "../../es.example.json";
+import frExample from "../../fr.example.json";
 import itExample from "../../it.example.json";
+import plExample from "../../pl.example.json";
 import ptExample from "../../pt.example.json";
 import ruExample from "../../ru.example.json";
 import srExample from "../../sr.example.json";
+import ukExample from "../../uk.example.json";
 import skillsExample from "../../skills.example.json";
 import { slugifyFileName } from "./files";
 import type {
@@ -29,6 +32,23 @@ type MaybeRecord = Record<string, unknown>;
 
 export function clone<T>(value: T): T {
   return JSON.parse(JSON.stringify(value)) as T;
+}
+
+function interleaveSkillColumns(columns: string[][]): string[] {
+  const result: string[] = [];
+  const maxRows = Math.max(...columns.map((column) => column.length), 0);
+
+  for (let rowIndex = 0; rowIndex < maxRows; rowIndex += 1) {
+    columns.forEach((column) => {
+      const nextValue = String(column[rowIndex] ?? "");
+
+      if (nextValue) {
+        result.push(nextValue);
+      }
+    });
+  }
+
+  return result;
 }
 
 export function isBuiltInResumeLanguage(
@@ -193,14 +213,24 @@ export function normalizeJob(job: unknown): Job {
 }
 
 export function normalizeSkills(skills: unknown): SkillsData {
-  const source = (skills ?? {}) as Partial<SkillsData>;
+  const source = (skills ?? {}) as Partial<SkillsData> & { list?: unknown };
+  const normalizedItems = Array.isArray(source.items)
+    ? source.items.map((item) => String(item ?? ""))
+    : Array.isArray(source.list)
+      ? interleaveSkillColumns(
+          source.list.map((column) =>
+            Array.isArray(column) ? column.map((item) => String(item ?? "")) : []
+          )
+        )
+      : clone(skillsExample.items);
+  const normalizedColumns = Number(source.columns);
 
   return {
-    list: Array.isArray(source.list)
-      ? source.list.map((column) =>
-          Array.isArray(column) ? column.map((item) => String(item ?? "")) : []
-        )
-      : clone(skillsExample.list),
+    items: normalizedItems,
+    columns:
+      Number.isInteger(normalizedColumns) && normalizedColumns >= 3 && normalizedColumns <= 6
+        ? normalizedColumns
+        : skillsExample.columns,
   };
 }
 
@@ -369,8 +399,16 @@ export function getDefaultResumeForLanguage(language: ResumeLanguageCode): Resum
     return normalizeResume(esExample);
   }
 
+  if (language === "fr") {
+    return normalizeResume(frExample);
+  }
+
   if (language === "it") {
     return normalizeResume(itExample);
+  }
+
+  if (language === "pl") {
+    return normalizeResume(plExample);
   }
 
   if (language === "pt") {
@@ -379,6 +417,10 @@ export function getDefaultResumeForLanguage(language: ResumeLanguageCode): Resum
 
   if (language === "sr") {
     return normalizeResume(srExample);
+  }
+
+  if (language === "uk") {
+    return normalizeResume(ukExample);
   }
 
   return normalizeResume(ruExample);
@@ -500,7 +542,7 @@ function collectCompletionValues(resume: ResumeData, skills: SkillsData): string
     resume.sections.languages.title,
     ...languageItems.flatMap((item) => [item.name, item.level]),
     resume.sections.skills.title,
-    ...skills.list.flat(),
+    ...skills.items,
   ];
 }
 

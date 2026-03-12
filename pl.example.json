@@ -1,0 +1,128 @@
+{
+  "header": {
+    "name": "<Imie i nazwisko>",
+    "title": "<Nazwa stanowiska>",
+    "contact": "<Miasto, kraj> | <Telefon> | Email: <email@example.com> | Telegram: <@telegram> | GitHub: <github>"
+  },
+  "sections": {
+    "summary": {
+      "title": "Podsumowanie",
+      "content": "<Krotkie podsumowanie: 3-4 zdania o doswiadczeniu, glownym stacku, typach produktow, zakresie odpowiedzialnosci i 1-2 mocnych rezultatach.>"
+    },
+    "experience": {
+      "title": "Doswiadczenie zawodowe",
+      "jobs": [
+        {
+          "hidden": false,
+          "title": "<Nazwa stanowiska>",
+          "company": "<Firma>",
+          "period": "<MMM RRRR - MMM RRRR>",
+          "tasks": [
+            {
+              "text": "<Co zbudowales + dlaczego + rezultat.>",
+              "hidden": false
+            },
+            {
+              "text": "<Mocny techniczny / ownership punkt.>",
+              "hidden": false
+            },
+            {
+              "text": "<Optymalizacja / architektura / zlozonosc systemu / automatyzacja.>",
+              "hidden": false
+            },
+            {
+              "text": "<Integracje / wydajnosc / niezawodnosc / CI/CD.>",
+              "hidden": false
+            },
+            {
+              "text": "<Metryka lub mierzalny rezultat, jesli jest.>",
+              "hidden": false
+            }
+          ],
+          "notes": "Stack technologiczny: <dodaj stack dla tej roli, jesli chcesz pokazac go w CV>"
+        },
+        {
+          "hidden": false,
+          "title": "<Nazwa stanowiska>",
+          "company": "<Firma>",
+          "period": "<MMM RRRR - MMM RRRR>",
+          "tasks": [
+            {
+              "text": "<Co zbudowales + dlaczego + rezultat.>",
+              "hidden": false
+            },
+            {
+              "text": "<Mocny techniczny / ownership punkt.>",
+              "hidden": false
+            },
+            {
+              "text": "<Optymalizacja / architektura / zlozonosc systemu / automatyzacja.>",
+              "hidden": false
+            },
+            {
+              "text": "<Integracje / wydajnosc / niezawodnosc / CI/CD.>",
+              "hidden": false
+            }
+          ],
+          "notes": "Stack technologiczny: <dodaj stack dla tej roli, jesli chcesz pokazac go w CV>"
+        },
+        {
+          "hidden": false,
+          "title": "<Nazwa stanowiska>",
+          "company": "<Firma>",
+          "period": "<MMM RRRR - MMM RRRR>",
+          "tasks": [
+            {
+              "text": "<Co zbudowales + dlaczego + rezultat.>",
+              "hidden": false
+            },
+            {
+              "text": "<Mocny techniczny / ownership punkt.>",
+              "hidden": false
+            },
+            {
+              "text": "<Optymalizacja / architektura / zlozonosc systemu / automatyzacja.>",
+              "hidden": false
+            },
+            {
+              "text": "<Integracje / wydajnosc / niezawodnosc / CI/CD.>",
+              "hidden": false
+            }
+          ],
+          "notes": "Stack technologiczny: <dodaj stack dla tej roli, jesli chcesz pokazac go w CV>"
+        }
+      ]
+    },
+    "education": {
+      "title": "Edukacja",
+      "entries": [
+        {
+          "course": "<Uczelnia>, <Stopien>, <Program>, <Lata>"
+        },
+        {
+          "course": "<Dodatkowa edukacja / minor / specjalizacja, lata>"
+        }
+      ]
+    },
+    "certificates": {
+      "title": "Kursy",
+      "items": [
+        {
+          "course": "<Kurs / certyfikat 1>",
+          "hidden": false
+        },
+        {
+          "course": "<Kurs / certyfikat 2>",
+          "hidden": false
+        }
+      ]
+    },
+    "languages": {
+      "title": "Jezyki",
+      "content": "<Jezyk>: <Poziom>, <Jezyk>: <Poziom>"
+    },
+    "skills": {
+      "title": "Umiejetnosci"
+    }
+  }
+}

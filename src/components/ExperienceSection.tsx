@@ -1,5 +1,23 @@
-import { useState } from "react";
-import { ChevronDown, ChevronUp, EyeOff, Plus, RotateCcw, Trash2 } from "lucide-react";
+import { useState, type ReactNode } from "react";
+import {
+  DndContext,
+  DragOverlay,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+  type DragStartEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { ChevronDown, EyeOff, GripVertical, Plus, RotateCcw, Trash2 } from "lucide-react";
 import Field from "./Field";
 import IconButton from "./IconButton";
 import SectionCard from "./SectionCard";
@@ -16,7 +34,7 @@ interface ExperienceSectionProps {
   exampleHiddenJobs: Job[];
   onChangeTitle: (value: string) => void;
   onAddJob: (collectionKey?: "jobs" | "_commentedJobs") => void;
-  onMoveJob: (index: number, direction: "up" | "down") => void;
+  onReorderJobs: (collectionKey: "jobs" | "_commentedJobs", fromIndex: number, toIndex: number) => void;
   onHideJob: (index: number) => void;
   onRestoreJob: (index: number) => void;
   onRemoveJob: (collectionKey: "jobs" | "_commentedJobs", index: number) => void;
@@ -44,9 +62,134 @@ interface ExperienceSectionProps {
     taskCollectionKey: "tasks" | "_commentedTasks",
     taskIndex: number
   ) => void;
+  onReorderTask: (
+    collectionKey: "jobs" | "_commentedJobs",
+    jobIndex: number,
+    taskCollectionKey: "tasks" | "_commentedTasks",
+    fromIndex: number,
+    toIndex: number
+  ) => void;
   onHideTask: (collectionKey: "jobs" | "_commentedJobs", jobIndex: number, taskIndex: number) => void;
   onRestoreTask: (collectionKey: "jobs" | "_commentedJobs", jobIndex: number, taskIndex: number) => void;
   onUpdateNotes: (collectionKey: "jobs" | "_commentedJobs", jobIndex: number, value: string) => void;
+}
+
+function TaskRow({
+  t,
+  task,
+  exampleTask,
+  index,
+  isHidden,
+  onUpdateTask,
+  onRemoveTask,
+  onHideTask,
+  onRestoreTask,
+  dragHandle,
+  isDragging,
+}: {
+  t: UIText;
+  task: JobTask;
+  exampleTask?: JobTask;
+  index: number;
+  isHidden: boolean;
+  onUpdateTask: (value: string) => void;
+  onRemoveTask: () => void;
+  onHideTask: () => void;
+  onRestoreTask: () => void;
+  dragHandle?: ReactNode;
+  isDragging?: boolean;
+}) {
+  return (
+    <article className={`task-row-card${isDragging ? " task-row-card--dragging" : ""}`}>
+      <span className="task-row-card__index">{t.bullet(index)}</span>
+      <Field
+        label=""
+        value={task.text}
+        onChange={onUpdateTask}
+        autoClearValue={exampleTask?.text ?? ""}
+        multiline
+        rows={1}
+      />
+      <div className="task-row-card__actions">
+        {dragHandle}
+        {!isHidden ? (
+          <IconButton icon={EyeOff} label={t.hideBullet} onClick={onHideTask} />
+        ) : (
+          <IconButton icon={RotateCcw} label={t.restoreBullet} onClick={onRestoreTask} />
+        )}
+        <IconButton
+          icon={Trash2}
+          label={isHidden ? t.deleteHiddenBullet : t.deleteBullet}
+          tone="ghost"
+          onClick={onRemoveTask}
+        />
+      </div>
+    </article>
+  );
+}
+
+function SortableTaskRow({
+  sortableId,
+  t,
+  task,
+  exampleTask,
+  index,
+  isHidden,
+  onUpdateTask,
+  onRemoveTask,
+  onHideTask,
+  onRestoreTask,
+}: {
+  sortableId: number;
+  t: UIText;
+  task: JobTask;
+  exampleTask?: JobTask;
+  index: number;
+  isHidden: boolean;
+  onUpdateTask: (value: string) => void;
+  onRemoveTask: () => void;
+  onHideTask: () => void;
+  onRestoreTask: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: sortableId,
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+      }}
+      className={`entry-row-sortable${isDragging ? " entry-row-sortable--dragging" : ""}`}
+    >
+      <TaskRow
+        t={t}
+        task={task}
+        exampleTask={exampleTask}
+        index={index}
+        isHidden={isHidden}
+        onUpdateTask={onUpdateTask}
+        onRemoveTask={onRemoveTask}
+        onHideTask={onHideTask}
+        onRestoreTask={onRestoreTask}
+        isDragging={isDragging}
+        dragHandle={
+          <button
+            type="button"
+            className="entry-row-card__drag-handle"
+            aria-label={t.dragToReorder}
+            title={t.dragToReorder}
+            {...attributes}
+            {...listeners}
+          >
+            <GripVertical strokeWidth={2} />
+          </button>
+        }
+      />
+    </div>
+  );
 }
 
 function JobCard({
@@ -56,7 +199,6 @@ function JobCard({
   index,
   collectionKey,
   isHidden,
-  onMoveJob,
   onHideJob,
   onRestoreJob,
   onRemoveJob,
@@ -64,11 +206,14 @@ function JobCard({
   onUpdateTask,
   onAddTask,
   onRemoveTask,
+  onReorderTask,
   onHideTask,
   onRestoreTask,
   onUpdateNotes,
   isCollapsed,
   onToggleCollapsed,
+  dragHandle,
+  isDragging,
 }: {
   t: UIText;
   job: Job;
@@ -76,7 +221,6 @@ function JobCard({
   index: number;
   collectionKey: "jobs" | "_commentedJobs";
   isHidden: boolean;
-  onMoveJob: (index: number, direction: "up" | "down") => void;
   onHideJob: (index: number) => void;
   onRestoreJob: (index: number) => void;
   onRemoveJob: (collectionKey: "jobs" | "_commentedJobs", index: number) => void;
@@ -104,12 +248,33 @@ function JobCard({
     taskCollectionKey: "tasks" | "_commentedTasks",
     taskIndex: number
   ) => void;
+  onReorderTask: (
+    collectionKey: "jobs" | "_commentedJobs",
+    jobIndex: number,
+    taskCollectionKey: "tasks" | "_commentedTasks",
+    fromIndex: number,
+    toIndex: number
+  ) => void;
   onHideTask: (collectionKey: "jobs" | "_commentedJobs", jobIndex: number, taskIndex: number) => void;
   onRestoreTask: (collectionKey: "jobs" | "_commentedJobs", jobIndex: number, taskIndex: number) => void;
   onUpdateNotes: (collectionKey: "jobs" | "_commentedJobs", jobIndex: number, value: string) => void;
   isCollapsed: boolean;
   onToggleCollapsed: () => void;
+  dragHandle?: ReactNode;
+  isDragging?: boolean;
 }) {
+  const [activeVisibleTaskDragIndex, setActiveVisibleTaskDragIndex] = useState<number | null>(null);
+  const [activeHiddenTaskDragIndex, setActiveHiddenTaskDragIndex] = useState<number | null>(null);
+  const taskSensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 6,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
   const visibleTasks = job.tasks.filter((task) => !task.hidden);
   const hiddenTasks = job.tasks.filter((task) => task.hidden);
   const exampleVisibleTasks = (exampleJob?.tasks ?? []).filter((task) => !task.hidden);
@@ -121,13 +286,24 @@ function JobCard({
     isHidden ? ` · ${t.hiddenBadge}` : ""
   }`;
   const metaLabel = [titleLabel, periodLabel].filter(Boolean).join(" · ");
+  const canReorderVisibleTasks = visibleTasks.length > 1;
+  const canReorderHiddenTasks = hiddenTasks.length > 1;
+  const activeVisibleTask = activeVisibleTaskDragIndex !== null ? visibleTasks[activeVisibleTaskDragIndex] : undefined;
+  const activeHiddenTask = activeHiddenTaskDragIndex !== null ? hiddenTasks[activeHiddenTaskDragIndex] : undefined;
 
   return (
-    <article className={`job-card${isHidden ? " job-card--hidden" : ""}${isCollapsed ? " job-card--collapsed" : ""}`}>
+    <article
+      className={`job-card${isHidden ? " job-card--hidden" : ""}${isCollapsed ? " job-card--collapsed" : ""}${
+        isDragging ? " job-card--dragging" : ""
+      }`}
+    >
       <div className="job-card__header">
         <button type="button" className="job-card__toggle" onClick={onToggleCollapsed}>
-          <span className="job-card__toggle-icon" aria-hidden="true">
-            {isCollapsed ? <ChevronDown strokeWidth={2} /> : <ChevronUp strokeWidth={2} />}
+          <span
+            className={`job-card__toggle-icon${!isCollapsed ? " job-card__toggle-icon--expanded" : ""}`}
+            aria-hidden="true"
+          >
+            <ChevronDown strokeWidth={2} />
           </span>
           <span className="job-card__title-wrap">
             <h3>{headerLabel}</h3>
@@ -135,14 +311,9 @@ function JobCard({
           </span>
         </button>
         <div className="job-card__actions">
+          {dragHandle}
           {!isHidden ? (
             <>
-              <IconButton icon={ChevronUp} label={t.moveUp} onClick={() => onMoveJob(index, "up")} />
-              <IconButton
-                icon={ChevronDown}
-                label={t.moveDown}
-                onClick={() => onMoveJob(index, "down")}
-              />
               <IconButton icon={EyeOff} label={t.hideJob} onClick={() => onHideJob(index)} />
             </>
           ) : (
@@ -180,29 +351,96 @@ function JobCard({
             />
           </div>
 
-          <div className="stack">
-            {visibleTasks.map((task: JobTask, taskIndex) => (
-              <div key={`${collectionKey}-${index}-task-${taskIndex}`} className="task-row">
-                <Field
-                  label={t.bullet(taskIndex)}
-                  value={task.text}
-                  onChange={(value) => onUpdateTask(collectionKey, index, "tasks", taskIndex, value)}
-                  autoClearValue={exampleVisibleTasks[taskIndex]?.text ?? ""}
-                  multiline
-                  rows={1}
-                />
-                <div className="task-row__actions">
-                  <IconButton icon={EyeOff} label={t.hideBullet} onClick={() => onHideTask(collectionKey, index, taskIndex)} />
-                  <IconButton
-                    icon={Trash2}
-                    label={t.deleteBullet}
-                    tone="ghost"
-                    onClick={() => onRemoveTask(collectionKey, index, "tasks", taskIndex)}
-                  />
+          {canReorderVisibleTasks ? (
+            <DndContext
+              sensors={taskSensors}
+              collisionDetection={closestCenter}
+              onDragStart={({ active }: DragStartEvent) => {
+                const taskIndex = Number(active.id);
+
+                if (!Number.isNaN(taskIndex)) {
+                  setActiveVisibleTaskDragIndex(taskIndex);
+                }
+              }}
+              onDragEnd={({ active, over }: DragEndEvent) => {
+                setActiveVisibleTaskDragIndex(null);
+
+                if (!over || active.id === over.id) {
+                  return;
+                }
+
+                const fromIndex = Number(active.id);
+                const toIndex = Number(over.id);
+
+                if (Number.isNaN(fromIndex) || Number.isNaN(toIndex)) {
+                  return;
+                }
+
+                onReorderTask(collectionKey, index, "tasks", fromIndex, toIndex);
+              }}
+              onDragCancel={() => setActiveVisibleTaskDragIndex(null)}
+            >
+              <SortableContext
+                items={visibleTasks.map((_, taskIndex) => taskIndex)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="stack">
+                  {visibleTasks.map((task: JobTask, taskIndex) => (
+                    <SortableTaskRow
+                      key={`${collectionKey}-${index}-task-${taskIndex}`}
+                      sortableId={taskIndex}
+                      t={t}
+                      task={task}
+                      exampleTask={exampleVisibleTasks[taskIndex]}
+                      index={taskIndex}
+                      isHidden={false}
+                      onUpdateTask={(value) =>
+                        onUpdateTask(collectionKey, index, "tasks", taskIndex, value)
+                      }
+                      onRemoveTask={() => onRemoveTask(collectionKey, index, "tasks", taskIndex)}
+                      onHideTask={() => onHideTask(collectionKey, index, taskIndex)}
+                      onRestoreTask={() => {}}
+                    />
+                  ))}
                 </div>
-              </div>
-            ))}
-          </div>
+              </SortableContext>
+              <DragOverlay zIndex={120}>
+                {activeVisibleTask ? (
+                  <div className="drag-overlay">
+                    <TaskRow
+                      t={t}
+                      task={activeVisibleTask}
+                      exampleTask={exampleVisibleTasks[activeVisibleTaskDragIndex ?? 0]}
+                      index={activeVisibleTaskDragIndex ?? 0}
+                      isHidden={false}
+                      onUpdateTask={() => {}}
+                      onRemoveTask={() => {}}
+                      onHideTask={() => {}}
+                      onRestoreTask={() => {}}
+                      isDragging
+                    />
+                  </div>
+                ) : null}
+              </DragOverlay>
+            </DndContext>
+          ) : (
+            <div className="stack">
+              {visibleTasks.map((task: JobTask, taskIndex) => (
+                <TaskRow
+                  key={`${collectionKey}-${index}-task-${taskIndex}`}
+                  t={t}
+                  task={task}
+                  exampleTask={exampleVisibleTasks[taskIndex]}
+                  index={taskIndex}
+                  isHidden={false}
+                  onUpdateTask={(value) => onUpdateTask(collectionKey, index, "tasks", taskIndex, value)}
+                  onRemoveTask={() => onRemoveTask(collectionKey, index, "tasks", taskIndex)}
+                  onHideTask={() => onHideTask(collectionKey, index, taskIndex)}
+                  onRestoreTask={() => {}}
+                />
+              ))}
+            </div>
+          )}
 
           <div className="job-card__footer">
             <button
@@ -230,37 +468,100 @@ function JobCard({
             </button>
           </div>
 
-          <div className="stack">
-            {hiddenTasks.map((task: JobTask, taskIndex) => (
-              <div key={`${collectionKey}-${index}-hidden-task-${taskIndex}`} className="task-row">
-                <Field
-                  label={t.bullet(taskIndex)}
-                  value={task.text}
-                  onChange={(value) =>
+          {canReorderHiddenTasks ? (
+            <DndContext
+              sensors={taskSensors}
+              collisionDetection={closestCenter}
+              onDragStart={({ active }: DragStartEvent) => {
+                const taskIndex = Number(active.id);
+
+                if (!Number.isNaN(taskIndex)) {
+                  setActiveHiddenTaskDragIndex(taskIndex);
+                }
+              }}
+              onDragEnd={({ active, over }: DragEndEvent) => {
+                setActiveHiddenTaskDragIndex(null);
+
+                if (!over || active.id === over.id) {
+                  return;
+                }
+
+                const fromIndex = Number(active.id);
+                const toIndex = Number(over.id);
+
+                if (Number.isNaN(fromIndex) || Number.isNaN(toIndex)) {
+                  return;
+                }
+
+                onReorderTask(collectionKey, index, "_commentedTasks", fromIndex, toIndex);
+              }}
+              onDragCancel={() => setActiveHiddenTaskDragIndex(null)}
+            >
+              <SortableContext
+                items={hiddenTasks.map((_, taskIndex) => taskIndex)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="stack">
+                  {hiddenTasks.map((task: JobTask, taskIndex) => (
+                    <SortableTaskRow
+                      key={`${collectionKey}-${index}-hidden-task-${taskIndex}`}
+                      sortableId={taskIndex}
+                      t={t}
+                      task={task}
+                      exampleTask={exampleHiddenTasks[taskIndex]}
+                      index={taskIndex}
+                      isHidden
+                      onUpdateTask={(value) =>
+                        onUpdateTask(collectionKey, index, "_commentedTasks", taskIndex, value)
+                      }
+                      onRemoveTask={() =>
+                        onRemoveTask(collectionKey, index, "_commentedTasks", taskIndex)
+                      }
+                      onHideTask={() => {}}
+                      onRestoreTask={() => onRestoreTask(collectionKey, index, taskIndex)}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+              <DragOverlay zIndex={120}>
+                {activeHiddenTask ? (
+                  <div className="drag-overlay">
+                    <TaskRow
+                      t={t}
+                      task={activeHiddenTask}
+                      exampleTask={exampleHiddenTasks[activeHiddenTaskDragIndex ?? 0]}
+                      index={activeHiddenTaskDragIndex ?? 0}
+                      isHidden
+                      onUpdateTask={() => {}}
+                      onRemoveTask={() => {}}
+                      onHideTask={() => {}}
+                      onRestoreTask={() => {}}
+                      isDragging
+                    />
+                  </div>
+                ) : null}
+              </DragOverlay>
+            </DndContext>
+          ) : (
+            <div className="stack">
+              {hiddenTasks.map((task: JobTask, taskIndex) => (
+                <TaskRow
+                  key={`${collectionKey}-${index}-hidden-task-${taskIndex}`}
+                  t={t}
+                  task={task}
+                  exampleTask={exampleHiddenTasks[taskIndex]}
+                  index={taskIndex}
+                  isHidden
+                  onUpdateTask={(value) =>
                     onUpdateTask(collectionKey, index, "_commentedTasks", taskIndex, value)
                   }
-                  autoClearValue={exampleHiddenTasks[taskIndex]?.text ?? ""}
-                  multiline
-                  rows={1}
+                  onRemoveTask={() => onRemoveTask(collectionKey, index, "_commentedTasks", taskIndex)}
+                  onHideTask={() => {}}
+                  onRestoreTask={() => onRestoreTask(collectionKey, index, taskIndex)}
                 />
-                <div className="task-row__actions">
-                  <IconButton
-                    icon={RotateCcw}
-                    label={t.restoreBullet}
-                    onClick={() => onRestoreTask(collectionKey, index, taskIndex)}
-                  />
-                  <IconButton
-                    icon={Trash2}
-                    label={t.deleteHiddenBullet}
-                    tone="ghost"
-                    onClick={() =>
-                      onRemoveTask(collectionKey, index, "_commentedTasks", taskIndex)
-                    }
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
           <Field
             label={t.notes}
@@ -276,6 +577,48 @@ function JobCard({
   );
 }
 
+function SortableJobCard(
+  props: Omit<
+    Parameters<typeof JobCard>[0],
+    "dragHandle" | "isDragging"
+  > & { sortableId: number }
+) {
+  const { sortableId, t, ...jobCardProps } = props;
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({
+      id: sortableId,
+    });
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+      }}
+      className={`job-card-sortable${isDragging ? " job-card-sortable--dragging" : ""}`}
+    >
+      <JobCard
+        {...jobCardProps}
+        t={t}
+        isDragging={isDragging}
+        dragHandle={
+          <button
+            type="button"
+            className="job-card__drag-handle"
+            aria-label={t.dragToReorder}
+            title={t.dragToReorder}
+            {...attributes}
+            {...listeners}
+          >
+            <GripVertical strokeWidth={2} />
+          </button>
+        }
+      />
+    </div>
+  );
+}
+
 export default function ExperienceSection({
   t,
   title,
@@ -286,7 +629,7 @@ export default function ExperienceSection({
   exampleHiddenJobs,
   onChangeTitle,
   onAddJob,
-  onMoveJob,
+  onReorderJobs,
   onHideJob,
   onRestoreJob,
   onRemoveJob,
@@ -294,11 +637,24 @@ export default function ExperienceSection({
   onUpdateTask,
   onAddTask,
   onRemoveTask,
+  onReorderTask,
   onHideTask,
   onRestoreTask,
   onUpdateNotes,
 }: ExperienceSectionProps) {
   const [collapsedCards, setCollapsedCards] = useState<Record<string, boolean>>({});
+  const [activeVisibleDragIndex, setActiveVisibleDragIndex] = useState<number | null>(null);
+  const [activeHiddenDragIndex, setActiveHiddenDragIndex] = useState<number | null>(null);
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 6,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const toggleCollapsed = (collectionKey: "jobs" | "_commentedJobs", index: number) => {
     const key = `${collectionKey}:${index}`;
@@ -307,6 +663,63 @@ export default function ExperienceSection({
       [key]: !current[key],
     }));
   };
+
+  const handleVisibleDragStart = ({ active }: DragStartEvent) => {
+    const index = Number(active.id);
+
+    if (!Number.isNaN(index)) {
+      setActiveVisibleDragIndex(index);
+    }
+  };
+
+  const handleVisibleDragEnd = ({ active, over }: DragEndEvent) => {
+    setActiveVisibleDragIndex(null);
+
+    if (!over || active.id === over.id) {
+      return;
+    }
+
+    const fromIndex = Number(active.id);
+    const toIndex = Number(over.id);
+
+    if (Number.isNaN(fromIndex) || Number.isNaN(toIndex)) {
+      return;
+    }
+
+    onReorderJobs("jobs", fromIndex, toIndex);
+  };
+
+  const handleHiddenDragStart = ({ active }: DragStartEvent) => {
+    const index = Number(active.id);
+
+    if (!Number.isNaN(index)) {
+      setActiveHiddenDragIndex(index);
+    }
+  };
+
+  const handleHiddenDragEnd = ({ active, over }: DragEndEvent) => {
+    setActiveHiddenDragIndex(null);
+
+    if (!over || active.id === over.id) {
+      return;
+    }
+
+    const fromIndex = Number(active.id);
+    const toIndex = Number(over.id);
+
+    if (Number.isNaN(fromIndex) || Number.isNaN(toIndex)) {
+      return;
+    }
+
+    onReorderJobs("_commentedJobs", fromIndex, toIndex);
+  };
+
+  const canReorderVisibleJobs = jobs.length > 1;
+  const canReorderHiddenJobs = hiddenJobs.length > 1;
+  const activeVisibleDragJob =
+    activeVisibleDragIndex !== null ? jobs[activeVisibleDragIndex] : undefined;
+  const activeHiddenDragJob =
+    activeHiddenDragIndex !== null ? hiddenJobs[activeHiddenDragIndex] : undefined;
 
   return (
     <SectionCard
@@ -319,7 +732,7 @@ export default function ExperienceSection({
         </button>
       }
     >
-      <div className="field-grid">
+      <div className="field-grid section-title-block">
         <Field
           label={t.sectionTitle}
           value={title}
@@ -328,32 +741,100 @@ export default function ExperienceSection({
         />
       </div>
 
-      <div className="stack">
-        {jobs.map((job, index) => (
-          <JobCard
-            key={`job-${index}`}
-            t={t}
-            job={job}
-            exampleJob={exampleJobs[index]}
-            index={index}
-            collectionKey="jobs"
-            isHidden={false}
-            onMoveJob={onMoveJob}
-            onHideJob={onHideJob}
-            onRestoreJob={onRestoreJob}
-            onRemoveJob={onRemoveJob}
-            onUpdateJobField={onUpdateJobField}
-            onUpdateTask={onUpdateTask}
-            onAddTask={onAddTask}
-            onRemoveTask={onRemoveTask}
-            onHideTask={onHideTask}
-            onRestoreTask={onRestoreTask}
-            onUpdateNotes={onUpdateNotes}
-            isCollapsed={Boolean(collapsedCards[`jobs:${index}`])}
-            onToggleCollapsed={() => toggleCollapsed("jobs", index)}
-          />
-        ))}
-      </div>
+      {canReorderVisibleJobs ? (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleVisibleDragStart}
+          onDragEnd={handleVisibleDragEnd}
+          onDragCancel={() => setActiveVisibleDragIndex(null)}
+        >
+          <SortableContext items={jobs.map((_, index) => index)} strategy={verticalListSortingStrategy}>
+            <div className="stack">
+              {jobs.map((job, index) => (
+                <SortableJobCard
+                  key={`job-${index}`}
+                  sortableId={index}
+                  t={t}
+                  job={job}
+                  exampleJob={exampleJobs[index]}
+                  index={index}
+                  collectionKey="jobs"
+                  isHidden={false}
+                  onHideJob={onHideJob}
+                  onRestoreJob={onRestoreJob}
+                  onRemoveJob={onRemoveJob}
+                  onUpdateJobField={onUpdateJobField}
+                  onUpdateTask={onUpdateTask}
+                  onAddTask={onAddTask}
+                  onRemoveTask={onRemoveTask}
+                  onReorderTask={onReorderTask}
+                  onHideTask={onHideTask}
+                  onRestoreTask={onRestoreTask}
+                  onUpdateNotes={onUpdateNotes}
+                  isCollapsed={Boolean(collapsedCards[`jobs:${index}`])}
+                  onToggleCollapsed={() => toggleCollapsed("jobs", index)}
+                />
+              ))}
+            </div>
+          </SortableContext>
+          <DragOverlay zIndex={120}>
+            {activeVisibleDragJob ? (
+              <div className="drag-overlay">
+                <JobCard
+                  t={t}
+                  job={activeVisibleDragJob}
+                  exampleJob={exampleJobs[activeVisibleDragIndex ?? 0]}
+                  index={activeVisibleDragIndex ?? 0}
+                  collectionKey="jobs"
+                  isHidden={false}
+                  onHideJob={onHideJob}
+                  onRestoreJob={onRestoreJob}
+                  onRemoveJob={onRemoveJob}
+                  onUpdateJobField={onUpdateJobField}
+                  onUpdateTask={onUpdateTask}
+                  onAddTask={onAddTask}
+                  onRemoveTask={onRemoveTask}
+                  onReorderTask={onReorderTask}
+                  onHideTask={onHideTask}
+                  onRestoreTask={onRestoreTask}
+                  onUpdateNotes={onUpdateNotes}
+                  isCollapsed={Boolean(collapsedCards[`jobs:${activeVisibleDragIndex}`])}
+                  onToggleCollapsed={() => {}}
+                  isDragging
+                />
+              </div>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+      ) : (
+        <div className="stack">
+          {jobs.map((job, index) => (
+            <JobCard
+              key={`job-${index}`}
+              t={t}
+              job={job}
+              exampleJob={exampleJobs[index]}
+              index={index}
+              collectionKey="jobs"
+              isHidden={false}
+              onHideJob={onHideJob}
+              onRestoreJob={onRestoreJob}
+              onRemoveJob={onRemoveJob}
+              onUpdateJobField={onUpdateJobField}
+              onUpdateTask={onUpdateTask}
+              onAddTask={onAddTask}
+              onRemoveTask={onRemoveTask}
+              onReorderTask={onReorderTask}
+              onHideTask={onHideTask}
+              onRestoreTask={onRestoreTask}
+              onUpdateNotes={onUpdateNotes}
+              isCollapsed={Boolean(collapsedCards[`jobs:${index}`])}
+              onToggleCollapsed={() => toggleCollapsed("jobs", index)}
+            />
+          ))}
+        </div>
+      )}
 
       <div className="subsection-header">
         <div>
@@ -370,32 +851,100 @@ export default function ExperienceSection({
         </button>
       </div>
 
-      <div className="stack">
-        {hiddenJobs.map((job, index) => (
-          <JobCard
-            key={`hidden-job-${index}`}
-            t={t}
-            job={job}
-            exampleJob={exampleHiddenJobs[index]}
-            index={index}
-            collectionKey="_commentedJobs"
-            isHidden
-            onMoveJob={onMoveJob}
-            onHideJob={onHideJob}
-            onRestoreJob={onRestoreJob}
-            onRemoveJob={onRemoveJob}
-            onUpdateJobField={onUpdateJobField}
-            onUpdateTask={onUpdateTask}
-            onAddTask={onAddTask}
-            onRemoveTask={onRemoveTask}
-            onHideTask={onHideTask}
-            onRestoreTask={onRestoreTask}
-            onUpdateNotes={onUpdateNotes}
-            isCollapsed={Boolean(collapsedCards[`_commentedJobs:${index}`])}
-            onToggleCollapsed={() => toggleCollapsed("_commentedJobs", index)}
-          />
-        ))}
-      </div>
+      {canReorderHiddenJobs ? (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleHiddenDragStart}
+          onDragEnd={handleHiddenDragEnd}
+          onDragCancel={() => setActiveHiddenDragIndex(null)}
+        >
+          <SortableContext items={hiddenJobs.map((_, index) => index)} strategy={verticalListSortingStrategy}>
+            <div className="stack">
+              {hiddenJobs.map((job, index) => (
+                <SortableJobCard
+                  key={`hidden-job-${index}`}
+                  sortableId={index}
+                  t={t}
+                  job={job}
+                  exampleJob={exampleHiddenJobs[index]}
+                  index={index}
+                  collectionKey="_commentedJobs"
+                  isHidden
+                  onHideJob={onHideJob}
+                  onRestoreJob={onRestoreJob}
+                  onRemoveJob={onRemoveJob}
+                  onUpdateJobField={onUpdateJobField}
+                  onUpdateTask={onUpdateTask}
+                  onAddTask={onAddTask}
+                  onRemoveTask={onRemoveTask}
+                  onReorderTask={onReorderTask}
+                  onHideTask={onHideTask}
+                  onRestoreTask={onRestoreTask}
+                  onUpdateNotes={onUpdateNotes}
+                  isCollapsed={Boolean(collapsedCards[`_commentedJobs:${index}`])}
+                  onToggleCollapsed={() => toggleCollapsed("_commentedJobs", index)}
+                />
+              ))}
+            </div>
+          </SortableContext>
+          <DragOverlay zIndex={120}>
+            {activeHiddenDragJob ? (
+              <div className="drag-overlay">
+                <JobCard
+                  t={t}
+                  job={activeHiddenDragJob}
+                  exampleJob={exampleHiddenJobs[activeHiddenDragIndex ?? 0]}
+                  index={activeHiddenDragIndex ?? 0}
+                  collectionKey="_commentedJobs"
+                  isHidden
+                  onHideJob={onHideJob}
+                  onRestoreJob={onRestoreJob}
+                  onRemoveJob={onRemoveJob}
+                  onUpdateJobField={onUpdateJobField}
+                  onUpdateTask={onUpdateTask}
+                  onAddTask={onAddTask}
+                  onRemoveTask={onRemoveTask}
+                  onReorderTask={onReorderTask}
+                  onHideTask={onHideTask}
+                  onRestoreTask={onRestoreTask}
+                  onUpdateNotes={onUpdateNotes}
+                  isCollapsed={Boolean(collapsedCards[`_commentedJobs:${activeHiddenDragIndex}`])}
+                  onToggleCollapsed={() => {}}
+                  isDragging
+                />
+              </div>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+      ) : (
+        <div className="stack">
+          {hiddenJobs.map((job, index) => (
+            <JobCard
+              key={`hidden-job-${index}`}
+              t={t}
+              job={job}
+              exampleJob={exampleHiddenJobs[index]}
+              index={index}
+              collectionKey="_commentedJobs"
+              isHidden
+              onHideJob={onHideJob}
+              onRestoreJob={onRestoreJob}
+              onRemoveJob={onRemoveJob}
+              onUpdateJobField={onUpdateJobField}
+              onUpdateTask={onUpdateTask}
+              onAddTask={onAddTask}
+              onRemoveTask={onRemoveTask}
+              onReorderTask={onReorderTask}
+              onHideTask={onHideTask}
+              onRestoreTask={onRestoreTask}
+              onUpdateNotes={onUpdateNotes}
+              isCollapsed={Boolean(collapsedCards[`_commentedJobs:${index}`])}
+              onToggleCollapsed={() => toggleCollapsed("_commentedJobs", index)}
+            />
+          ))}
+        </div>
+      )}
     </SectionCard>
   );
 }

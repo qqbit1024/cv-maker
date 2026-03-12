@@ -23,7 +23,7 @@ export default function SummarySection({
 }: SummarySectionProps) {
   return (
     <SectionCard title={t.summary} description={t.summaryDescription}>
-      <div className="field-grid">
+      <div className="field-grid section-title-block">
         <Field
           label={t.sectionTitle}
           value={title}

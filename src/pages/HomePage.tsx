@@ -50,8 +50,11 @@ export default function HomePage() {
           interfaceLanguageOptions={studio.interfaceLanguageOptions}
           resumeProgressItems={studio.resumeProgressItems}
           pdfFileName={studio.pdfFileName}
+          totalContacts={studio.totalContacts}
           totalJobs={studio.jobs.length}
-          totalEducation={studio.resume.sections.education.entries.length}
+          totalEducation={studio.totalEducation}
+          totalCertificates={studio.totalCertificates}
+          totalLanguages={studio.totalLanguages}
           totalSkills={studio.totalSkills}
           didAutoSave={studio.didAutoSave}
           onChangeUiLanguage={(language) => studio.setUiLanguage(language)}
@@ -82,6 +85,7 @@ export default function HomePage() {
             onChangeContact={studio.updateContactItem}
             onAddContact={studio.addContactItem}
             onRemoveContact={studio.removeContactItem}
+            onReorderContacts={studio.reorderContactItems}
           />
 
           <SummarySection
@@ -112,7 +116,7 @@ export default function HomePage() {
             exampleHiddenJobs={studio.defaultResume.sections.experience.jobs.filter((job) => job.hidden)}
             onChangeTitle={(value) => studio.updateSectionTitle("experience", value)}
             onAddJob={studio.addJob}
-            onMoveJob={studio.moveJob}
+            onReorderJobs={studio.reorderJobs}
             onHideJob={studio.hideJob}
             onRestoreJob={studio.restoreHiddenJob}
             onRemoveJob={studio.removeJob}
@@ -120,6 +124,7 @@ export default function HomePage() {
             onUpdateTask={studio.updateTask}
             onAddTask={studio.addTask}
             onRemoveTask={studio.removeTask}
+            onReorderTask={studio.reorderTask}
             onHideTask={studio.hideTask}
             onRestoreTask={studio.restoreHiddenTask}
             onUpdateNotes={studio.updateJobNotes}
@@ -157,7 +162,11 @@ export default function HomePage() {
                 studio.removeEducationEntry(collectionKey, index);
               }
             }}
-            onMoveEntry={studio.moveEducationEntry}
+            onReorderEntry={(collectionKey, fromIndex, toIndex) => {
+              if (collectionKey === "entries" || collectionKey === "_commentedEntries") {
+                studio.reorderEducationEntry(collectionKey, fromIndex, toIndex);
+              }
+            }}
             onHideEntry={studio.hideEducationEntry}
             onRestoreEntry={studio.restoreEducationEntry}
             visibleCollectionKey="entries"
@@ -200,7 +209,11 @@ export default function HomePage() {
                 studio.removeCertificateEntry(collectionKey, index);
               }
             }}
-            onMoveEntry={studio.moveCertificateEntry}
+            onReorderEntry={(collectionKey, fromIndex, toIndex) => {
+              if (collectionKey === "items" || collectionKey === "_commentedItems") {
+                studio.reorderCertificateEntry(collectionKey, fromIndex, toIndex);
+              }
+            }}
             onHideEntry={studio.hideCertificateEntry}
             onRestoreEntry={studio.restoreCertificateEntry}
             visibleCollectionKey="items"
@@ -218,18 +231,21 @@ export default function HomePage() {
             onUpdateLanguage={studio.updateLanguageItem}
             onAddLanguage={studio.addLanguageItem}
             onRemoveLanguage={studio.removeLanguageItem}
+            onReorderLanguages={studio.reorderLanguageItems}
           />
 
           <SkillsSection
             t={studio.t}
             title={studio.resume.sections.skills.title}
-            columns={studio.skills.list}
+            items={studio.skills.items}
+            columns={studio.skills.columns}
             exampleTitle={studio.defaultResume.sections.skills.title}
-            exampleColumns={studio.defaultSkills.list}
+            exampleItems={studio.defaultSkills.items}
             onChangeTitle={(value) => studio.updateSectionTitle("skills", value)}
-            onUpdateSkill={studio.updateSkillCell}
-            onAddRow={studio.addSkillsRow}
-            onRemoveEmptyRow={studio.removeEmptySkillsRow}
+            onUpdateSkill={studio.updateSkillItem}
+            onAddSkill={studio.addSkillItem}
+            onRemoveSkill={studio.removeSkillItem}
+            onChangeColumns={studio.updateSkillColumns}
           />
         </main>
       </div>

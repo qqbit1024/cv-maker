@@ -19,8 +19,11 @@ interface AppSidebarProps {
   interfaceLanguageOptions: LanguageOption[];
   resumeProgressItems: ResumeProgressItem[];
   pdfFileName: string;
+  totalContacts: number;
   totalJobs: number;
   totalEducation: number;
+  totalCertificates: number;
+  totalLanguages: number;
   totalSkills: number;
   didAutoSave: boolean;
   onChangeUiLanguage: (language: InterfaceLanguageCode) => void;
@@ -46,8 +49,11 @@ export default function AppSidebar({
   interfaceLanguageOptions,
   resumeProgressItems,
   pdfFileName,
+  totalContacts,
   totalJobs,
   totalEducation,
+  totalCertificates,
+  totalLanguages,
   totalSkills,
   didAutoSave,
   onChangeUiLanguage,
@@ -252,12 +258,24 @@ export default function AppSidebar({
         <p className="sidebar-title">{t.snapshot}</p>
         <dl className="stats-list">
           <div>
+            <dt>{t.contacts}</dt>
+            <dd>{totalContacts}</dd>
+          </div>
+          <div>
             <dt>{t.jobs}</dt>
             <dd>{totalJobs}</dd>
           </div>
           <div>
             <dt>{t.education}</dt>
             <dd>{totalEducation}</dd>
+          </div>
+          <div>
+            <dt>{t.certificates}</dt>
+            <dd>{totalCertificates}</dd>
+          </div>
+          <div>
+            <dt>{t.languages}</dt>
+            <dd>{totalLanguages}</dd>
           </div>
           <div>
             <dt>{t.skills}</dt>

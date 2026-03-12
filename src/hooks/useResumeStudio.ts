@@ -234,7 +234,17 @@ export function useResumeStudio() {
   );
   const pdfFileName = pdfFileNames[activeLanguage] ?? getDefaultPdfFileName(activeLanguage);
   const languageLevelOptions = getLanguageLevelOptions(uiLanguage);
-  const totalSkills = skills.list.flat().filter((item) => String(item ?? "").trim()).length;
+  const totalContacts = contactItems.filter((item) => String(item ?? "").trim()).length;
+  const totalEducation = resume.sections.education.entries.filter((entry) =>
+    String(entry.course ?? "").trim()
+  ).length;
+  const totalCertificates = certificateEntries.filter((entry) =>
+    String(entry.course ?? "").trim()
+  ).length;
+  const totalLanguages = languageItems.filter(
+    (item) => String(item.name ?? "").trim() || String(item.level ?? "").trim()
+  ).length;
+  const totalSkills = skills.items.filter((item) => String(item ?? "").trim()).length;
   const interfaceLanguageOptions: LanguageOption[] = getInterfaceLanguageOptions(uiLanguage);
   const defaultSkills = getDefaultSkills();
   const resumeProgressItems: ResumeProgressItem[] = Object.keys(resumes).map((language) => ({
@@ -352,6 +362,28 @@ export function useResumeStudio() {
   const removeContactItem = (contactIndex: number) => {
     const items = contactItems.filter((_, index) => index !== contactIndex);
     setContactItems(items.length ? items : [""]);
+  };
+
+  const reorderContactItems = (fromIndex: number, toIndex: number) => {
+    if (
+      fromIndex === toIndex ||
+      fromIndex < 0 ||
+      toIndex < 0 ||
+      fromIndex >= contactItems.length ||
+      toIndex >= contactItems.length
+    ) {
+      return;
+    }
+
+    const items = [...contactItems];
+    const [movedItem] = items.splice(fromIndex, 1);
+
+    if (typeof movedItem === "undefined") {
+      return;
+    }
+
+    items.splice(toIndex, 0, movedItem);
+    setContactItems(items);
   };
 
   const updatePdfFileName = (value: string) => {
@@ -486,6 +518,64 @@ export function useResumeStudio() {
     });
   };
 
+  const reorderTask = (
+    collectionKey: JobCollectionKey,
+    jobIndex: number,
+    taskCollectionKey: TaskCollectionKey,
+    fromIndex: number,
+    toIndex: number
+  ) => {
+    updateExperienceCollection((jobsCollection) => {
+      const jobSourceIndex = findJobSourceIndex(jobsCollection, collectionKey, jobIndex);
+
+      if (jobSourceIndex === -1) {
+        return jobsCollection;
+      }
+
+      return jobsCollection.map((job, index) => {
+        if (index !== jobSourceIndex) {
+          return job;
+        }
+
+        const targetHidden = getTaskVisibility(taskCollectionKey);
+        const filteredTasks = job.tasks.filter((task) => Boolean(task.hidden) === targetHidden);
+
+        if (
+          fromIndex === toIndex ||
+          fromIndex < 0 ||
+          toIndex < 0 ||
+          fromIndex >= filteredTasks.length ||
+          toIndex >= filteredTasks.length
+        ) {
+          return job;
+        }
+
+        const reorderedTasks = [...filteredTasks];
+        const [movedTask] = reorderedTasks.splice(fromIndex, 1);
+
+        if (!movedTask) {
+          return job;
+        }
+
+        reorderedTasks.splice(toIndex, 0, movedTask);
+
+        let filteredCursor = 0;
+        return {
+          ...job,
+          tasks: job.tasks.map((task) => {
+            if (Boolean(task.hidden) !== targetHidden) {
+              return task;
+            }
+
+            const nextTask = reorderedTasks[filteredCursor];
+            filteredCursor += 1;
+            return nextTask ?? task;
+          }),
+        };
+      });
+    });
+  };
+
   const addJob = (collectionKey: JobCollectionKey = "jobs") => {
     updateExperienceCollection((jobsCollection) => [
       ...jobsCollection,
@@ -529,6 +619,48 @@ export function useResumeStudio() {
       ];
 
       return nextJobs;
+    });
+  };
+
+  const reorderJobs = (collectionKey: JobCollectionKey, fromIndex: number, toIndex: number) => {
+    updateExperienceCollection((jobsCollection) => {
+      const targetHidden = getJobVisibility(collectionKey);
+      const filteredJobs = jobsCollection.filter(
+        (job) => Boolean(job.hidden) === targetHidden
+      );
+
+      if (fromIndex === toIndex) {
+        return jobsCollection;
+      }
+
+      if (
+        fromIndex < 0 ||
+        toIndex < 0 ||
+        fromIndex >= filteredJobs.length ||
+        toIndex >= filteredJobs.length
+      ) {
+        return jobsCollection;
+      }
+
+      const reorderedJobs = [...filteredJobs];
+      const [movedJob] = reorderedJobs.splice(fromIndex, 1);
+
+      if (!movedJob) {
+        return jobsCollection;
+      }
+
+      reorderedJobs.splice(toIndex, 0, movedJob);
+
+      let filteredCursor = 0;
+      return jobsCollection.map((job) => {
+        if (Boolean(job.hidden) !== targetHidden) {
+          return job;
+        }
+
+        const nextJob = reorderedJobs[filteredCursor];
+        filteredCursor += 1;
+        return nextJob ?? job;
+      });
     });
   };
 
@@ -672,6 +804,34 @@ export function useResumeStudio() {
     updateEducationCollection("entries", (entries) => moveItem(entries, entryIndex, direction));
   };
 
+  const reorderEducationEntry = (
+    collectionKey: EducationCollectionKey,
+    fromIndex: number,
+    toIndex: number
+  ) => {
+    updateEducationCollection(collectionKey, (entries) => {
+      if (
+        fromIndex === toIndex ||
+        fromIndex < 0 ||
+        toIndex < 0 ||
+        fromIndex >= entries.length ||
+        toIndex >= entries.length
+      ) {
+        return entries;
+      }
+
+      const nextEntries = [...entries];
+      const [movedEntry] = nextEntries.splice(fromIndex, 1);
+
+      if (!movedEntry) {
+        return entries;
+      }
+
+      nextEntries.splice(toIndex, 0, movedEntry);
+      return nextEntries;
+    });
+  };
+
   const hideEducationEntry = (entryIndex: number) => {
     updateActiveResume((current) => {
       const entries = [...current.sections.education.entries];
@@ -783,6 +943,43 @@ export function useResumeStudio() {
     });
   };
 
+  const reorderLanguageItems = (fromIndex: number, toIndex: number) => {
+    updateActiveResume((current) => {
+      const items = current.sections.languages.items ?? [createEmptyLanguageItem()];
+
+      if (
+        fromIndex === toIndex ||
+        fromIndex < 0 ||
+        toIndex < 0 ||
+        fromIndex >= items.length ||
+        toIndex >= items.length
+      ) {
+        return current;
+      }
+
+      const nextItems = [...items];
+      const [movedItem] = nextItems.splice(fromIndex, 1);
+
+      if (!movedItem) {
+        return current;
+      }
+
+      nextItems.splice(toIndex, 0, movedItem);
+
+      return {
+        ...current,
+        sections: {
+          ...current.sections,
+          languages: {
+            ...current.sections.languages,
+            items: nextItems,
+            content: joinLanguageItems(nextItems),
+          },
+        },
+      };
+    });
+  };
+
   const updateCertificatesCollection = (
     updater: (items: CourseEntry[]) => CourseEntry[]
   ) => {
@@ -866,6 +1063,47 @@ export function useResumeStudio() {
     });
   };
 
+  const reorderCertificateEntry = (
+    collectionKey: CertificatesCollectionKey,
+    fromIndex: number,
+    toIndex: number
+  ) => {
+    updateCertificatesCollection((items) => {
+      const targetHidden = getCertificateVisibility(collectionKey);
+      const filteredItems = items.filter((item) => Boolean(item.hidden) === targetHidden);
+
+      if (
+        fromIndex === toIndex ||
+        fromIndex < 0 ||
+        toIndex < 0 ||
+        fromIndex >= filteredItems.length ||
+        toIndex >= filteredItems.length
+      ) {
+        return items;
+      }
+
+      const reorderedItems = [...filteredItems];
+      const [movedItem] = reorderedItems.splice(fromIndex, 1);
+
+      if (!movedItem) {
+        return items;
+      }
+
+      reorderedItems.splice(toIndex, 0, movedItem);
+
+      let filteredCursor = 0;
+      return items.map((item) => {
+        if (Boolean(item.hidden) !== targetHidden) {
+          return item;
+        }
+
+        const nextItem = reorderedItems[filteredCursor];
+        filteredCursor += 1;
+        return nextItem ?? item;
+      });
+    });
+  };
+
   const hideCertificateEntry = (entryIndex: number) => {
     updateCertificatesCollection((items) => {
       const sourceIndex = findCertificateSourceIndex(items, "items", entryIndex);
@@ -894,62 +1132,47 @@ export function useResumeStudio() {
     });
   };
 
-  const updateSkillCell = (rowIndex: number, columnIndex: number, value: string) => {
+  const updateSkillItem = (index: number, value: string) => {
     setSkills((current) => ({
       ...current,
-      list: Array.from({ length: Math.max(current.list.length, 5) }, (_, index) => {
-        const column = [...(current.list[index] ?? [])];
-
-        if (index !== columnIndex) {
-          return column;
-        }
-
-        while (column.length <= rowIndex) {
-          column.push("");
-        }
-
-        column[rowIndex] = value;
-        return column;
-      }),
+      items: current.items.map((item, itemIndex) => (itemIndex === index ? value : item)),
     }));
   };
 
-  const addSkillsRow = () => {
+  const addSkillItem = () => {
     setSkills((current) => ({
       ...current,
-      list: Array.from({ length: Math.max(current.list.length, 5) }, (_, index) => [
-        ...(current.list[index] ?? []),
-        "",
-      ]),
+      items: [...current.items, ""],
     }));
   };
 
-  const removeEmptySkillsRow = () => {
+  const removeSkillItem = (index: number) => {
     setSkills((current) => {
-      const normalizedColumns = Array.from(
-        { length: Math.max(current.list.length, 5) },
-        (_, index) => [...(current.list[index] ?? [])]
-      );
-      const rowCount = Math.max(0, ...normalizedColumns.map((column) => column.length));
-      const lastRowIndex = rowCount - 1;
-
-      if (lastRowIndex <= 0) {
-        return current;
+      if (current.items.length <= 1) {
+        return {
+          ...current,
+          items: [""],
+        };
       }
 
-      const hasValuesInLastRow = normalizedColumns.some((column) =>
-        String(column[lastRowIndex] ?? "").trim()
-      );
+      const nextItems = current.items.filter((_, itemIndex) => itemIndex !== index);
 
-      if (hasValuesInLastRow) {
+      return {
+        ...current,
+        items: nextItems.length ? nextItems : [""],
+      };
+    });
+  };
+
+  const updateSkillColumns = (value: number) => {
+    setSkills((current) => {
+      if (value < 3 || value > 6) {
         return current;
       }
 
       return {
         ...current,
-        list: normalizedColumns.map((column) =>
-          column.length > lastRowIndex ? column.slice(0, -1) : column
-        ),
+        columns: value,
       };
     });
   };
@@ -1290,12 +1513,16 @@ export function useResumeStudio() {
     didAutoSave,
     importInputRef,
     contactItems,
+    totalContacts,
     hiddenJobs,
+    totalEducation,
     hiddenEducationEntries,
     hiddenCertificateEntries,
     certificates,
     certificateEntries,
     languageItems,
+    totalCertificates,
+    totalLanguages,
     languageLevelOptions,
     interfaceLanguageOptions,
     resumeProgressItems,
@@ -1307,13 +1534,16 @@ export function useResumeStudio() {
     updateContactItem,
     addContactItem,
     removeContactItem,
+    reorderContactItems,
     updateJobField,
     updateTask,
     addTask,
     removeTask,
+    reorderTask,
     addJob,
     removeJob,
     moveJob,
+    reorderJobs,
     hideJob,
     restoreHiddenJob,
     hideTask,
@@ -1323,20 +1553,24 @@ export function useResumeStudio() {
     addEducationEntry,
     removeEducationEntry,
     moveEducationEntry,
+    reorderEducationEntry,
     hideEducationEntry,
     restoreEducationEntry,
     updateLanguageItem,
     addLanguageItem,
     removeLanguageItem,
+    reorderLanguageItems,
     updateCertificateEntry,
     addCertificateEntry,
     removeCertificateEntry,
     moveCertificateEntry,
+    reorderCertificateEntry,
     hideCertificateEntry,
     restoreCertificateEntry,
-    updateSkillCell,
-    addSkillsRow,
-    removeEmptySkillsRow,
+    updateSkillItem,
+    addSkillItem,
+    removeSkillItem,
+    updateSkillColumns,
     handleImportFile,
     handleExportSelection,
     openImportPicker,

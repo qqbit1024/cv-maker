@@ -27,6 +27,26 @@ function interleaveArrays(columns: string[][]): string[] {
   return result;
 }
 
+function getSkillItems(skillsData: SkillsData): string[] {
+  if (Array.isArray(skillsData.items)) {
+    return skillsData.items.map((item) => String(item ?? "").trim()).filter(Boolean);
+  }
+
+  return interleaveArrays((skillsData as { list?: string[][] }).list ?? [])
+    .map((item) => String(item ?? "").trim())
+    .filter(Boolean);
+}
+
+function getSkillsColumnCount(skillsData: SkillsData): number {
+  const normalizedColumns = Number(skillsData.columns);
+
+  if (Number.isInteger(normalizedColumns) && normalizedColumns >= 3 && normalizedColumns <= 6) {
+    return normalizedColumns;
+  }
+
+  return 5;
+}
+
 function wrapText(text: unknown, maxWidth: number, font: PDFFont, size: number): string[] {
   const normalizedText = String(text ?? "").replace(/\s+/g, " ").trim();
 
@@ -393,9 +413,11 @@ export async function createResumePdf({
 
   drawSectionTitle(resumeData.sections.skills.title);
 
-  const interleavedSkills = interleaveArrays(skillsData.list);
-  const skillsPerRow = 5;
+  const interleavedSkills = getSkillItems(skillsData);
+  const skillsPerRow = getSkillsColumnCount(skillsData);
   const rowHeight = 12;
+  const availableWidth = PAGE_WIDTH - LEFT_MARGIN - RIGHT_MARGIN;
+  const columnWidth = availableWidth / skillsPerRow;
 
   for (let index = 0; index < interleavedSkills.length; index += skillsPerRow) {
     ensureSpace(rowHeight);
@@ -404,7 +426,7 @@ export async function createResumePdf({
 
     rowSkills.forEach((skill, columnIndex) => {
       page.drawText(`• ${skill}`, {
-        x: 20 + columnIndex * 115,
+        x: LEFT_MARGIN + columnIndex * columnWidth,
         y: yPosition,
         size: 9,
         font,
