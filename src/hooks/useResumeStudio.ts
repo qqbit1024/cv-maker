@@ -1177,6 +1177,30 @@ export function useResumeStudio() {
     });
   };
 
+  const applyActiveWorkspaceSnapshot = (snapshot: {
+    resume: ResumeData;
+    skills: SkillsData;
+    pdfFileName: string;
+  }) => {
+    const normalizedResume = normalizeResume(snapshot.resume);
+    const normalizedSkills = normalizeSkills(snapshot.skills);
+    const normalizedFileName = ensurePdfFileName(
+      snapshot.pdfFileName,
+      activeLanguage,
+      normalizedResume
+    );
+
+    setResumes((current) => ({
+      ...current,
+      [activeLanguage]: normalizedResume,
+    }));
+    setSkills(normalizedSkills);
+    setPdfFileNames((current) => ({
+      ...current,
+      [activeLanguage]: normalizedFileName,
+    }));
+  };
+
   const importResume = async (language: ResumeLanguageCode, file: File) => {
     try {
       const parsed = await readJsonFile<ResumeData>(file);
@@ -1575,6 +1599,9 @@ export function useResumeStudio() {
     handleExportSelection,
     openImportPicker,
     resetToExamples,
+    applyActiveWorkspaceSnapshot,
     downloadPdf,
   };
 }
+
+export type ResumeStudioController = ReturnType<typeof useResumeStudio>;

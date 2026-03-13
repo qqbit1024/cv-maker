@@ -1,6 +1,10 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
+declare const process: {
+  env: Record<string, string | undefined>;
+};
+
 function getGithubPagesBase() {
   const repository = process.env.GITHUB_REPOSITORY;
 

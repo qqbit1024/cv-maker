@@ -1,5 +1,19 @@
 import { useState } from "react";
-import { ChevronDown, Copy, Moon, Pencil, Plus, Sun, Trash2 } from "lucide-react";
+import {
+  ChevronDown,
+  Copy,
+  Eye,
+  FolderKanban,
+  Gauge,
+  Moon,
+  Pencil,
+  PenSquare,
+  Plus,
+  Sun,
+  Target,
+  Trash2,
+} from "lucide-react";
+import { NavLink } from "react-router-dom";
 import IconButton from "./IconButton";
 import type { UIText } from "../i18n/uiText";
 import type {
@@ -18,26 +32,13 @@ interface AppSidebarProps {
   activeLanguageLabel: string;
   interfaceLanguageOptions: LanguageOption[];
   resumeProgressItems: ResumeProgressItem[];
-  pdfFileName: string;
-  totalContacts: number;
-  totalJobs: number;
-  totalEducation: number;
-  totalCertificates: number;
-  totalLanguages: number;
-  totalSkills: number;
-  didAutoSave: boolean;
   onChangeUiLanguage: (language: InterfaceLanguageCode) => void;
   onToggleTheme: () => void;
   onChangeResumeLanguage: (language: ResumeLanguageCode) => void;
-  onChangePdfFileName: (value: string) => void;
   onOpenCreateResumeLanguage: () => void;
   onDuplicateResumeLanguage: (language: ResumeLanguageCode) => void;
   onRenameResumeLanguage: (language: ResumeLanguageCode) => void;
   onDeleteResumeLanguage: (language: ResumeLanguageCode) => void;
-  onOpenImport: () => void;
-  onOpenExport: () => void;
-  onDownloadPdf: () => void;
-  isGenerating: boolean;
 }
 
 export default function AppSidebar({
@@ -48,26 +49,13 @@ export default function AppSidebar({
   activeLanguageLabel,
   interfaceLanguageOptions,
   resumeProgressItems,
-  pdfFileName,
-  totalContacts,
-  totalJobs,
-  totalEducation,
-  totalCertificates,
-  totalLanguages,
-  totalSkills,
-  didAutoSave,
   onChangeUiLanguage,
   onToggleTheme,
   onChangeResumeLanguage,
-  onChangePdfFileName,
   onOpenCreateResumeLanguage,
   onDuplicateResumeLanguage,
   onRenameResumeLanguage,
   onDeleteResumeLanguage,
-  onOpenImport,
-  onOpenExport,
-  onDownloadPdf,
-  isGenerating,
 }: AppSidebarProps) {
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
   const activeInterfaceLanguageOption =
@@ -137,6 +125,44 @@ export default function AppSidebar({
           </div>
         </div>
       </div>
+
+      <nav className="sidebar-panel">
+        <p className="sidebar-title">{t.workspace}</p>
+        <div className="sidebar-nav">
+          <NavLink to="/" end className={({ isActive }) => `sidebar-nav__link${isActive ? " sidebar-nav__link--active" : ""}`}>
+            <PenSquare className="button__icon" strokeWidth={2} />
+            <span>{t.navEditor}</span>
+          </NavLink>
+          <NavLink
+            to="/versions"
+            className={({ isActive }) => `sidebar-nav__link${isActive ? " sidebar-nav__link--active" : ""}`}
+          >
+            <FolderKanban className="button__icon" strokeWidth={2} />
+            <span>{t.navVersions}</span>
+          </NavLink>
+          <NavLink
+            to="/vacancy"
+            className={({ isActive }) => `sidebar-nav__link${isActive ? " sidebar-nav__link--active" : ""}`}
+          >
+            <Target className="button__icon" strokeWidth={2} />
+            <span>{t.navVacancy}</span>
+          </NavLink>
+          <NavLink
+            to="/preview"
+            className={({ isActive }) => `sidebar-nav__link${isActive ? " sidebar-nav__link--active" : ""}`}
+          >
+            <Eye className="button__icon" strokeWidth={2} />
+            <span>{t.navPreview}</span>
+          </NavLink>
+          <NavLink
+            to="/control"
+            className={({ isActive }) => `sidebar-nav__link${isActive ? " sidebar-nav__link--active" : ""}`}
+          >
+            <Gauge className="button__icon" strokeWidth={2} />
+            <span>{t.navControl}</span>
+          </NavLink>
+        </div>
+      </nav>
 
       <div className="sidebar-panel">
         <div className="sidebar-panel__header">
@@ -208,80 +234,6 @@ export default function AppSidebar({
             </div>
           ))}
         </div>
-      </div>
-
-      <div className="sidebar-panel">
-        <p className="sidebar-title">{t.files}</p>
-        <div className="action-grid">
-          <button type="button" onClick={onOpenImport}>
-            {t.import}
-          </button>
-          <button type="button" onClick={onOpenExport}>
-            {t.export}
-          </button>
-        </div>
-        <div className={`autosave-indicator${didAutoSave ? " autosave-indicator--active" : ""}`}>
-          <span className="autosave-indicator__dot" aria-hidden="true" />
-          <span className="autosave-indicator__label">{t.autosave}</span>
-          <span className="autosave-indicator__value">{t.autosaveSaved}</span>
-        </div>
-      </div>
-
-      <div className="sidebar-panel">
-        <p className="sidebar-title">{t.generate}</p>
-        <div className="sidebar-stack">
-          <div className="field">
-            <label className="field__label" htmlFor="pdf-file-name">
-              {t.pdfFileName}
-            </label>
-            <input
-              id="pdf-file-name"
-              className="field__control field__control--mono"
-              value={pdfFileName}
-              onChange={(event) => onChangePdfFileName(event.target.value)}
-            />
-            <p className="field__hint">{t.pdfFileNameHint}</p>
-          </div>
-
-          <button
-            type="button"
-            className="button--primary"
-            onClick={onDownloadPdf}
-            disabled={isGenerating}
-          >
-            {isGenerating ? t.generating : t.downloadPdf(activeLanguageLabel)}
-          </button>
-        </div>
-      </div>
-
-      <div className="sidebar-panel">
-        <p className="sidebar-title">{t.snapshot}</p>
-        <dl className="stats-list">
-          <div>
-            <dt>{t.contacts}</dt>
-            <dd>{totalContacts}</dd>
-          </div>
-          <div>
-            <dt>{t.jobs}</dt>
-            <dd>{totalJobs}</dd>
-          </div>
-          <div>
-            <dt>{t.education}</dt>
-            <dd>{totalEducation}</dd>
-          </div>
-          <div>
-            <dt>{t.certificates}</dt>
-            <dd>{totalCertificates}</dd>
-          </div>
-          <div>
-            <dt>{t.languages}</dt>
-            <dd>{totalLanguages}</dd>
-          </div>
-          <div>
-            <dt>{t.skills}</dt>
-            <dd>{totalSkills}</dd>
-          </div>
-        </dl>
       </div>
     </aside>
   );

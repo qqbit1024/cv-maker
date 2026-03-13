@@ -8,6 +8,12 @@ export interface UIText {
   interfaceLanguageMenuLabel: string;
   switchToDarkTheme: string;
   switchToLightTheme: string;
+  workspace: string;
+  navEditor: string;
+  navVersions: string;
+  navVacancy: string;
+  navPreview: string;
+  navControl: string;
   headerDescription: string;
   summaryDescription: string;
   experienceDescription: string;
@@ -30,8 +36,55 @@ export interface UIText {
   duplicateResumeLanguageConfirm: string;
   renameResumeLanguageConfirm: string;
   duplicateResumeLanguageDefaultName: (label: string) => string;
+  versionsTitle: string;
+  versionsDescription: string;
+  saveVersion: string;
+  saveVersionTitle: string;
+  saveVersionConfirm: string;
+  renameVersionTitle: string;
+  renameVersionConfirm: string;
+  versionName: string;
+  versionNamePlaceholder: string;
+  versionDefaultName: (label: string) => string;
+  activeResumeLanguage: string;
+  applyVersion: string;
+  overwriteVersion: string;
+  renameVersion: string;
+  deleteVersion: string;
+  deleteVersionConfirm: (label: string) => string;
+  overwriteVersionConfirm: (label: string) => string;
+  versionUpdatedAt: (value: string) => string;
+  noVersionsTitle: string;
+  noVersionsDescription: string;
   fieldProgress: (completed: number, total: number) => string;
+  vacancyTitle: string;
+  vacancyDescription: string;
+  vacancyRole: string;
+  vacancyCompany: string;
+  vacancyCoverage: string;
+  vacancyInput: string;
+  vacancyInputHint: string;
+  vacancyNotes: string;
+  vacancyExtractedKeywords: string;
+  vacancyMatchedKeywords: string;
+  vacancyMissingKeywords: string;
+  vacancyNoMatches: string;
+  vacancyAllKeywordsCovered: string;
+  vacancyEmptyTitle: string;
+  vacancyEmptyDescription: string;
+  vacancySuggestions: string;
+  vacancySuggestionKeywords: string;
+  vacancySuggestionLeadership: string;
+  vacancySuggestionScale: string;
+  vacancySuggestionStrong: string;
+  controlTitle: string;
+  controlDescription: string;
+  controlStateTitle: string;
+  controlStateDescription: string;
+  controlSummaryTitle: string;
+  controlSummaryDescription: string;
   files: string;
+  filesDescription: string;
   import: string;
   export: string;
   importTargetTitle: string;
@@ -47,6 +100,17 @@ export interface UIText {
   pdfFileNameHint: string;
   generating: string;
   downloadPdf: (languageLabel: string) => string;
+  previewTitle: string;
+  previewDescription: string;
+  previewRefresh: string;
+  previewOpenInNewTab: string;
+  previewRefreshing: string;
+  previewUpdatedAt: (value: string) => string;
+  previewWaiting: string;
+  previewFrameTitle: string;
+  previewWaitingTitle: string;
+  previewWaitingDescription: string;
+  previewError: (error: string) => string;
   autosave: string;
   autosaveSaved: string;
   lastAction: string;
@@ -132,6 +196,11 @@ export interface UIText {
   resumeLanguageExists: (label: string) => string;
   resumeLanguageRenamed: (label: string) => string;
   resumeLanguageDeleted: (label: string) => string;
+  versionSaved: (label: string) => string;
+  versionRenamed: (label: string) => string;
+  versionApplied: (label: string) => string;
+  versionDeleted: (label: string) => string;
+  versionOverwritten: (label: string) => string;
   cannotDeleteLastResumeLanguage: string;
   deleteResumeLanguageConfirm: (label: string) => string;
   pdfDownloaded: (filename: string) => string;
@@ -148,6 +217,12 @@ const ruText: UIText = {
     interfaceLanguageMenuLabel: "Выбрать язык приложения",
     switchToDarkTheme: "Включить тёмную тему",
     switchToLightTheme: "Включить светлую тему",
+    workspace: "Режимы",
+    navEditor: "Редактор",
+    navVersions: "Версии",
+    navVacancy: "Вакансия",
+    navPreview: "Превью",
+    navControl: "Управление",
     headerDescription: "Имя, роль и контакты, которые попадут в шапку PDF.",
     summaryDescription: "Короткое позиционирование: стек, опыт, фокус и то, что ищешь.",
     experienceDescription: "Основные места работы, достижения, скрытые пункты и заметки.",
@@ -170,8 +245,69 @@ const ruText: UIText = {
     duplicateResumeLanguageConfirm: "Дублировать",
     renameResumeLanguageConfirm: "Сохранить",
     duplicateResumeLanguageDefaultName: (label) => `${label} копия`,
+    versionsTitle: "Версии и пресеты",
+    versionsDescription:
+      "Сохраняй готовые снимки текущего резюме, чтобы быстро переключаться между базовой версией и адаптациями под вакансии.",
+    saveVersion: "Сохранить версию",
+    saveVersionTitle: "Сохранить текущую версию",
+    saveVersionConfirm: "Сохранить",
+    renameVersionTitle: "Переименовать версию",
+    renameVersionConfirm: "Сохранить",
+    versionName: "Название версии",
+    versionNamePlaceholder: "Например: Germany frontend / Startup",
+    versionDefaultName: (label) => `${label} base`,
+    activeResumeLanguage: "Активный язык резюме",
+    applyVersion: "Применить",
+    overwriteVersion: "Обновить",
+    renameVersion: "Переименовать",
+    deleteVersion: "Удалить",
+    deleteVersionConfirm: (label) => `Удалить версию «${label}»?`,
+    overwriteVersionConfirm: (label) =>
+      `Перезаписать версию «${label}» текущим состоянием редактора?`,
+    versionUpdatedAt: (value) => `Обновлено: ${value}`,
+    noVersionsTitle: "Пока нет сохранённых версий",
+    noVersionsDescription:
+      "Сохрани текущую конфигурацию как пресет и используй её как отправную точку под разные вакансии.",
     fieldProgress: (completed, total) => `${completed}/${total}`,
+    vacancyTitle: "Vacancy mode",
+    vacancyDescription:
+      "Вставь текст вакансии и быстро проверь, какие ключевые слова уже покрыты текущей версией резюме, а какие стоит усилить.",
+    vacancyRole: "Роль / заголовок вакансии",
+    vacancyCompany: "Компания",
+    vacancyCoverage: "Покрытие",
+    vacancyInput: "Текст вакансии",
+    vacancyInputHint:
+      "Сюда можно вставить полное описание вакансии. Подсветка будет опираться на текущую активную версию резюме.",
+    vacancyNotes: "Заметки по вакансии",
+    vacancyExtractedKeywords: "Извлечённые ключевые слова",
+    vacancyMatchedKeywords: "Уже покрыто",
+    vacancyMissingKeywords: "Стоит усилить",
+    vacancyNoMatches: "Пока нет явных совпадений.",
+    vacancyAllKeywordsCovered: "Ключевые слова выглядят покрытыми.",
+    vacancyEmptyTitle: "Пока нечего анализировать",
+    vacancyEmptyDescription:
+      "Добавь роль или вставь описание вакансии, и здесь появятся совпадения, пробелы и рекомендации.",
+    vacancySuggestions: "Что бы я усилил",
+    vacancySuggestionKeywords:
+      "Добавь недостающие стек-ключевые слова в summary, skills или релевантные bullets по опыту.",
+    vacancySuggestionLeadership:
+      "Подсвети ownership, mentoring, code review или архитектурные решения, если вакансия явно ждёт senior-сигналы.",
+    vacancySuggestionScale:
+      "Усиль техническую глубину: производительность, сложные интеграции, системный дизайн и масштаб.",
+    vacancySuggestionStrong:
+      "Покрытие уже выглядит сильным. Дальше имеет смысл только подзеркалить язык вакансии в 1-2 bullets.",
+    controlTitle: "Файлы, экспорт и сводка",
+    controlDescription:
+      "Отдельный режим для импорта и экспорта данных, генерации PDF и общей сводки по текущей версии резюме.",
+    controlStateTitle: "Состояние текущей версии",
+    controlStateDescription:
+      "Работаешь с активным языком резюме. Здесь можно проверить имя PDF, автосохранение и скачать файл.",
+    controlSummaryTitle: "Сводка по текущей версии",
+    controlSummaryDescription:
+      "Количество заполненных сущностей в активном резюме: контакты, опыт, образование, сертификаты, языки и навыки.",
     files: "Файлы",
+    filesDescription:
+      "Импорт возвращает JSON-данные в редактор, а экспорт сохраняет текущую версию резюме и навыков во внешние файлы.",
     import: "Импорт",
     export: "Экспорт",
     importTargetTitle: "Что импортировать?",
@@ -187,6 +323,18 @@ const ruText: UIText = {
     pdfFileNameHint: "Можно изменить имя перед скачиванием. Расширение .pdf добавится автоматически.",
     generating: "Генерирую PDF...",
     downloadPdf: (languageLabel) => `Скачать PDF (${languageLabel})`,
+    previewTitle: "Live PDF preview",
+    previewDescription:
+      "Отдельная страница для быстрой проверки итоговой вёрстки. Превью обновляется после изменений в текущем резюме.",
+    previewRefresh: "Обновить сейчас",
+    previewOpenInNewTab: "Открыть отдельно",
+    previewRefreshing: "Обновляю превью...",
+    previewUpdatedAt: (value) => `Последнее обновление: ${value}`,
+    previewWaiting: "Ожидаю первый рендер PDF...",
+    previewFrameTitle: "PDF preview",
+    previewWaitingTitle: "Превью готовится",
+    previewWaitingDescription: "После первого рендера здесь появится встраиваемый PDF.",
+    previewError: (error) => `Не удалось обновить превью: ${error}`,
     autosave: "Автосохранение",
     autosaveSaved: "Сохранено локально",
     lastAction: "Последнее действие",
@@ -273,6 +421,11 @@ const ruText: UIText = {
     resumeLanguageExists: (label) => `Язык резюме уже существует: ${label}.`,
     resumeLanguageRenamed: (label) => `Язык резюме переименован: ${label}.`,
     resumeLanguageDeleted: (label) => `Удалён язык резюме: ${label}.`,
+    versionSaved: (label) => `Сохранена версия: ${label}.`,
+    versionRenamed: (label) => `Переименована версия: ${label}.`,
+    versionApplied: (label) => `Применена версия: ${label}.`,
+    versionDeleted: (label) => `Удалена версия: ${label}.`,
+    versionOverwritten: (label) => `Обновлена версия: ${label}.`,
     cannotDeleteLastResumeLanguage: "Нельзя удалить последний язык резюме.",
     deleteResumeLanguageConfirm: (label) => `Удалить язык резюме «${label}»?`,
     pdfDownloaded: (filename) => `PDF сохранён: ${filename}.`,
@@ -289,6 +442,12 @@ const enText: UIText = {
     interfaceLanguageMenuLabel: "Choose interface language",
     switchToDarkTheme: "Switch to dark theme",
     switchToLightTheme: "Switch to light theme",
+    workspace: "Workspace",
+    navEditor: "Editor",
+    navVersions: "Versions",
+    navVacancy: "Vacancy",
+    navPreview: "Preview",
+    navControl: "Control",
     headerDescription: "Name, role, and contacts that will appear in the PDF header.",
     summaryDescription: "Short positioning: stack, experience, focus, and what you are looking for.",
     experienceDescription: "Main jobs, achievement bullets, hidden items, and working notes.",
@@ -311,8 +470,69 @@ const enText: UIText = {
     duplicateResumeLanguageConfirm: "Duplicate",
     renameResumeLanguageConfirm: "Save",
     duplicateResumeLanguageDefaultName: (label) => `${label} copy`,
+    versionsTitle: "Versions and presets",
+    versionsDescription:
+      "Save named snapshots of the current resume so you can jump between your base version and vacancy-specific adaptations.",
+    saveVersion: "Save version",
+    saveVersionTitle: "Save current version",
+    saveVersionConfirm: "Save",
+    renameVersionTitle: "Rename version",
+    renameVersionConfirm: "Save",
+    versionName: "Version name",
+    versionNamePlaceholder: "For example: Germany frontend / Startup",
+    versionDefaultName: (label) => `${label} base`,
+    activeResumeLanguage: "Active resume language",
+    applyVersion: "Apply",
+    overwriteVersion: "Overwrite",
+    renameVersion: "Rename",
+    deleteVersion: "Delete",
+    deleteVersionConfirm: (label) => `Delete version "${label}"?`,
+    overwriteVersionConfirm: (label) =>
+      `Overwrite version "${label}" with the current editor state?`,
+    versionUpdatedAt: (value) => `Updated: ${value}`,
+    noVersionsTitle: "No saved versions yet",
+    noVersionsDescription:
+      "Save the current configuration as a preset and reuse it as a starting point for different roles or companies.",
     fieldProgress: (completed, total) => `${completed}/${total}`,
+    vacancyTitle: "Vacancy mode",
+    vacancyDescription:
+      "Paste a job description and quickly see which keywords are already covered by the current resume and which ones should be strengthened.",
+    vacancyRole: "Role / job title",
+    vacancyCompany: "Company",
+    vacancyCoverage: "Coverage",
+    vacancyInput: "Vacancy text",
+    vacancyInputHint:
+      "Paste the full vacancy text here. Matching is calculated against the current active resume version.",
+    vacancyNotes: "Vacancy notes",
+    vacancyExtractedKeywords: "Extracted keywords",
+    vacancyMatchedKeywords: "Already covered",
+    vacancyMissingKeywords: "Worth strengthening",
+    vacancyNoMatches: "No obvious matches yet.",
+    vacancyAllKeywordsCovered: "The key terms look covered.",
+    vacancyEmptyTitle: "Nothing to analyze yet",
+    vacancyEmptyDescription:
+      "Add a role or paste the vacancy text, and this page will show matches, gaps, and suggestions.",
+    vacancySuggestions: "What I would strengthen",
+    vacancySuggestionKeywords:
+      "Add the missing stack keywords to the summary, skills, or relevant experience bullets.",
+    vacancySuggestionLeadership:
+      "Highlight ownership, mentoring, code review, or architecture decisions if the role expects senior signals.",
+    vacancySuggestionScale:
+      "Add more technical depth around performance, integrations, scale, or system design.",
+    vacancySuggestionStrong:
+      "Coverage already looks strong. At this point, mirror the vacancy wording in one or two bullets only.",
+    controlTitle: "Files, export, and overview",
+    controlDescription:
+      "A dedicated mode for importing and exporting data, generating PDFs, and reviewing the current resume version at a glance.",
+    controlStateTitle: "Current version state",
+    controlStateDescription:
+      "You are working with the active resume language. Check the PDF filename, autosave status, and download the file here.",
+    controlSummaryTitle: "Current version overview",
+    controlSummaryDescription:
+      "Counts of filled entities in the active resume: contacts, jobs, education, certificates, languages, and skills.",
     files: "Files",
+    filesDescription:
+      "Import loads JSON data back into the editor, while export saves the current resume version and skills to external files.",
     import: "Import",
     export: "Export",
     importTargetTitle: "What do you want to import?",
@@ -328,6 +548,18 @@ const enText: UIText = {
     pdfFileNameHint: "You can change the filename before download. The .pdf extension will be added automatically.",
     generating: "Generating PDF...",
     downloadPdf: (languageLabel) => `Download PDF (${languageLabel})`,
+    previewTitle: "Live PDF preview",
+    previewDescription:
+      "A dedicated screen for quickly checking the final layout. The preview refreshes after changes in the current resume.",
+    previewRefresh: "Refresh now",
+    previewOpenInNewTab: "Open separately",
+    previewRefreshing: "Refreshing preview...",
+    previewUpdatedAt: (value) => `Last update: ${value}`,
+    previewWaiting: "Waiting for the first PDF render...",
+    previewFrameTitle: "PDF preview",
+    previewWaitingTitle: "Preview is being prepared",
+    previewWaitingDescription: "The embedded PDF will appear here after the first render.",
+    previewError: (error) => `Failed to refresh preview: ${error}`,
     autosave: "Autosave",
     autosaveSaved: "Saved locally",
     lastAction: "Last action",
@@ -414,6 +646,11 @@ const enText: UIText = {
     resumeLanguageExists: (label) => `Resume language already exists: ${label}.`,
     resumeLanguageRenamed: (label) => `Renamed resume language: ${label}.`,
     resumeLanguageDeleted: (label) => `Deleted resume language: ${label}.`,
+    versionSaved: (label) => `Saved version: ${label}.`,
+    versionRenamed: (label) => `Renamed version: ${label}.`,
+    versionApplied: (label) => `Applied version: ${label}.`,
+    versionDeleted: (label) => `Deleted version: ${label}.`,
+    versionOverwritten: (label) => `Updated version: ${label}.`,
     cannotDeleteLastResumeLanguage: "You cannot delete the last resume language.",
     deleteResumeLanguageConfirm: (label) => `Delete resume language "${label}"?`,
     pdfDownloaded: (filename) => `Saved PDF: ${filename}.`,
@@ -1408,17 +1645,743 @@ const ukText: UIText = {
   unknownError: "Невідома помилка",
 };
 
+const featureTextOverrides = {
+  de: {
+    workspace: "Modi",
+    navEditor: "Editor",
+    navVersions: "Versionen",
+    navVacancy: "Stelle",
+    navPreview: "Vorschau",
+    navControl: "Verwaltung",
+    duplicateResumeLanguage: "Sprache des Lebenslaufs duplizieren",
+    renameResumeLanguage: "Sprache des Lebenslaufs umbenennen",
+    duplicateResumeLanguageTitle: "Sprache des Lebenslaufs duplizieren",
+    renameResumeLanguageTitle: "Sprache des Lebenslaufs umbenennen",
+    duplicateResumeLanguageConfirm: "Duplizieren",
+    renameResumeLanguageConfirm: "Speichern",
+    duplicateResumeLanguageDefaultName: (label: string) => `${label} Kopie`,
+    versionsTitle: "Versionen und Presets",
+    versionsDescription:
+      "Speichere benannte Snapshots des aktuellen Lebenslaufs, um schnell zwischen der Basisversion und Anpassungen für konkrete Stellen zu wechseln.",
+    saveVersion: "Version speichern",
+    saveVersionTitle: "Aktuelle Version speichern",
+    saveVersionConfirm: "Speichern",
+    renameVersionTitle: "Version umbenennen",
+    renameVersionConfirm: "Speichern",
+    versionName: "Versionsname",
+    versionNamePlaceholder: "Zum Beispiel: Deutschland Frontend / Startup",
+    versionDefaultName: (label: string) => `${label} Basis`,
+    activeResumeLanguage: "Aktive Sprache des Lebenslaufs",
+    applyVersion: "Anwenden",
+    overwriteVersion: "Überschreiben",
+    renameVersion: "Umbenennen",
+    deleteVersion: "Löschen",
+    deleteVersionConfirm: (label: string) => `Version „${label}“ löschen?`,
+    overwriteVersionConfirm: (label: string) =>
+      `Version „${label}“ mit dem aktuellen Stand des Editors überschreiben?`,
+    versionUpdatedAt: (value: string) => `Aktualisiert: ${value}`,
+    noVersionsTitle: "Noch keine gespeicherten Versionen",
+    noVersionsDescription:
+      "Speichere die aktuelle Konfiguration als Preset und verwende sie als Ausgangspunkt für verschiedene Rollen oder Unternehmen.",
+    vacancyTitle: "Stellenmodus",
+    vacancyDescription:
+      "Füge eine Stellenbeschreibung ein und prüfe schnell, welche Schlüsselwörter bereits vom aktuellen Lebenslauf abgedeckt werden und welche noch verstärkt werden sollten.",
+    vacancyRole: "Rolle / Stellentitel",
+    vacancyCompany: "Unternehmen",
+    vacancyCoverage: "Abdeckung",
+    vacancyInput: "Text der Stelle",
+    vacancyInputHint:
+      "Füge hier die vollständige Stellenbeschreibung ein. Der Abgleich wird mit der aktuell aktiven Version des Lebenslaufs berechnet.",
+    vacancyNotes: "Notizen zur Stelle",
+    vacancyExtractedKeywords: "Extrahierte Schlüsselwörter",
+    vacancyMatchedKeywords: "Bereits abgedeckt",
+    vacancyMissingKeywords: "Sollte verstärkt werden",
+    vacancyNoMatches: "Noch keine eindeutigen Treffer.",
+    vacancyAllKeywordsCovered: "Die wichtigsten Begriffe wirken abgedeckt.",
+    vacancyEmptyTitle: "Noch nichts zu analysieren",
+    vacancyEmptyDescription:
+      "Füge eine Rolle hinzu oder kopiere den Text der Stelle ein. Diese Seite zeigt dann Treffer, Lücken und Empfehlungen.",
+    vacancySuggestions: "Was ich verstärken würde",
+    vacancySuggestionKeywords:
+      "Fehlende Stack-Schlüsselwörter im Summary, im Skills-Block oder in passenden Experience-Bullets ergänzen.",
+    vacancySuggestionLeadership:
+      "Ownership, Mentoring, Code Review oder Architekturentscheidungen hervorheben, wenn die Rolle Senior-Signale erwartet.",
+    vacancySuggestionScale:
+      "Mehr technische Tiefe zu Performance, Integrationen, Skalierung oder System Design ergänzen.",
+    vacancySuggestionStrong:
+      "Die Abdeckung sieht bereits stark aus. Jetzt reicht es, die Formulierungen der Stelle in ein oder zwei Bullets gezielt zu spiegeln.",
+    controlTitle: "Dateien, Export und Überblick",
+    controlDescription:
+      "Eigener Modus für Import und Export der Daten, PDF-Generierung und einen schnellen Überblick über die aktuelle Version des Lebenslaufs.",
+    filesDescription:
+      "Import lädt JSON-Daten zurück in den Editor, während Export die aktuelle Version des Lebenslaufs und die Skills in externe Dateien speichert.",
+    controlStateTitle: "Status der aktuellen Version",
+    controlStateDescription:
+      "Du arbeitest mit der aktiven Sprache des Lebenslaufs. Hier kannst du den PDF-Dateinamen prüfen, den Autosave sehen und die Datei herunterladen.",
+    controlSummaryTitle: "Überblick der aktuellen Version",
+    controlSummaryDescription:
+      "Anzahl der ausgefüllten Elemente im aktiven Lebenslauf: Kontakte, Erfahrung, Ausbildung, Zertifikate, Sprachen und Skills.",
+    previewTitle: "Live-PDF-Vorschau",
+    previewDescription:
+      "Eigene Seite für die schnelle Prüfung des finalen Layouts. Die Vorschau wird nach Änderungen im aktuellen Lebenslauf aktualisiert.",
+    previewRefresh: "Jetzt aktualisieren",
+    previewOpenInNewTab: "Separat öffnen",
+    previewRefreshing: "Vorschau wird aktualisiert...",
+    previewUpdatedAt: (value: string) => `Letzte Aktualisierung: ${value}`,
+    previewWaiting: "Warte auf das erste PDF-Rendering...",
+    previewFrameTitle: "PDF-Vorschau",
+    previewWaitingTitle: "Vorschau wird vorbereitet",
+    previewWaitingDescription: "Nach dem ersten Render erscheint hier das eingebettete PDF.",
+    previewError: (error: string) => `Vorschau konnte nicht aktualisiert werden: ${error}`,
+    versionSaved: (label: string) => `Version gespeichert: ${label}.`,
+    versionRenamed: (label: string) => `Version umbenannt: ${label}.`,
+    versionApplied: (label: string) => `Version angewendet: ${label}.`,
+    versionDeleted: (label: string) => `Version gelöscht: ${label}.`,
+    versionOverwritten: (label: string) => `Version aktualisiert: ${label}.`,
+  },
+  es: {
+    workspace: "Modos",
+    navEditor: "Editor",
+    navVersions: "Versiones",
+    navVacancy: "Vacante",
+    navPreview: "Vista previa",
+    navControl: "Control",
+    duplicateResumeLanguage: "Duplicar idioma del CV",
+    renameResumeLanguage: "Renombrar idioma del CV",
+    duplicateResumeLanguageTitle: "Duplicar idioma del CV",
+    renameResumeLanguageTitle: "Renombrar idioma del CV",
+    duplicateResumeLanguageConfirm: "Duplicar",
+    renameResumeLanguageConfirm: "Guardar",
+    duplicateResumeLanguageDefaultName: (label: string) => `${label} copia`,
+    versionsTitle: "Versiones y presets",
+    versionsDescription:
+      "Guarda snapshots con nombre del CV actual para cambiar rápido entre la versión base y adaptaciones para vacantes concretas.",
+    saveVersion: "Guardar versión",
+    saveVersionTitle: "Guardar versión actual",
+    saveVersionConfirm: "Guardar",
+    renameVersionTitle: "Renombrar versión",
+    renameVersionConfirm: "Guardar",
+    versionName: "Nombre de la versión",
+    versionNamePlaceholder: "Por ejemplo: Alemania frontend / Startup",
+    versionDefaultName: (label: string) => `${label} base`,
+    activeResumeLanguage: "Idioma activo del CV",
+    applyVersion: "Aplicar",
+    overwriteVersion: "Sobrescribir",
+    renameVersion: "Renombrar",
+    deleteVersion: "Eliminar",
+    deleteVersionConfirm: (label: string) => `¿Eliminar la versión "${label}"?`,
+    overwriteVersionConfirm: (label: string) =>
+      `¿Sobrescribir la versión "${label}" con el estado actual del editor?`,
+    versionUpdatedAt: (value: string) => `Actualizado: ${value}`,
+    noVersionsTitle: "Todavía no hay versiones guardadas",
+    noVersionsDescription:
+      "Guarda la configuración actual como preset y reutilízala como punto de partida para distintos puestos o empresas.",
+    vacancyTitle: "Modo vacante",
+    vacancyDescription:
+      "Pega una vacante y comprueba rápido qué palabras clave ya cubre el CV actual y cuáles conviene reforzar.",
+    vacancyRole: "Rol / puesto",
+    vacancyCompany: "Empresa",
+    vacancyCoverage: "Cobertura",
+    vacancyInput: "Texto de la vacante",
+    vacancyInputHint:
+      "Pega aquí el texto completo de la vacante. La coincidencia se calcula con la versión activa del CV.",
+    vacancyNotes: "Notas sobre la vacante",
+    vacancyExtractedKeywords: "Palabras clave extraídas",
+    vacancyMatchedKeywords: "Ya cubiertas",
+    vacancyMissingKeywords: "Conviene reforzar",
+    vacancyNoMatches: "Todavía no hay coincidencias claras.",
+    vacancyAllKeywordsCovered: "Los términos clave parecen cubiertos.",
+    vacancyEmptyTitle: "Aún no hay nada que analizar",
+    vacancyEmptyDescription:
+      "Añade un rol o pega el texto de la vacante y esta página mostrará coincidencias, huecos y sugerencias.",
+    vacancySuggestions: "Qué reforzaría",
+    vacancySuggestionKeywords:
+      "Añade las palabras clave del stack que faltan al summary, a habilidades o a los bullets de experiencia relevantes.",
+    vacancySuggestionLeadership:
+      "Destaca ownership, mentoring, code review o decisiones de arquitectura si la vacante espera señales senior.",
+    vacancySuggestionScale:
+      "Añade más profundidad técnica sobre rendimiento, integraciones, escala o system design.",
+    vacancySuggestionStrong:
+      "La cobertura ya se ve fuerte. En este punto basta con reflejar el lenguaje de la vacante en uno o dos bullets.",
+    controlTitle: "Archivos, exportación y resumen",
+    controlDescription:
+      "Modo dedicado para importar y exportar datos, generar PDF y revisar de un vistazo la versión actual del CV.",
+    filesDescription:
+      "Importar devuelve los datos JSON al editor, mientras que exportar guarda la versión actual del CV y las skills en archivos externos.",
+    controlStateTitle: "Estado de la versión actual",
+    controlStateDescription:
+      "Estás trabajando con el idioma activo del CV. Aquí puedes revisar el nombre del PDF, el autosave y descargar el archivo.",
+    controlSummaryTitle: "Resumen de la versión actual",
+    controlSummaryDescription:
+      "Cantidad de entidades completadas en el CV activo: contactos, experiencia, educación, certificados, idiomas y habilidades.",
+    previewTitle: "Vista previa PDF en vivo",
+    previewDescription:
+      "Pantalla dedicada para comprobar rápidamente la maquetación final. La vista previa se actualiza después de cambios en el CV actual.",
+    previewRefresh: "Actualizar ahora",
+    previewOpenInNewTab: "Abrir aparte",
+    previewRefreshing: "Actualizando vista previa...",
+    previewUpdatedAt: (value: string) => `Última actualización: ${value}`,
+    previewWaiting: "Esperando el primer render del PDF...",
+    previewFrameTitle: "Vista previa PDF",
+    previewWaitingTitle: "La vista previa se está preparando",
+    previewWaitingDescription: "El PDF incrustado aparecerá aquí después del primer render.",
+    previewError: (error: string) => `No se pudo actualizar la vista previa: ${error}`,
+    versionSaved: (label: string) => `Versión guardada: ${label}.`,
+    versionRenamed: (label: string) => `Versión renombrada: ${label}.`,
+    versionApplied: (label: string) => `Versión aplicada: ${label}.`,
+    versionDeleted: (label: string) => `Versión eliminada: ${label}.`,
+    versionOverwritten: (label: string) => `Versión actualizada: ${label}.`,
+  },
+  it: {
+    workspace: "Modalità",
+    navEditor: "Editor",
+    navVersions: "Versioni",
+    navVacancy: "Vacancy",
+    navPreview: "Anteprima",
+    navControl: "Controllo",
+    duplicateResumeLanguage: "Duplica lingua del CV",
+    renameResumeLanguage: "Rinomina lingua del CV",
+    duplicateResumeLanguageTitle: "Duplica lingua del CV",
+    renameResumeLanguageTitle: "Rinomina lingua del CV",
+    duplicateResumeLanguageConfirm: "Duplica",
+    renameResumeLanguageConfirm: "Salva",
+    duplicateResumeLanguageDefaultName: (label: string) => `${label} copia`,
+    versionsTitle: "Versioni e preset",
+    versionsDescription:
+      "Salva snapshot con nome del CV corrente per passare rapidamente tra la versione base e gli adattamenti per vacancy specifiche.",
+    saveVersion: "Salva versione",
+    saveVersionTitle: "Salva versione corrente",
+    saveVersionConfirm: "Salva",
+    renameVersionTitle: "Rinomina versione",
+    renameVersionConfirm: "Salva",
+    versionName: "Nome della versione",
+    versionNamePlaceholder: "Per esempio: Germania frontend / Startup",
+    versionDefaultName: (label: string) => `${label} base`,
+    activeResumeLanguage: "Lingua attiva del CV",
+    applyVersion: "Applica",
+    overwriteVersion: "Sovrascrivi",
+    renameVersion: "Rinomina",
+    deleteVersion: "Elimina",
+    deleteVersionConfirm: (label: string) => `Eliminare la versione "${label}"?`,
+    overwriteVersionConfirm: (label: string) =>
+      `Sovrascrivere la versione "${label}" con lo stato attuale dell'editor?`,
+    versionUpdatedAt: (value: string) => `Aggiornata: ${value}`,
+    noVersionsTitle: "Nessuna versione salvata",
+    noVersionsDescription:
+      "Salva la configurazione corrente come preset e riusala come punto di partenza per ruoli o aziende diversi.",
+    vacancyTitle: "Modalità vacancy",
+    vacancyDescription:
+      "Incolla una vacancy e controlla rapidamente quali keyword sono già coperte dal CV corrente e quali conviene rafforzare.",
+    vacancyRole: "Ruolo / job title",
+    vacancyCompany: "Azienda",
+    vacancyCoverage: "Copertura",
+    vacancyInput: "Testo della vacancy",
+    vacancyInputHint:
+      "Incolla qui il testo completo della vacancy. Il matching viene calcolato rispetto alla versione attiva del CV.",
+    vacancyNotes: "Note sulla vacancy",
+    vacancyExtractedKeywords: "Keyword estratte",
+    vacancyMatchedKeywords: "Già coperte",
+    vacancyMissingKeywords: "Da rafforzare",
+    vacancyNoMatches: "Ancora nessuna corrispondenza evidente.",
+    vacancyAllKeywordsCovered: "I termini chiave sembrano coperti.",
+    vacancyEmptyTitle: "Ancora niente da analizzare",
+    vacancyEmptyDescription:
+      "Aggiungi un ruolo o incolla il testo della vacancy e questa pagina mostrerà match, gap e suggerimenti.",
+    vacancySuggestions: "Cosa rafforzerei",
+    vacancySuggestionKeywords:
+      "Aggiungi le keyword mancanti dello stack nel summary, nelle skills o nei bullet di esperienza più rilevanti.",
+    vacancySuggestionLeadership:
+      "Evidenzia ownership, mentoring, code review o decisioni architetturali se il ruolo richiede segnali senior.",
+    vacancySuggestionScale:
+      "Aggiungi più profondità tecnica su performance, integrazioni, scala o system design.",
+    vacancySuggestionStrong:
+      "La copertura sembra già forte. A questo punto basta rispecchiare il wording della vacancy in uno o due bullet.",
+    controlTitle: "File, export e panoramica",
+    controlDescription:
+      "Modalità dedicata all'import/export dei dati, alla generazione del PDF e a una panoramica rapida della versione corrente del CV.",
+    filesDescription:
+      "Importa riporta i dati JSON nell'editor, mentre esporta salva la versione corrente del CV e le skills in file esterni.",
+    controlStateTitle: "Stato della versione corrente",
+    controlStateDescription:
+      "Stai lavorando con la lingua attiva del CV. Qui puoi controllare il nome del PDF, l'autosave e scaricare il file.",
+    controlSummaryTitle: "Panoramica della versione corrente",
+    controlSummaryDescription:
+      "Numero di entità compilate nel CV attivo: contatti, esperienza, istruzione, certificati, lingue e competenze.",
+    previewTitle: "Anteprima PDF live",
+    previewDescription:
+      "Schermata dedicata per controllare rapidamente il layout finale. L'anteprima si aggiorna dopo le modifiche nel CV corrente.",
+    previewRefresh: "Aggiorna ora",
+    previewOpenInNewTab: "Apri separatamente",
+    previewRefreshing: "Aggiornamento anteprima...",
+    previewUpdatedAt: (value: string) => `Ultimo aggiornamento: ${value}`,
+    previewWaiting: "In attesa del primo render del PDF...",
+    previewFrameTitle: "Anteprima PDF",
+    previewWaitingTitle: "Anteprima in preparazione",
+    previewWaitingDescription: "Il PDF incorporato apparirà qui dopo il primo render.",
+    previewError: (error: string) => `Impossibile aggiornare l'anteprima: ${error}`,
+    versionSaved: (label: string) => `Versione salvata: ${label}.`,
+    versionRenamed: (label: string) => `Versione rinominata: ${label}.`,
+    versionApplied: (label: string) => `Versione applicata: ${label}.`,
+    versionDeleted: (label: string) => `Versione eliminata: ${label}.`,
+    versionOverwritten: (label: string) => `Versione aggiornata: ${label}.`,
+  },
+  pt: {
+    workspace: "Modos",
+    navEditor: "Editor",
+    navVersions: "Versões",
+    navVacancy: "Vaga",
+    navPreview: "Pré-visualização",
+    navControl: "Controlo",
+    duplicateResumeLanguage: "Duplicar idioma do currículo",
+    renameResumeLanguage: "Renomear idioma do currículo",
+    duplicateResumeLanguageTitle: "Duplicar idioma do currículo",
+    renameResumeLanguageTitle: "Renomear idioma do currículo",
+    duplicateResumeLanguageConfirm: "Duplicar",
+    renameResumeLanguageConfirm: "Guardar",
+    duplicateResumeLanguageDefaultName: (label: string) => `${label} cópia`,
+    versionsTitle: "Versões e presets",
+    versionsDescription:
+      "Guarda snapshots com nome do currículo atual para alternar rapidamente entre a versão base e adaptações para vagas específicas.",
+    saveVersion: "Guardar versão",
+    saveVersionTitle: "Guardar versão atual",
+    saveVersionConfirm: "Guardar",
+    renameVersionTitle: "Renomear versão",
+    renameVersionConfirm: "Guardar",
+    versionName: "Nome da versão",
+    versionNamePlaceholder: "Por exemplo: Alemanha frontend / Startup",
+    versionDefaultName: (label: string) => `${label} base`,
+    activeResumeLanguage: "Idioma ativo do currículo",
+    applyVersion: "Aplicar",
+    overwriteVersion: "Substituir",
+    renameVersion: "Renomear",
+    deleteVersion: "Eliminar",
+    deleteVersionConfirm: (label: string) => `Eliminar a versão "${label}"?`,
+    overwriteVersionConfirm: (label: string) =>
+      `Substituir a versão "${label}" pelo estado atual do editor?`,
+    versionUpdatedAt: (value: string) => `Atualizada: ${value}`,
+    noVersionsTitle: "Ainda não há versões guardadas",
+    noVersionsDescription:
+      "Guarda a configuração atual como preset e reutiliza-a como ponto de partida para diferentes funções ou empresas.",
+    vacancyTitle: "Modo vaga",
+    vacancyDescription:
+      "Cola uma vaga e vê rapidamente que palavras-chave já estão cobertas pelo currículo atual e quais ainda vale a pena reforçar.",
+    vacancyRole: "Função / título",
+    vacancyCompany: "Empresa",
+    vacancyCoverage: "Cobertura",
+    vacancyInput: "Texto da vaga",
+    vacancyInputHint:
+      "Cola aqui o texto completo da vaga. A correspondência é calculada com a versão ativa do currículo.",
+    vacancyNotes: "Notas da vaga",
+    vacancyExtractedKeywords: "Palavras-chave extraídas",
+    vacancyMatchedKeywords: "Já cobertas",
+    vacancyMissingKeywords: "Vale a pena reforçar",
+    vacancyNoMatches: "Ainda não há correspondências evidentes.",
+    vacancyAllKeywordsCovered: "Os termos principais parecem cobertos.",
+    vacancyEmptyTitle: "Ainda não há nada para analisar",
+    vacancyEmptyDescription:
+      "Adiciona uma função ou cola o texto da vaga e esta página mostrará correspondências, lacunas e sugestões.",
+    vacancySuggestions: "O que eu reforçaria",
+    vacancySuggestionKeywords:
+      "Adiciona as palavras-chave do stack que faltam no summary, nas skills ou nos bullets de experiência relevantes.",
+    vacancySuggestionLeadership:
+      "Destaca ownership, mentoring, code review ou decisões de arquitetura se a vaga espera sinais de senioridade.",
+    vacancySuggestionScale:
+      "Adiciona mais profundidade técnica sobre performance, integrações, escala ou system design.",
+    vacancySuggestionStrong:
+      "A cobertura já parece forte. Neste ponto basta espelhar a linguagem da vaga em um ou dois bullets.",
+    controlTitle: "Ficheiros, exportação e visão geral",
+    controlDescription:
+      "Modo dedicado para importar e exportar dados, gerar PDFs e rever rapidamente a versão atual do currículo.",
+    filesDescription:
+      "Importar volta a carregar os dados JSON no editor, enquanto exportar guarda a versão atual do currículo e as skills em ficheiros externos.",
+    controlStateTitle: "Estado da versão atual",
+    controlStateDescription:
+      "Estás a trabalhar com o idioma ativo do currículo. Aqui podes verificar o nome do PDF, o autosave e descarregar o ficheiro.",
+    controlSummaryTitle: "Resumo da versão atual",
+    controlSummaryDescription:
+      "Quantidade de entidades preenchidas no currículo ativo: contactos, experiência, educação, certificados, idiomas e competências.",
+    previewTitle: "Pré-visualização PDF em direto",
+    previewDescription:
+      "Ecrã dedicado para verificar rapidamente o layout final. A pré-visualização é atualizada após alterações no currículo atual.",
+    previewRefresh: "Atualizar agora",
+    previewOpenInNewTab: "Abrir em separado",
+    previewRefreshing: "A atualizar a pré-visualização...",
+    previewUpdatedAt: (value: string) => `Última atualização: ${value}`,
+    previewWaiting: "À espera do primeiro render do PDF...",
+    previewFrameTitle: "Pré-visualização PDF",
+    previewWaitingTitle: "A pré-visualização está a ser preparada",
+    previewWaitingDescription: "O PDF incorporado aparecerá aqui após o primeiro render.",
+    previewError: (error: string) => `Não foi possível atualizar a pré-visualização: ${error}`,
+    versionSaved: (label: string) => `Versão guardada: ${label}.`,
+    versionRenamed: (label: string) => `Versão renomeada: ${label}.`,
+    versionApplied: (label: string) => `Versão aplicada: ${label}.`,
+    versionDeleted: (label: string) => `Versão eliminada: ${label}.`,
+    versionOverwritten: (label: string) => `Versão atualizada: ${label}.`,
+  },
+  sr: {
+    workspace: "Режими",
+    navEditor: "Едитор",
+    navVersions: "Верзије",
+    navVacancy: "Оглас",
+    navPreview: "Преглед",
+    navControl: "Контрола",
+    duplicateResumeLanguage: "Дуплирај језик резимеа",
+    renameResumeLanguage: "Преименуј језик резимеа",
+    duplicateResumeLanguageTitle: "Дуплирај језик резимеа",
+    renameResumeLanguageTitle: "Преименуј језик резимеа",
+    duplicateResumeLanguageConfirm: "Дуплирај",
+    renameResumeLanguageConfirm: "Сачувај",
+    duplicateResumeLanguageDefaultName: (label: string) => `${label} копија`,
+    versionsTitle: "Верзије и пресети",
+    versionsDescription:
+      "Сачувај именоване снимке тренутног резимеа да би лако прелазио између базне верзије и варијанти за конкретне огласе.",
+    saveVersion: "Сачувај верзију",
+    saveVersionTitle: "Сачувај тренутну верзију",
+    saveVersionConfirm: "Сачувај",
+    renameVersionTitle: "Преименуј верзију",
+    renameVersionConfirm: "Сачувај",
+    versionName: "Назив верзије",
+    versionNamePlaceholder: "На пример: Немачка frontend / Startup",
+    versionDefaultName: (label: string) => `${label} база`,
+    activeResumeLanguage: "Активни језик резимеа",
+    applyVersion: "Примени",
+    overwriteVersion: "Препиши",
+    renameVersion: "Преименуј",
+    deleteVersion: "Обриши",
+    deleteVersionConfirm: (label: string) => `Обрисати верзију „${label}“?`,
+    overwriteVersionConfirm: (label: string) =>
+      `Преписати верзију „${label}“ тренутним стањем едитора?`,
+    versionUpdatedAt: (value: string) => `Ажурирано: ${value}`,
+    noVersionsTitle: "Још нема сачуваних верзија",
+    noVersionsDescription:
+      "Сачувај тренутну конфигурацију као пресет и користи је као полазну тачку за различите улоге или компаније.",
+    vacancyTitle: "Режим огласа",
+    vacancyDescription:
+      "Налепи текст огласа и брзо провери које кључне речи су већ покривене у тренутном резимеу, а које треба појачати.",
+    vacancyRole: "Улога / назив позиције",
+    vacancyCompany: "Компанија",
+    vacancyCoverage: "Покривеност",
+    vacancyInput: "Текст огласа",
+    vacancyInputHint:
+      "Овде налепи цео текст огласа. Подударање се рачуна у односу на тренутно активну верзију резимеа.",
+    vacancyNotes: "Белешке о огласу",
+    vacancyExtractedKeywords: "Извучене кључне речи",
+    vacancyMatchedKeywords: "Већ покривено",
+    vacancyMissingKeywords: "Вреди појачати",
+    vacancyNoMatches: "Још нема јасних поклапања.",
+    vacancyAllKeywordsCovered: "Кључни појмови делују покривено.",
+    vacancyEmptyTitle: "Још нема ништа за анализу",
+    vacancyEmptyDescription:
+      "Додај улогу или налепи текст огласа и ова страница ће показати поклапања, празнине и предлоге.",
+    vacancySuggestions: "Шта бих појачао",
+    vacancySuggestionKeywords:
+      "Додај недостајуће stack кључне речи у summary, skills или релевантне experience bullets.",
+    vacancySuggestionLeadership:
+      "Истакни ownership, mentoring, code review или архитектурске одлуке ако се за улогу очекују senior сигнали.",
+    vacancySuggestionScale:
+      "Додај више техничке дубине око перформанси, интеграција, скале или system design-а.",
+    vacancySuggestionStrong:
+      "Покривеност већ делује јако. У овој фази довољно је да у један или два bullet-а одразиш формулације из огласа.",
+    controlTitle: "Датотеке, извоз и преглед",
+    controlDescription:
+      "Посебан режим за увоз и извоз података, генерисање PDF-а и брз преглед тренутне верзије резимеа.",
+    filesDescription:
+      "Увоз враћа JSON податке у едитор, а извоз чува тренутну верзију резимеа и skills у спољне датотеке.",
+    controlStateTitle: "Стање тренутне верзије",
+    controlStateDescription:
+      "Радиш са активним језиком резимеа. Овде можеш да провериш име PDF-а, autosave и да преузмеш датотеку.",
+    controlSummaryTitle: "Преглед тренутне верзије",
+    controlSummaryDescription:
+      "Број попуњених ентитета у активном резимеу: контакти, искуство, образовање, сертификати, језици и вештине.",
+    previewTitle: "Live PDF преглед",
+    previewDescription:
+      "Посебан екран за брзу проверу финалног распореда. Преглед се освежава после измена у тренутном резимеу.",
+    previewRefresh: "Освежи сада",
+    previewOpenInNewTab: "Отвори одвојено",
+    previewRefreshing: "Освежавам преглед...",
+    previewUpdatedAt: (value: string) => `Последње ажурирање: ${value}`,
+    previewWaiting: "Чекам први PDF render...",
+    previewFrameTitle: "PDF преглед",
+    previewWaitingTitle: "Преглед се припрема",
+    previewWaitingDescription: "Уграђени PDF ће се појавити овде после првог render-а.",
+    previewError: (error: string) => `Није успело освежавање прегледа: ${error}`,
+    versionSaved: (label: string) => `Сачувана верзија: ${label}.`,
+    versionRenamed: (label: string) => `Преименована верзија: ${label}.`,
+    versionApplied: (label: string) => `Примењена верзија: ${label}.`,
+    versionDeleted: (label: string) => `Обрисана верзија: ${label}.`,
+    versionOverwritten: (label: string) => `Ажурирана верзија: ${label}.`,
+  },
+  fr: {
+    workspace: "Modes",
+    navEditor: "Éditeur",
+    navVersions: "Versions",
+    navVacancy: "Offre",
+    navPreview: "Aperçu",
+    navControl: "Contrôle",
+    versionsTitle: "Versions et presets",
+    versionsDescription:
+      "Enregistre des snapshots nommés du CV actuel pour passer rapidement entre la version de base et des adaptations pour des offres précises.",
+    saveVersion: "Enregistrer la version",
+    saveVersionTitle: "Enregistrer la version actuelle",
+    saveVersionConfirm: "Enregistrer",
+    renameVersionTitle: "Renommer la version",
+    renameVersionConfirm: "Enregistrer",
+    versionName: "Nom de la version",
+    versionNamePlaceholder: "Par exemple : Allemagne frontend / Startup",
+    versionDefaultName: (label: string) => `${label} base`,
+    activeResumeLanguage: "Langue active du CV",
+    applyVersion: "Appliquer",
+    overwriteVersion: "Écraser",
+    renameVersion: "Renommer",
+    deleteVersion: "Supprimer",
+    deleteVersionConfirm: (label: string) => `Supprimer la version « ${label} » ?`,
+    overwriteVersionConfirm: (label: string) =>
+      `Écraser la version « ${label} » avec l'état actuel de l'éditeur ?`,
+    versionUpdatedAt: (value: string) => `Mis à jour : ${value}`,
+    noVersionsTitle: "Aucune version enregistrée pour l'instant",
+    noVersionsDescription:
+      "Enregistre la configuration actuelle comme preset et réutilise-la comme point de départ pour différents rôles ou entreprises.",
+    vacancyTitle: "Mode offre",
+    vacancyDescription:
+      "Colle une offre d'emploi et vois rapidement quels mots-clés sont déjà couverts par le CV actuel et lesquels devraient être renforcés.",
+    vacancyRole: "Rôle / intitulé",
+    vacancyCompany: "Entreprise",
+    vacancyCoverage: "Couverture",
+    vacancyInput: "Texte de l'offre",
+    vacancyInputHint:
+      "Colle ici le texte complet de l'offre. Le matching est calculé par rapport à la version active du CV.",
+    vacancyNotes: "Notes sur l'offre",
+    vacancyExtractedKeywords: "Mots-clés extraits",
+    vacancyMatchedKeywords: "Déjà couverts",
+    vacancyMissingKeywords: "À renforcer",
+    vacancyNoMatches: "Aucune correspondance évidente pour l'instant.",
+    vacancyAllKeywordsCovered: "Les termes clés semblent couverts.",
+    vacancyEmptyTitle: "Rien à analyser pour l'instant",
+    vacancyEmptyDescription:
+      "Ajoute un rôle ou colle le texte de l'offre et cette page affichera les correspondances, les manques et les suggestions.",
+    vacancySuggestions: "Ce que je renforcerais",
+    vacancySuggestionKeywords:
+      "Ajoute les mots-clés stack manquants dans le résumé, les compétences ou les bullets d'expérience pertinents.",
+    vacancySuggestionLeadership:
+      "Mets en avant l'ownership, le mentoring, la code review ou les décisions d'architecture si le rôle attend des signaux senior.",
+    vacancySuggestionScale:
+      "Ajoute plus de profondeur technique autour de la performance, des intégrations, de l'échelle ou du system design.",
+    vacancySuggestionStrong:
+      "La couverture semble déjà solide. À ce stade, reflète simplement le vocabulaire de l'offre dans un ou deux bullets.",
+    controlTitle: "Fichiers, export et vue d'ensemble",
+    controlDescription:
+      "Mode dédié à l'import/export des données, à la génération du PDF et à une vue rapide de la version actuelle du CV.",
+    filesDescription:
+      "L'import recharge les données JSON dans l'éditeur, tandis que l'export enregistre la version actuelle du CV et les compétences dans des fichiers externes.",
+    controlStateTitle: "État de la version actuelle",
+    controlStateDescription:
+      "Tu travailles avec la langue active du CV. Ici, tu peux vérifier le nom du PDF, l'autosave et télécharger le fichier.",
+    controlSummaryTitle: "Vue d'ensemble de la version actuelle",
+    controlSummaryDescription:
+      "Nombre d'éléments remplis dans le CV actif : contacts, expérience, formation, certificats, langues et compétences.",
+    previewTitle: "Aperçu PDF en direct",
+    previewDescription:
+      "Écran dédié pour vérifier rapidement la mise en page finale. L'aperçu se met à jour après les modifications du CV actuel.",
+    previewRefresh: "Actualiser maintenant",
+    previewOpenInNewTab: "Ouvrir séparément",
+    previewRefreshing: "Actualisation de l'aperçu...",
+    previewUpdatedAt: (value: string) => `Dernière mise à jour : ${value}`,
+    previewWaiting: "En attente du premier rendu PDF...",
+    previewFrameTitle: "Aperçu PDF",
+    previewWaitingTitle: "L'aperçu est en préparation",
+    previewWaitingDescription: "Le PDF intégré apparaîtra ici après le premier rendu.",
+    previewError: (error: string) => `Impossible d'actualiser l'aperçu : ${error}`,
+    versionSaved: (label: string) => `Version enregistrée : ${label}.`,
+    versionRenamed: (label: string) => `Version renommée : ${label}.`,
+    versionApplied: (label: string) => `Version appliquée : ${label}.`,
+    versionDeleted: (label: string) => `Version supprimée : ${label}.`,
+    versionOverwritten: (label: string) => `Version mise à jour : ${label}.`,
+  },
+  pl: {
+    workspace: "Tryby",
+    navEditor: "Edytor",
+    navVersions: "Wersje",
+    navVacancy: "Oferta",
+    navPreview: "Podgląd",
+    navControl: "Sterowanie",
+    versionsTitle: "Wersje i presety",
+    versionsDescription:
+      "Zapisuj nazwane snapshoty aktualnego CV, aby szybko przełączać się między wersją bazową a wariantami pod konkretne oferty.",
+    saveVersion: "Zapisz wersję",
+    saveVersionTitle: "Zapisz bieżącą wersję",
+    saveVersionConfirm: "Zapisz",
+    renameVersionTitle: "Zmień nazwę wersji",
+    renameVersionConfirm: "Zapisz",
+    versionName: "Nazwa wersji",
+    versionNamePlaceholder: "Na przykład: Niemcy frontend / Startup",
+    versionDefaultName: (label: string) => `${label} baza`,
+    activeResumeLanguage: "Aktywny język CV",
+    applyVersion: "Zastosuj",
+    overwriteVersion: "Nadpisz",
+    renameVersion: "Zmień nazwę",
+    deleteVersion: "Usuń",
+    deleteVersionConfirm: (label: string) => `Usunąć wersję „${label}”?`,
+    overwriteVersionConfirm: (label: string) =>
+      `Nadpisać wersję „${label}” bieżącym stanem edytora?`,
+    versionUpdatedAt: (value: string) => `Zaktualizowano: ${value}`,
+    noVersionsTitle: "Brak zapisanych wersji",
+    noVersionsDescription:
+      "Zapisz bieżącą konfigurację jako preset i używaj jej jako punktu startowego dla różnych ról lub firm.",
+    vacancyTitle: "Tryb oferty",
+    vacancyDescription:
+      "Wklej ofertę pracy i szybko sprawdź, które słowa kluczowe są już pokryte przez aktualne CV, a które warto wzmocnić.",
+    vacancyRole: "Rola / stanowisko",
+    vacancyCompany: "Firma",
+    vacancyCoverage: "Pokrycie",
+    vacancyInput: "Treść oferty",
+    vacancyInputHint:
+      "Wklej tutaj pełną treść oferty. Dopasowanie jest liczone względem aktywnej wersji CV.",
+    vacancyNotes: "Notatki do oferty",
+    vacancyExtractedKeywords: "Wyodrębnione słowa kluczowe",
+    vacancyMatchedKeywords: "Już pokryte",
+    vacancyMissingKeywords: "Warto wzmocnić",
+    vacancyNoMatches: "Na razie brak wyraźnych dopasowań.",
+    vacancyAllKeywordsCovered: "Kluczowe terminy wyglądają na pokryte.",
+    vacancyEmptyTitle: "Jeszcze nic do analizy",
+    vacancyEmptyDescription:
+      "Dodaj rolę albo wklej treść oferty, a ta strona pokaże dopasowania, luki i sugestie.",
+    vacancySuggestions: "Co bym wzmocnił",
+    vacancySuggestionKeywords:
+      "Dodaj brakujące słowa kluczowe stacku do summary, umiejętności albo odpowiednich bulletów doświadczenia.",
+    vacancySuggestionLeadership:
+      "Podkreśl ownership, mentoring, code review lub decyzje architektoniczne, jeśli oferta oczekuje sygnałów senior.",
+    vacancySuggestionScale:
+      "Dodaj więcej głębi technicznej wokół wydajności, integracji, skali lub system design.",
+    vacancySuggestionStrong:
+      "Pokrycie wygląda już mocno. Na tym etapie wystarczy odbić język oferty w jednym lub dwóch bulletach.",
+    controlTitle: "Pliki, eksport i przegląd",
+    controlDescription:
+      "Osobny tryb do importu i eksportu danych, generowania PDF oraz szybkiego podglądu bieżącej wersji CV.",
+    filesDescription:
+      "Import przywraca dane JSON do edytora, a eksport zapisuje bieżącą wersję CV i umiejętności do zewnętrznych plików.",
+    controlStateTitle: "Stan bieżącej wersji",
+    controlStateDescription:
+      "Pracujesz na aktywnym języku CV. Tutaj możesz sprawdzić nazwę PDF, autosave i pobrać plik.",
+    controlSummaryTitle: "Przegląd bieżącej wersji",
+    controlSummaryDescription:
+      "Liczba wypełnionych elementów w aktywnym CV: kontakty, doświadczenie, edukacja, certyfikaty, języki i umiejętności.",
+    previewTitle: "Podgląd PDF na żywo",
+    previewDescription:
+      "Osobny ekran do szybkiego sprawdzania końcowego układu. Podgląd odświeża się po zmianach w aktualnym CV.",
+    previewRefresh: "Odśwież teraz",
+    previewOpenInNewTab: "Otwórz osobno",
+    previewRefreshing: "Odświeżam podgląd...",
+    previewUpdatedAt: (value: string) => `Ostatnia aktualizacja: ${value}`,
+    previewWaiting: "Czekam na pierwszy render PDF...",
+    previewFrameTitle: "Podgląd PDF",
+    previewWaitingTitle: "Podgląd jest przygotowywany",
+    previewWaitingDescription: "Osadzony PDF pojawi się tutaj po pierwszym renderze.",
+    previewError: (error: string) => `Nie udało się odświeżyć podglądu: ${error}`,
+    versionSaved: (label: string) => `Zapisano wersję: ${label}.`,
+    versionRenamed: (label: string) => `Zmieniono nazwę wersji: ${label}.`,
+    versionApplied: (label: string) => `Zastosowano wersję: ${label}.`,
+    versionDeleted: (label: string) => `Usunięto wersję: ${label}.`,
+    versionOverwritten: (label: string) => `Zaktualizowano wersję: ${label}.`,
+  },
+  uk: {
+    workspace: "Режими",
+    navEditor: "Редактор",
+    navVersions: "Версії",
+    navVacancy: "Вакансія",
+    navPreview: "Прев’ю",
+    navControl: "Керування",
+    versionsTitle: "Версії та пресети",
+    versionsDescription:
+      "Зберігай іменовані snapshots поточного резюме, щоб швидко перемикатися між базовою версією та адаптаціями під конкретні вакансії.",
+    saveVersion: "Зберегти версію",
+    saveVersionTitle: "Зберегти поточну версію",
+    saveVersionConfirm: "Зберегти",
+    renameVersionTitle: "Перейменувати версію",
+    renameVersionConfirm: "Зберегти",
+    versionName: "Назва версії",
+    versionNamePlaceholder: "Наприклад: Німеччина frontend / Startup",
+    versionDefaultName: (label: string) => `${label} база`,
+    activeResumeLanguage: "Активна мова резюме",
+    applyVersion: "Застосувати",
+    overwriteVersion: "Перезаписати",
+    renameVersion: "Перейменувати",
+    deleteVersion: "Видалити",
+    deleteVersionConfirm: (label: string) => `Видалити версію «${label}»?`,
+    overwriteVersionConfirm: (label: string) =>
+      `Перезаписати версію «${label}» поточним станом редактора?`,
+    versionUpdatedAt: (value: string) => `Оновлено: ${value}`,
+    noVersionsTitle: "Ще немає збережених версій",
+    noVersionsDescription:
+      "Збережи поточну конфігурацію як пресет і використовуй її як стартову точку для різних ролей або компаній.",
+    vacancyTitle: "Режим вакансії",
+    vacancyDescription:
+      "Встав текст вакансії й швидко подивись, які ключові слова вже покриті поточним резюме, а які варто підсилити.",
+    vacancyRole: "Роль / назва позиції",
+    vacancyCompany: "Компанія",
+    vacancyCoverage: "Покриття",
+    vacancyInput: "Текст вакансії",
+    vacancyInputHint:
+      "Встав сюди повний текст вакансії. Зіставлення рахується відносно активної версії резюме.",
+    vacancyNotes: "Нотатки до вакансії",
+    vacancyExtractedKeywords: "Витягнуті ключові слова",
+    vacancyMatchedKeywords: "Вже покрито",
+    vacancyMissingKeywords: "Варто підсилити",
+    vacancyNoMatches: "Поки що немає очевидних збігів.",
+    vacancyAllKeywordsCovered: "Ключові терміни виглядають покритими.",
+    vacancyEmptyTitle: "Поки нічого аналізувати",
+    vacancyEmptyDescription:
+      "Додай роль або встав текст вакансії, і ця сторінка покаже збіги, прогалини та підказки.",
+    vacancySuggestions: "Що я б підсилив",
+    vacancySuggestionKeywords:
+      "Додай відсутні stack-ключові слова в summary, skills або релевантні bullets досвіду.",
+    vacancySuggestionLeadership:
+      "Підсвіти ownership, mentoring, code review або архітектурні рішення, якщо роль очікує senior-сигнали.",
+    vacancySuggestionScale:
+      "Додай більше технічної глибини навколо performance, інтеграцій, масштабу або system design.",
+    vacancySuggestionStrong:
+      "Покриття вже виглядає сильним. На цьому етапі достатньо віддзеркалити формулювання вакансії в одному-двох bullets.",
+    controlTitle: "Файли, експорт і зведення",
+    controlDescription:
+      "Окремий режим для імпорту й експорту даних, генерації PDF та швидкого огляду поточної версії резюме.",
+    filesDescription:
+      "Імпорт повертає JSON-дані в редактор, а експорт зберігає поточну версію резюме й навички у зовнішні файли.",
+    controlStateTitle: "Стан поточної версії",
+    controlStateDescription:
+      "Ти працюєш з активною мовою резюме. Тут можна перевірити назву PDF, autosave і завантажити файл.",
+    controlSummaryTitle: "Огляд поточної версії",
+    controlSummaryDescription:
+      "Кількість заповнених сутностей в активному резюме: контакти, досвід, освіта, сертифікати, мови й навички.",
+    previewTitle: "Live PDF прев’ю",
+    previewDescription:
+      "Окремий екран для швидкої перевірки фінальної верстки. Прев’ю оновлюється після змін у поточному резюме.",
+    previewRefresh: "Оновити зараз",
+    previewOpenInNewTab: "Відкрити окремо",
+    previewRefreshing: "Оновлюю прев’ю...",
+    previewUpdatedAt: (value: string) => `Останнє оновлення: ${value}`,
+    previewWaiting: "Чекаю на перший рендер PDF...",
+    previewFrameTitle: "PDF прев’ю",
+    previewWaitingTitle: "Прев’ю готується",
+    previewWaitingDescription: "Вбудований PDF з’явиться тут після першого рендеру.",
+    previewError: (error: string) => `Не вдалося оновити прев’ю: ${error}`,
+    versionSaved: (label: string) => `Збережено версію: ${label}.`,
+    versionRenamed: (label: string) => `Перейменовано версію: ${label}.`,
+    versionApplied: (label: string) => `Застосовано версію: ${label}.`,
+    versionDeleted: (label: string) => `Видалено версію: ${label}.`,
+    versionOverwritten: (label: string) => `Оновлено версію: ${label}.`,
+  },
+} as const satisfies Partial<Record<InterfaceLanguageCode, Partial<UIText>>>;
+
 export const uiText: Record<InterfaceLanguageCode, UIText> = {
   ru: ruText,
   en: enText,
-  de: deText,
-  es: esText,
-  it: itText,
-  pt: ptText,
-  sr: srText,
-  fr: frText,
-  pl: plText,
-  uk: ukText,
+  de: { ...deText, ...featureTextOverrides.de },
+  es: { ...esText, ...featureTextOverrides.es },
+  it: { ...itText, ...featureTextOverrides.it },
+  pt: { ...ptText, ...featureTextOverrides.pt },
+  sr: { ...srText, ...featureTextOverrides.sr },
+  fr: { ...frText, ...featureTextOverrides.fr },
+  pl: { ...plText, ...featureTextOverrides.pl },
+  uk: { ...ukText, ...featureTextOverrides.uk },
 };
 
 const interfaceLanguageMeta = {

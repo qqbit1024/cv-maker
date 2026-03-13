@@ -126,3 +126,29 @@ export interface ResumeProgressItem {
   total: number;
   percent: number;
 }
+
+export interface ResumePreset {
+  id: string;
+  language: ResumeLanguageCode;
+  name: string;
+  resume: ResumeData;
+  skills: SkillsData;
+  pdfFileName: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface VacancyDraft {
+  role: string;
+  company: string;
+  description: string;
+  notes: string;
+}
+
+export interface VacancyAnalysis {
+  score: number;
+  extractedKeywords: string[];
+  matchedKeywords: string[];
+  missingKeywords: string[];
+  suggestions: string[];
+}
