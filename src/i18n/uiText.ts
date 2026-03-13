@@ -923,6 +923,18 @@ const deText: UIText = {
   interfaceLanguageMenuLabel: "Sprache der Anwendung wählen",
   switchToDarkTheme: "Dunkles Design aktivieren",
   switchToLightTheme: "Helles Design aktivieren",
+  headerDescription: "Name, Rolle und Kontakte, die in den PDF-Kopfbereich übernommen werden.",
+  summaryDescription:
+    "Kurze Positionierung: Stack, Erfahrung, Fokus und wonach du suchst.",
+  experienceDescription:
+    "Wichtige Stationen, Ergebnisse, ausgeblendete Punkte und Arbeitsnotizen.",
+  educationDescription:
+    "Ausbildung und zusätzliche Einträge für diese Version des Lebenslaufs.",
+  certificatesDescription:
+    "Kurse und Zertifikate, die du in dieser CV-Version behalten möchtest.",
+  languagesDescription: "Sprachen und Niveaus für den finalen PDF-Block.",
+  skillsDescription:
+    "Skill-Grid in genau der Reihenfolge, in der es ins Template übernommen wird.",
   resumeLanguage: "Sprachen des Lebenslaufs und Fortschritt",
   resumeLanguageHint:
     "Klicke auf eine Sprache, um im Editor zu ihr zu wechseln, oder füge mit + eine neue hinzu.",
@@ -947,7 +959,19 @@ const deText: UIText = {
   pdfFileNameHint:
     "Du kannst den Dateinamen vor dem Download ändern. Die Endung .pdf wird automatisch hinzugefügt.",
   generating: "PDF wird generiert...",
+  pdfTemplate: "PDF-Template",
+  pdfTemplateHint:
+    "Klassisch behält die aktuelle Dichte. Kompakt hilft, mehr Inhalt unterzubringen. Minimal schafft mehr Luft und eine ruhigere Präsentation.",
+  templateClassic: "Klassisch",
+  templateClassicDescription: "Basislayout mit vertrautem Gleichgewicht bei Dichte und Akzenten.",
+  templateCompact: "Kompakt",
+  templateCompactDescription: "Dichtere Anordnung für längere Lebenslauf-Versionen.",
+  templateMinimal: "Minimal",
+  templateMinimalDescription: "Mehr Luft, ruhigere Kopfzeile und klarere Darstellung.",
   downloadPdf: (languageLabel) => `PDF herunterladen (${languageLabel})`,
+  qualityTitle: "Qualitätscheck",
+  qualityDescription:
+    "Lokale Checkliste für die aktuelle Lebenslauf-Version: Struktur, Vollständigkeit, Tiefe der Bullets und allgemeine Lesbarkeit.",
   snapshot: "Übersicht",
   jobs: "Positionen",
   education: "Ausbildung",
@@ -1040,6 +1064,18 @@ const esText: UIText = {
   interfaceLanguageMenuLabel: "Elegir idioma de la aplicación",
   switchToDarkTheme: "Activar tema oscuro",
   switchToLightTheme: "Activar tema claro",
+  headerDescription: "Nombre, rol y contactos que aparecerán en la cabecera del PDF.",
+  summaryDescription:
+    "Posicionamiento corto: stack, experiencia, foco y lo que estás buscando.",
+  experienceDescription:
+    "Principales trabajos, logros, elementos ocultos y notas de trabajo.",
+  educationDescription:
+    "Formación principal y registros adicionales para esta versión del CV.",
+  certificatesDescription:
+    "Cursos y certificados que quieres conservar en esta versión del CV.",
+  languagesDescription: "Idiomas y niveles para el bloque final del PDF.",
+  skillsDescription:
+    "Cuadrícula de habilidades en el mismo orden en que aparecerán en la plantilla.",
   resumeLanguage: "Idiomas del CV y progreso",
   resumeLanguageHint:
     "Haz clic en un idioma para cambiar el editor a ese idioma o añade uno nuevo con +.",
@@ -1064,7 +1100,19 @@ const esText: UIText = {
   pdfFileNameHint:
     "Puedes cambiar el nombre del archivo antes de descargarlo. La extensión .pdf se añadirá automáticamente.",
   generating: "Generando PDF...",
+  pdfTemplate: "Plantilla PDF",
+  pdfTemplateHint:
+    "Clásica mantiene la densidad actual. Compacta ayuda a meter más contenido. Minimalista añade aire y simplifica la presentación.",
+  templateClassic: "Clásica",
+  templateClassicDescription: "Maquetación base con un equilibrio familiar de densidad y acentos.",
+  templateCompact: "Compacta",
+  templateCompactDescription: "Distribución más densa para versiones largas del CV.",
+  templateMinimal: "Minimalista",
+  templateMinimalDescription: "Más aire, cabecera más calmada y presentación más limpia.",
   downloadPdf: (languageLabel) => `Descargar PDF (${languageLabel})`,
+  qualityTitle: "Revisión de calidad",
+  qualityDescription:
+    "Checklist local para la versión actual del CV: estructura, completitud, profundidad de los bullets y legibilidad general.",
   snapshot: "Resumen",
   jobs: "Experiencia",
   education: "Educación",
@@ -1156,6 +1204,18 @@ const itText: UIText = {
   interfaceLanguageMenuLabel: "Scegli la lingua dell'applicazione",
   switchToDarkTheme: "Attiva tema scuro",
   switchToLightTheme: "Attiva tema chiaro",
+  headerDescription: "Nome, ruolo e contatti che compariranno nell'intestazione del PDF.",
+  summaryDescription:
+    "Posizionamento breve: stack, esperienza, focus e ciò che stai cercando.",
+  experienceDescription:
+    "Principali esperienze, risultati, elementi nascosti e note di lavoro.",
+  educationDescription:
+    "Formazione principale e voci aggiuntive per questa versione del CV.",
+  certificatesDescription:
+    "Corsi e certificati che vuoi mantenere in questa versione del CV.",
+  languagesDescription: "Lingue e livelli per il blocco finale del PDF.",
+  skillsDescription:
+    "Griglia delle competenze nello stesso ordine in cui entreranno nel template.",
   resumeLanguage: "Lingue del CV e progresso",
   resumeLanguageHint:
     "Fai clic su una lingua per passare a quella lingua nell'editor oppure aggiungine una nuova con +.",
@@ -1180,7 +1240,19 @@ const itText: UIText = {
   pdfFileNameHint:
     "Puoi cambiare il nome del file prima del download. L'estensione .pdf verrà aggiunta automaticamente.",
   generating: "Generazione PDF in corso...",
+  pdfTemplate: "Template PDF",
+  pdfTemplateHint:
+    "Classico mantiene la densità attuale. Compatto aiuta a far entrare più contenuto. Minimal aggiunge respiro e semplifica la presentazione.",
+  templateClassic: "Classico",
+  templateClassicDescription: "Layout base con un equilibrio familiare tra densità e accenti.",
+  templateCompact: "Compatto",
+  templateCompactDescription: "Impaginazione più densa per versioni lunghe del CV.",
+  templateMinimal: "Minimal",
+  templateMinimalDescription: "Più spazio, header più calmo e presentazione più pulita.",
   downloadPdf: (languageLabel) => `Scarica PDF (${languageLabel})`,
+  qualityTitle: "Controllo qualità",
+  qualityDescription:
+    "Checklist locale per la versione corrente del CV: struttura, completezza, profondità dei bullet e leggibilità complessiva.",
   snapshot: "Panoramica",
   jobs: "Esperienza",
   education: "Istruzione",
@@ -1272,6 +1344,19 @@ const ptText: UIText = {
   interfaceLanguageMenuLabel: "Escolher idioma da aplicação",
   switchToDarkTheme: "Ativar tema escuro",
   switchToLightTheme: "Ativar tema claro",
+  headerDescription:
+    "Nome, função e contactos que vão aparecer no cabeçalho do PDF.",
+  summaryDescription:
+    "Posicionamento curto: stack, experiência, foco e o que procuras.",
+  experienceDescription:
+    "Principais experiências, resultados, elementos ocultos e notas de trabalho.",
+  educationDescription:
+    "Educação principal e registos extra para esta versão do currículo.",
+  certificatesDescription:
+    "Cursos e certificados que queres manter nesta versão do CV.",
+  languagesDescription: "Idiomas e níveis para o bloco final do PDF.",
+  skillsDescription:
+    "Grelha de competências na mesma ordem em que aparecerão no template.",
   resumeLanguage: "Idiomas do currículo e progresso",
   resumeLanguageHint:
     "Clica num idioma para mudar o editor para ele ou adiciona um novo com +.",
@@ -1296,7 +1381,19 @@ const ptText: UIText = {
   pdfFileNameHint:
     "Podes alterar o nome do ficheiro antes de o descarregar. A extensão .pdf será adicionada automaticamente.",
   generating: "A gerar PDF...",
+  pdfTemplate: "Template PDF",
+  pdfTemplateHint:
+    "Clássico mantém a densidade atual. Compacto ajuda a encaixar mais conteúdo. Minimal cria mais respiro e simplifica a apresentação.",
+  templateClassic: "Clássico",
+  templateClassicDescription: "Layout base com um equilíbrio familiar entre densidade e acentos.",
+  templateCompact: "Compacto",
+  templateCompactDescription: "Disposição mais densa para versões longas do currículo.",
+  templateMinimal: "Minimal",
+  templateMinimalDescription: "Mais ar, cabeçalho mais calmo e apresentação mais limpa.",
   downloadPdf: (languageLabel) => `Descarregar PDF (${languageLabel})`,
+  qualityTitle: "Verificação de qualidade",
+  qualityDescription:
+    "Checklist local para a versão atual do currículo: estrutura, completude, profundidade dos bullets e legibilidade geral.",
   snapshot: "Resumo",
   jobs: "Experiência",
   education: "Educação",
@@ -1388,6 +1485,18 @@ const srText: UIText = {
   interfaceLanguageMenuLabel: "Изабери језик апликације",
   switchToDarkTheme: "Укључи тамну тему",
   switchToLightTheme: "Укључи светлу тему",
+  headerDescription: "Име, улога и контакти који ће ући у заглавље PDF-а.",
+  summaryDescription:
+    "Кратко позиционирање: стек, искуство, фокус и оно што тражиш.",
+  experienceDescription:
+    "Главна радна места, резултати, сакривене ставке и радне белешке.",
+  educationDescription:
+    "Основно образовање и додатни записи за ову верзију резимеа.",
+  certificatesDescription:
+    "Курсеви и сертификати које желиш да задржиш у овој верзији CV-а.",
+  languagesDescription: "Језици и нивои за финални PDF блок.",
+  skillsDescription:
+    "Мрежа вештина у истом редоследу у ком ће ући у шаблон.",
   resumeLanguage: "Језици резимеа и напредак",
   resumeLanguageHint:
     "Кликни на језик да пребациш едитор на њега или додај нови помоћу +.",
@@ -1412,7 +1521,19 @@ const srText: UIText = {
   pdfFileNameHint:
     "Можеш да промениш име датотеке пре преузимања. Екстензија .pdf ће бити додата аутоматски.",
   generating: "Генеришем PDF...",
+  pdfTemplate: "PDF шаблон",
+  pdfTemplateHint:
+    "Класичан задржава тренутну густину. Компактан помаже да стане више садржаја. Минималистички додаје више ваздуха и мирнију презентацију.",
+  templateClassic: "Класичан",
+  templateClassicDescription: "Основни распоред са познатим балансом густине и акцената.",
+  templateCompact: "Компактан",
+  templateCompactDescription: "Гушћи распоред за дуже верзије резимеа.",
+  templateMinimal: "Минималистички",
+  templateMinimalDescription: "Више ваздуха, мирније заглавље и чистија презентација.",
   downloadPdf: (languageLabel) => `Преузми PDF (${languageLabel})`,
+  qualityTitle: "Провера квалитета",
+  qualityDescription:
+    "Локална чек-листа за тренутну верзију резимеа: структура, потпуност, дубина bullets и општа читљивост.",
   snapshot: "Преглед",
   jobs: "Радна места",
   education: "Образовање",
@@ -1548,7 +1669,19 @@ const frText: UIText = {
   pdfFileNameHint:
     "Tu peux modifier le nom avant le téléchargement. L'extension .pdf sera ajoutée automatiquement.",
   generating: "Génération du PDF...",
+  pdfTemplate: "Modèle PDF",
+  pdfTemplateHint:
+    "Classique garde la densité actuelle. Compact aide à faire tenir plus de contenu. Minimal ajoute de l'air et une présentation plus calme.",
+  templateClassic: "Classique",
+  templateClassicDescription: "Mise en page de base avec un équilibre familier entre densité et accents.",
+  templateCompact: "Compact",
+  templateCompactDescription: "Disposition plus dense pour les versions longues du CV.",
+  templateMinimal: "Minimaliste",
+  templateMinimalDescription: "Plus d'air, un en-tête plus calme et une présentation plus propre.",
   downloadPdf: (languageLabel) => `Télécharger le PDF (${languageLabel})`,
+  qualityTitle: "Vérification qualité",
+  qualityDescription:
+    "Checklist locale pour la version actuelle du CV : structure, complétude, profondeur des bullets et lisibilité générale.",
   autosave: "Sauvegarde auto",
   autosaveSaved: "Enregistré localement",
   lastAction: "Dernière action",
@@ -1681,7 +1814,19 @@ const plText: UIText = {
   pdfFileNameHint:
     "Możesz zmienić nazwę przed pobraniem. Rozszerzenie .pdf zostanie dodane automatycznie.",
   generating: "Generuję PDF...",
+  pdfTemplate: "Szablon PDF",
+  pdfTemplateHint:
+    "Klasyczny zachowuje obecną gęstość. Kompaktowy pomaga zmieścić więcej treści. Minimalistyczny dodaje więcej oddechu i prostszą prezentację.",
+  templateClassic: "Klasyczny",
+  templateClassicDescription: "Bazowy układ z oswojonym balansem gęstości i akcentów.",
+  templateCompact: "Kompaktowy",
+  templateCompactDescription: "Gęstszy układ dla dłuższych wersji CV.",
+  templateMinimal: "Minimalistyczny",
+  templateMinimalDescription: "Więcej przestrzeni, spokojniejszy nagłówek i czystsza prezentacja.",
   downloadPdf: (languageLabel) => `Pobierz PDF (${languageLabel})`,
+  qualityTitle: "Kontrola jakości",
+  qualityDescription:
+    "Lokalna checklista dla bieżącej wersji CV: struktura, kompletność, głębia bulletów i ogólna czytelność.",
   autosave: "Autozapis",
   autosaveSaved: "Zapisano lokalnie",
   lastAction: "Ostatnia akcja",
@@ -1814,7 +1959,19 @@ const ukText: UIText = {
   pdfFileNameHint:
     "Можна змінити назву перед завантаженням. Розширення .pdf додасться автоматично.",
   generating: "Генерую PDF...",
+  pdfTemplate: "PDF-шаблон",
+  pdfTemplateHint:
+    "Класичний зберігає поточну щільність. Компактний допомагає вмістити більше контенту. Мінімалістичний додає більше повітря й спокійнішу подачу.",
+  templateClassic: "Класичний",
+  templateClassicDescription: "Базова верстка зі звичним балансом щільності та акцентів.",
+  templateCompact: "Компактний",
+  templateCompactDescription: "Щільніший макет для довших версій резюме.",
+  templateMinimal: "Мінімалістичний",
+  templateMinimalDescription: "Більше повітря, спокійніша шапка та чистіша подача.",
   downloadPdf: (languageLabel) => `Завантажити PDF (${languageLabel})`,
+  qualityTitle: "Перевірка якості",
+  qualityDescription:
+    "Локальний чек-лист для поточної версії резюме: структура, повнота, глибина bullets і загальна читабельність.",
   autosave: "Автозбереження",
   autosaveSaved: "Збережено локально",
   lastAction: "Остання дія",
@@ -1995,9 +2152,9 @@ const featureTextOverrides = {
     controlSummaryTitle: "Überblick der aktuellen Version",
     controlSummaryDescription:
       "Anzahl der ausgefüllten Elemente im aktiven Lebenslauf: Kontakte, Erfahrung, Ausbildung, Zertifikate, Sprachen und Skills.",
-    previewTitle: "Live-PDF-Vorschau",
+    previewTitle: "PDF-Vorschau",
     previewDescription:
-      "Eigene Seite für die schnelle Prüfung des finalen Layouts. Die Vorschau wird nach Änderungen im aktuellen Lebenslauf aktualisiert.",
+      "Ein eigener Bildschirm, um das finale Layout schnell zu prüfen, das Template zu wechseln und die aktuelle Version des Lebenslaufs zu exportieren.",
     previewRefresh: "Jetzt aktualisieren",
     previewOpenInNewTab: "Separat öffnen",
     previewExpand: "Vorschau vergrößern",
@@ -2104,9 +2261,9 @@ const featureTextOverrides = {
     controlSummaryTitle: "Resumen de la versión actual",
     controlSummaryDescription:
       "Cantidad de entidades completadas en el CV activo: contactos, experiencia, educación, certificados, idiomas y habilidades.",
-    previewTitle: "Vista previa PDF en vivo",
+    previewTitle: "Vista previa PDF",
     previewDescription:
-      "Pantalla dedicada para comprobar rápidamente la maquetación final. La vista previa se actualiza después de cambios en el CV actual.",
+      "Pantalla dedicada para revisar rápidamente la maquetación final, cambiar la plantilla y exportar la versión actual del CV.",
     previewRefresh: "Actualizar ahora",
     previewOpenInNewTab: "Abrir aparte",
     previewExpand: "Ampliar vista previa",
@@ -2213,9 +2370,9 @@ const featureTextOverrides = {
     controlSummaryTitle: "Panoramica della versione corrente",
     controlSummaryDescription:
       "Numero di entità compilate nel CV attivo: contatti, esperienza, istruzione, certificati, lingue e competenze.",
-    previewTitle: "Anteprima PDF live",
+    previewTitle: "Anteprima PDF",
     previewDescription:
-      "Schermata dedicata per controllare rapidamente il layout finale. L'anteprima si aggiorna dopo le modifiche nel CV corrente.",
+      "Schermata dedicata per controllare rapidamente il layout finale, cambiare template ed esportare la versione corrente del CV.",
     previewRefresh: "Aggiorna ora",
     previewOpenInNewTab: "Apri separatamente",
     previewExpand: "Espandi anteprima",
@@ -2322,9 +2479,9 @@ const featureTextOverrides = {
     controlSummaryTitle: "Resumo da versão atual",
     controlSummaryDescription:
       "Quantidade de entidades preenchidas no currículo ativo: contactos, experiência, educação, certificados, idiomas e competências.",
-    previewTitle: "Pré-visualização PDF em direto",
+    previewTitle: "Pré-visualização PDF",
     previewDescription:
-      "Ecrã dedicado para verificar rapidamente o layout final. A pré-visualização é atualizada após alterações no currículo atual.",
+      "Ecrã dedicado para verificar rapidamente o layout final, mudar o template e exportar a versão atual do currículo.",
     previewRefresh: "Atualizar agora",
     previewOpenInNewTab: "Abrir em separado",
     previewExpand: "Expandir pré-visualização",
@@ -2431,9 +2588,9 @@ const featureTextOverrides = {
     controlSummaryTitle: "Преглед тренутне верзије",
     controlSummaryDescription:
       "Број попуњених ентитета у активном резимеу: контакти, искуство, образовање, сертификати, језици и вештине.",
-    previewTitle: "Live PDF преглед",
+    previewTitle: "PDF преглед",
     previewDescription:
-      "Посебан екран за брзу проверу финалног распореда. Преглед се освежава после измена у тренутном резимеу.",
+      "Посебан екран за брзу проверу финалног распореда, избор шаблона и извоз тренутне верзије резимеа.",
     previewRefresh: "Освежи сада",
     previewOpenInNewTab: "Отвори одвојено",
     previewExpand: "Прошири преглед",
@@ -2533,9 +2690,9 @@ const featureTextOverrides = {
     controlSummaryTitle: "Vue d'ensemble de la version actuelle",
     controlSummaryDescription:
       "Nombre d'éléments remplis dans le CV actif : contacts, expérience, formation, certificats, langues et compétences.",
-    previewTitle: "Aperçu PDF en direct",
+    previewTitle: "Aperçu PDF",
     previewDescription:
-      "Écran dédié pour vérifier rapidement la mise en page finale. L'aperçu se met à jour après les modifications du CV actuel.",
+      "Écran dédié pour vérifier rapidement la mise en page finale, changer de modèle et exporter la version actuelle du CV.",
     previewRefresh: "Actualiser maintenant",
     previewOpenInNewTab: "Ouvrir séparément",
     previewExpand: "Agrandir l’aperçu",
@@ -2635,9 +2792,9 @@ const featureTextOverrides = {
     controlSummaryTitle: "Przegląd bieżącej wersji",
     controlSummaryDescription:
       "Liczba wypełnionych elementów w aktywnym CV: kontakty, doświadczenie, edukacja, certyfikaty, języki i umiejętności.",
-    previewTitle: "Podgląd PDF na żywo",
+    previewTitle: "Podgląd PDF",
     previewDescription:
-      "Osobny ekran do szybkiego sprawdzania końcowego układu. Podgląd odświeża się po zmianach w aktualnym CV.",
+      "Osobny ekran do szybkiego sprawdzania końcowego układu, zmiany szablonu i eksportu bieżącej wersji CV.",
     previewRefresh: "Odśwież teraz",
     previewOpenInNewTab: "Otwórz osobno",
     previewExpand: "Powiększ podgląd",
@@ -2737,9 +2894,9 @@ const featureTextOverrides = {
     controlSummaryTitle: "Огляд поточної версії",
     controlSummaryDescription:
       "Кількість заповнених сутностей в активному резюме: контакти, досвід, освіта, сертифікати, мови й навички.",
-    previewTitle: "Live PDF прев’ю",
+    previewTitle: "Перегляд PDF",
     previewDescription:
-      "Окремий екран для швидкої перевірки фінальної верстки. Прев’ю оновлюється після змін у поточному резюме.",
+      "Окремий екран для швидкої перевірки фінальної верстки, зміни шаблону та експорту поточної версії резюме.",
     previewRefresh: "Оновити зараз",
     previewOpenInNewTab: "Відкрити окремо",
     previewExpand: "Розгорнути прев’ю",
