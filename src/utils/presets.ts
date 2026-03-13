@@ -2,9 +2,17 @@ import type {
   ResumeData,
   ResumeLanguageCode,
   ResumePreset,
+  ResumeTemplateId,
   SkillsData,
 } from "../types/resume";
-import { clone, ensurePdfFileName, normalizeResume, normalizeSkills } from "./resumeState";
+import {
+  clone,
+  DEFAULT_TEMPLATE_ID,
+  ensurePdfFileName,
+  normalizeResume,
+  normalizeResumeTemplate,
+  normalizeSkills,
+} from "./resumeState";
 
 const PRESETS_STORAGE_KEY = "resume-studio-presets-v1";
 
@@ -40,6 +48,7 @@ function normalizePreset(preset: unknown): ResumePreset | null {
     resume,
     skills,
     pdfFileName: ensurePdfFileName(source.pdfFileName, language, resume),
+    templateId: normalizeResumeTemplate(source.templateId),
     createdAt,
     updatedAt,
   };
@@ -96,12 +105,14 @@ export function createPresetSnapshot({
   resume,
   skills,
   pdfFileName,
+  templateId,
 }: {
   language: ResumeLanguageCode;
   name: string;
   resume: ResumeData;
   skills: SkillsData;
   pdfFileName: string;
+  templateId: ResumeTemplateId;
 }): ResumePreset {
   const timestamp = new Date().toISOString();
 
@@ -112,6 +123,7 @@ export function createPresetSnapshot({
     resume: clone(resume),
     skills: clone(skills),
     pdfFileName: ensurePdfFileName(pdfFileName, language, resume),
+    templateId: normalizeResumeTemplate(templateId),
     createdAt: timestamp,
     updatedAt: timestamp,
   };
@@ -123,6 +135,7 @@ export function updatePresetSnapshot(
     resume: ResumeData;
     skills: SkillsData;
     pdfFileName: string;
+    templateId: ResumeTemplateId;
   }
 ): ResumePreset {
   return {
@@ -130,6 +143,7 @@ export function updatePresetSnapshot(
     resume: clone(payload.resume),
     skills: clone(payload.skills),
     pdfFileName: ensurePdfFileName(payload.pdfFileName, preset.language, payload.resume),
+    templateId: normalizeResumeTemplate(payload.templateId ?? DEFAULT_TEMPLATE_ID),
     updatedAt: new Date().toISOString(),
   };
 }

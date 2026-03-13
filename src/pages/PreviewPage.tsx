@@ -1,8 +1,9 @@
 import { startTransition, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
-import { ExternalLink, RefreshCcw } from "lucide-react";
+import { ExternalLink, LayoutTemplate, RefreshCcw } from "lucide-react";
 import fontUrl from "../../fonts/helvetica_regular.otf";
 import { useStudioOutlet } from "../hooks/useStudioOutlet";
 import { createResumePdf } from "../lib/pdfTemplate";
+import type { ResumeTemplateId } from "../types/resume";
 
 export default function PreviewPage() {
   const studio = useStudioOutlet();
@@ -13,6 +14,7 @@ export default function PreviewPage() {
   const [error, setError] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
   const [updatedAt, setUpdatedAt] = useState<string>("");
+  const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
   const fontBytesRef = useRef<ArrayBuffer | null>(null);
   const previewUrlRef = useRef<string | null>(null);
 
@@ -22,9 +24,10 @@ export default function PreviewPage() {
         resume: deferredResume,
         skills: deferredSkills,
         language: studio.activeLanguage,
+        template: studio.activeResumeTemplate,
         refreshKey,
       }),
-    [deferredResume, deferredSkills, studio.activeLanguage, refreshKey]
+    [deferredResume, deferredSkills, studio.activeLanguage, studio.activeResumeTemplate, refreshKey]
   );
 
   useEffect(() => {
@@ -43,6 +46,7 @@ export default function PreviewPage() {
           resumeData: deferredResume,
           skillsData: deferredSkills,
           fontBytes: fontBytesRef.current,
+          templateId: studio.activeResumeTemplate,
         });
         const pdfBuffer =
           bytes.buffer instanceof ArrayBuffer
@@ -95,6 +99,28 @@ export default function PreviewPage() {
     []
   );
 
+  useEffect(() => {
+    if (!isTemplateModalOpen) {
+      return undefined;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsTemplateModalOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isTemplateModalOpen]);
+
   const refreshPreview = () => {
     startTransition(() => {
       setRefreshKey((current) => current + 1);
@@ -109,6 +135,32 @@ export default function PreviewPage() {
     window.open(previewUrl, "_blank", "noopener,noreferrer");
   };
 
+  const templateOptions: Array<{
+    id: ResumeTemplateId;
+    title: string;
+    description: string;
+  }> = [
+    {
+      id: "classic",
+      title: studio.t.templateClassic,
+      description: studio.t.templateClassicDescription,
+    },
+    {
+      id: "compact",
+      title: studio.t.templateCompact,
+      description: studio.t.templateCompactDescription,
+    },
+    {
+      id: "minimal",
+      title: studio.t.templateMinimal,
+      description: studio.t.templateMinimalDescription,
+    },
+  ];
+
+  const activeTemplate = templateOptions.find(
+    (template) => template.id === studio.activeResumeTemplate
+  ) ?? templateOptions[0];
+
   return (
     <section className="page-panel page-panel--preview">
       <div className="page-panel__header">
@@ -117,32 +169,54 @@ export default function PreviewPage() {
           <h2>{studio.t.previewTitle}</h2>
           <p>{studio.t.previewDescription}</p>
         </div>
-        <div className="page-panel__actions">
-          <button type="button" className="button--with-icon button--small" onClick={refreshPreview}>
-            <RefreshCcw className="button__icon" strokeWidth={2} />
-            <span>{studio.t.previewRefresh}</span>
-          </button>
-          <button
-            type="button"
-            className="button--with-icon button--small"
-            onClick={openPreviewInNewTab}
-            disabled={!previewUrl}
-          >
-            <ExternalLink className="button__icon" strokeWidth={2} />
-            <span>{studio.t.previewOpenInNewTab}</span>
-          </button>
+        <div className="page-panel__actions page-panel__actions--preview">
+          <div className="preview-actions-stack">
+            <button
+              type="button"
+              className="button--with-icon button--small"
+              onClick={refreshPreview}
+            >
+              <RefreshCcw className="button__icon" strokeWidth={2} />
+              <span>{studio.t.previewRefresh}</span>
+            </button>
+            <button
+              type="button"
+              className="button--with-icon button--small"
+              onClick={openPreviewInNewTab}
+              disabled={!previewUrl}
+            >
+              <ExternalLink className="button__icon" strokeWidth={2} />
+              <span>{studio.t.previewOpenInNewTab}</span>
+            </button>
+            <button
+              type="button"
+              className="button--with-icon button--small"
+              onClick={() => setIsTemplateModalOpen(true)}
+            >
+              <LayoutTemplate className="button__icon" strokeWidth={2} />
+              <span>{studio.t.pdfTemplate}</span>
+            </button>
+          </div>
         </div>
       </div>
 
       <div className="page-panel__body page-panel__body--preview">
         <div className="preview-toolbar">
-          <span className="status-caption">{studio.t.activeResumeLanguage}</span>
-          <strong>{studio.activeResumeLanguageLabel}</strong>
-          <span className="preview-toolbar__spacer" />
-          <span className="status">
-            {isRendering
-              ? studio.t.previewRefreshing
-              : updatedAt
+          <div className="preview-toolbar__group">
+            <span className="status-caption">{studio.t.activeResumeLanguage}</span>
+            <strong>{studio.activeResumeLanguageLabel}</strong>
+          </div>
+          <div className="preview-toolbar__group preview-toolbar__group--wide">
+            <span className="status-caption">{studio.t.pdfTemplate}</span>
+            <strong>{activeTemplate.title}</strong>
+            <span className="status">{activeTemplate.description}</span>
+          </div>
+          <div className="preview-toolbar__group preview-toolbar__group--status">
+            <span className="status-caption">{studio.t.navPreview}</span>
+            <span className="status">
+              {isRendering
+                ? studio.t.previewRefreshing
+                : updatedAt
                 ? studio.t.previewUpdatedAt(
                     new Intl.DateTimeFormat(studio.uiLanguage, {
                       dateStyle: "medium",
@@ -150,7 +224,8 @@ export default function PreviewPage() {
                     }).format(new Date(updatedAt))
                   )
                 : studio.t.previewWaiting}
-          </span>
+            </span>
+          </div>
         </div>
 
         {error ? <p className="page-note page-note--error">{error}</p> : null}
@@ -171,6 +246,74 @@ export default function PreviewPage() {
           )}
         </div>
       </div>
+
+      {isTemplateModalOpen ? (
+        <div
+          className="modal-backdrop"
+          onClick={() => setIsTemplateModalOpen(false)}
+          role="presentation"
+        >
+          <div
+            className="modal-card modal-card--wide modal-card--template-picker"
+            onClick={(event) => event.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label={studio.t.pdfTemplate}
+          >
+            <div className="modal-card__header">
+              <div className="modal-card__title-block">
+                <h3>{studio.t.pdfTemplate}</h3>
+                <p className="status">{studio.t.pdfTemplateHint}</p>
+              </div>
+              <div className="modal-card__header-actions">
+                <button
+                  type="button"
+                  className="button--ghost button--small"
+                  onClick={() => setIsTemplateModalOpen(false)}
+                >
+                  {studio.t.closeModal}
+                </button>
+              </div>
+            </div>
+            <div className="modal-card__body">
+              <div className="template-grid">
+                {templateOptions.map((template) => (
+                  <button
+                    key={template.id}
+                    type="button"
+                    className={`template-card${
+                      studio.activeResumeTemplate === template.id ? " template-card--active" : ""
+                    }`}
+                    onClick={() => {
+                      studio.updateResumeTemplate(template.id);
+                      setIsTemplateModalOpen(false);
+                    }}
+                  >
+                    <span
+                      className={`template-card__thumb template-card__thumb--${template.id}`}
+                      aria-hidden="true"
+                    >
+                      <span className="template-card__page">
+                        <span className="template-card__hero" />
+                        <span className="template-card__line template-card__line--short" />
+                        <span className="template-card__line" />
+                        <span className="template-card__line" />
+                        <span className="template-card__columns">
+                          <span />
+                          <span />
+                          <span />
+                        </span>
+                      </span>
+                    </span>
+                    <strong>{template.title}</strong>
+                    <span>{template.description}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }

@@ -1,16 +1,96 @@
 import { PDFDocument, rgb, type PDFFont } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
-import type { ResumeData, SkillsData } from "../types/resume";
+import type { ResumeData, ResumeTemplateId, SkillsData } from "../types/resume";
 
 const PAGE_WIDTH = 595.28;
 const PAGE_HEIGHT = 841.89;
-const LEFT_MARGIN = 15;
-const RIGHT_MARGIN = 20;
-const TOP_Y = 800;
-const BOTTOM_MARGIN = 40;
-const RIGHT_COLUMN_WIDTH = 110;
-const RIGHT_COLUMN_X = PAGE_WIDTH - RIGHT_MARGIN - RIGHT_COLUMN_WIDTH;
-const EXPERIENCE_TITLE_MAX_WIDTH = RIGHT_COLUMN_X - LEFT_MARGIN - 10;
+
+const TEMPLATE_CONFIG = {
+  classic: {
+    leftMargin: 15,
+    rightMargin: 20,
+    topY: 800,
+    bottomMargin: 40,
+    rightColumnWidth: 110,
+    headerMode: "inline" as const,
+    headerNameSize: 14,
+    headerTitleSize: 14,
+    contactSize: 10.5,
+    contactLineHeight: 12,
+    summarySize: 9,
+    summaryLineHeight: 10,
+    sectionTitleSize: 12,
+    sectionTitleGap: 15,
+    sectionLineGap: 5,
+    paragraphGap: 3,
+    experienceHeadingSize: 10,
+    experienceHeadingLineHeight: 12,
+    experienceGapAfterHeading: 3,
+    taskSize: 8.5,
+    taskLineHeight: 9.3,
+    taskBlockGap: 6,
+    educationSize: 10,
+    educationLineHeight: 12,
+    skillsSize: 9,
+    skillsRowHeight: 12,
+  },
+  compact: {
+    leftMargin: 14,
+    rightMargin: 16,
+    topY: 806,
+    bottomMargin: 34,
+    rightColumnWidth: 102,
+    headerMode: "inline" as const,
+    headerNameSize: 13.2,
+    headerTitleSize: 13.2,
+    contactSize: 9.7,
+    contactLineHeight: 11,
+    summarySize: 8.4,
+    summaryLineHeight: 9.2,
+    sectionTitleSize: 11.2,
+    sectionTitleGap: 12,
+    sectionLineGap: 4,
+    paragraphGap: 2,
+    experienceHeadingSize: 9.4,
+    experienceHeadingLineHeight: 10.8,
+    experienceGapAfterHeading: 2,
+    taskSize: 8.1,
+    taskLineHeight: 8.8,
+    taskBlockGap: 4,
+    educationSize: 9.5,
+    educationLineHeight: 10.6,
+    skillsSize: 8.4,
+    skillsRowHeight: 10.6,
+  },
+  minimal: {
+    leftMargin: 24,
+    rightMargin: 24,
+    topY: 794,
+    bottomMargin: 42,
+    rightColumnWidth: 120,
+    headerMode: "stacked" as const,
+    headerNameSize: 18,
+    headerTitleSize: 11.2,
+    contactSize: 9.6,
+    contactLineHeight: 11,
+    summarySize: 8.9,
+    summaryLineHeight: 10.2,
+    sectionTitleSize: 11.4,
+    sectionTitleGap: 14,
+    sectionLineGap: 4,
+    paragraphGap: 3,
+    experienceHeadingSize: 9.8,
+    experienceHeadingLineHeight: 11.5,
+    experienceGapAfterHeading: 3,
+    taskSize: 8.4,
+    taskLineHeight: 9.1,
+    taskBlockGap: 6,
+    educationSize: 9.7,
+    educationLineHeight: 11.2,
+    skillsSize: 8.8,
+    skillsRowHeight: 11.2,
+  },
+} as const satisfies Record<ResumeTemplateId, Record<string, number | string>>;
 
 function interleaveArrays(columns: string[][]): string[] {
   const result: string[] = [];
@@ -117,13 +197,23 @@ interface CreateResumePdfParams {
   resumeData: ResumeData;
   skillsData: SkillsData;
   fontBytes: ArrayBuffer;
+  templateId?: ResumeTemplateId;
 }
 
 export async function createResumePdf({
   resumeData,
   skillsData,
   fontBytes,
+  templateId = "classic",
 }: CreateResumePdfParams): Promise<Uint8Array> {
+  const template = TEMPLATE_CONFIG[templateId] ?? TEMPLATE_CONFIG.classic;
+  const LEFT_MARGIN = template.leftMargin;
+  const RIGHT_MARGIN = template.rightMargin;
+  const TOP_Y = template.topY;
+  const BOTTOM_MARGIN = template.bottomMargin;
+  const RIGHT_COLUMN_WIDTH = template.rightColumnWidth;
+  const RIGHT_COLUMN_X = PAGE_WIDTH - RIGHT_MARGIN - RIGHT_COLUMN_WIDTH;
+  const EXPERIENCE_TITLE_MAX_WIDTH = RIGHT_COLUMN_X - LEFT_MARGIN - 10;
   const pdfDoc = await PDFDocument.create();
   pdfDoc.registerFontkit(fontkit);
 
@@ -211,14 +301,14 @@ export async function createResumePdf({
     page.drawText(title, {
       x: LEFT_MARGIN,
       y: yPosition,
-      size: 12,
+      size: template.sectionTitleSize,
       font,
     });
 
-    yPosition -= 5;
+    yPosition -= template.sectionLineGap;
     ensureSpace(10);
     drawLine();
-    yPosition -= 15;
+    yPosition -= template.sectionTitleGap;
   };
 
   const drawRightAlignedText = (
@@ -278,12 +368,12 @@ export async function createResumePdf({
       const mainLines = wrapText(mainLine, mainLineMaxWidth, font, 10);
 
       mainLines.forEach((line, lineIndex) => {
-        ensureSpace(12);
+        ensureSpace(template.educationLineHeight);
 
         page.drawText(lineIndex === 0 ? `• ${line}` : line, {
           x: lineIndex === 0 ? LEFT_MARGIN : 28,
           y: yPosition,
-          size: 10,
+          size: template.educationSize,
           font,
         });
 
@@ -291,11 +381,11 @@ export async function createResumePdf({
           drawRightAlignedText(year, {
             rightX: PAGE_WIDTH - RIGHT_MARGIN,
             y: yPosition,
-            size: 10,
+            size: template.educationSize,
           });
         }
 
-        yPosition -= 12;
+        yPosition -= template.educationLineHeight;
       });
 
       if (secondaryLine) {
@@ -319,25 +409,57 @@ export async function createResumePdf({
     drawSectionTitle(section.title);
     drawWrappedText(section.content, {
       x: LEFT_MARGIN,
-      size: 10,
-      lineHeight: 12,
+      size: template.educationSize,
+      lineHeight: template.educationLineHeight,
       maxWidth: PAGE_WIDTH - LEFT_MARGIN - RIGHT_MARGIN,
     });
     yPosition -= 6;
   };
 
   const header = resumeData.header;
-  page.drawText(`${header.name} | ${header.title}`, {
-    x: 180,
-    y: yPosition,
-    size: 14,
-    font,
-  });
+  if (template.headerMode === "stacked") {
+    const name = String(header.name ?? "").trim();
+    const title = String(header.title ?? "").trim();
+    const nameWidth = font.widthOfTextAtSize(name, template.headerNameSize);
 
-  yPosition -= 20;
+    page.drawText(name, {
+      x: (PAGE_WIDTH - nameWidth) / 2,
+      y: yPosition,
+      size: template.headerNameSize,
+      font,
+    });
+
+    yPosition -= 18;
+
+    if (title) {
+      const titleWidth = font.widthOfTextAtSize(title, template.headerTitleSize);
+      page.drawText(title, {
+        x: (PAGE_WIDTH - titleWidth) / 2,
+        y: yPosition,
+        size: template.headerTitleSize,
+        font,
+      });
+      yPosition -= 16;
+    }
+  } else {
+    page.drawText(`${header.name} | ${header.title}`, {
+      x: 180,
+      y: yPosition,
+      size: template.headerNameSize,
+      font,
+    });
+
+    yPosition -= 20;
+  }
+
   drawWrappedText(getHeaderContactText(header), {
-    size: 10.5,
-    lineHeight: 12,
+    x: template.headerMode === "stacked" ? LEFT_MARGIN + 30 : LEFT_MARGIN,
+    size: template.contactSize,
+    lineHeight: template.contactLineHeight,
+    maxWidth:
+      template.headerMode === "stacked"
+        ? PAGE_WIDTH - LEFT_MARGIN - RIGHT_MARGIN - 60
+        : PAGE_WIDTH - LEFT_MARGIN - RIGHT_MARGIN,
   });
 
   yPosition -= 8;
@@ -348,9 +470,9 @@ export async function createResumePdf({
     : summary.content;
   drawSectionTitle(summary.title);
   drawWrappedText(summaryContent, {
-    size: 9,
-    lineHeight: 10,
-    paragraphGap: 3,
+    size: template.summarySize,
+    lineHeight: template.summaryLineHeight,
+    paragraphGap: template.paragraphGap,
   });
 
   yPosition -= 8;
@@ -364,16 +486,16 @@ export async function createResumePdf({
       `${job.title} | ${job.company}`,
       EXPERIENCE_TITLE_MAX_WIDTH,
       font,
-      10
+      template.experienceHeadingSize
     );
 
     titleLines.forEach((line, lineIndex) => {
-      ensureSpace(12);
+      ensureSpace(template.experienceHeadingLineHeight);
 
       page.drawText(line, {
         x: LEFT_MARGIN,
         y: yPosition,
-        size: 10,
+        size: template.experienceHeadingSize,
         font,
       });
 
@@ -381,26 +503,26 @@ export async function createResumePdf({
         drawRightAlignedText(period, {
           rightX: PAGE_WIDTH - RIGHT_MARGIN,
           y: yPosition,
-          size: 10,
+          size: template.experienceHeadingSize,
         });
       }
 
-      yPosition -= 12;
+      yPosition -= template.experienceHeadingLineHeight;
     });
 
-    yPosition -= 3;
+    yPosition -= template.experienceGapAfterHeading;
 
     getVisibleTaskTexts(job.tasks).forEach((task) => {
       drawWrappedText(task, {
         x: 30,
-        size: 8.5,
-        lineHeight: 9.3,
+        size: template.taskSize,
+        lineHeight: template.taskLineHeight,
         maxWidth: 540,
         bullet: true,
       });
     });
 
-    yPosition -= 6;
+    yPosition -= template.taskBlockGap;
   });
 
   drawEducationLikeSection(resumeData.sections.education);
@@ -415,7 +537,7 @@ export async function createResumePdf({
 
   const interleavedSkills = getSkillItems(skillsData);
   const skillsPerRow = getSkillsColumnCount(skillsData);
-  const rowHeight = 12;
+  const rowHeight = template.skillsRowHeight;
   const availableWidth = PAGE_WIDTH - LEFT_MARGIN - RIGHT_MARGIN;
   const columnWidth = availableWidth / skillsPerRow;
 
@@ -428,7 +550,7 @@ export async function createResumePdf({
       page.drawText(`• ${skill}`, {
         x: LEFT_MARGIN + columnIndex * columnWidth,
         y: yPosition,
-        size: 9,
+        size: template.skillsSize,
         font,
       });
     });

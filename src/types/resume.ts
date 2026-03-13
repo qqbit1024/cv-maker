@@ -12,6 +12,7 @@ export type InterfaceLanguageCode =
 export type ThemeMode = "light" | "dark";
 export type BuiltInResumeLanguageCode = "ru" | "en";
 export type ResumeLanguageCode = string;
+export type ResumeTemplateId = "classic" | "compact" | "minimal";
 export type ModalType = "import" | "export" | null;
 export type ImportTarget = ResumeLanguageCode | "skills";
 export type Direction = "up" | "down";
@@ -110,6 +111,7 @@ export interface ResumeStudioState {
   skills: SkillsData;
   pdfFileNames: Record<ResumeLanguageCode, string>;
   resumeLanguageLabels: Record<ResumeLanguageCode, string>;
+  resumeTemplates: Record<ResumeLanguageCode, ResumeTemplateId>;
 }
 
 export interface LanguageOption {
@@ -134,6 +136,7 @@ export interface ResumePreset {
   resume: ResumeData;
   skills: SkillsData;
   pdfFileName: string;
+  templateId: ResumeTemplateId;
   createdAt: string;
   updatedAt: string;
 }
@@ -151,4 +154,24 @@ export interface VacancyAnalysis {
   matchedKeywords: string[];
   missingKeywords: string[];
   suggestions: string[];
+}
+
+export type QualityCheckSeverity = "error" | "warning" | "good";
+
+export interface QualityCheckIssue {
+  id: string;
+  title: string;
+  description: string;
+  severity: QualityCheckSeverity;
+  section: string;
+}
+
+export interface ResumeQualityAnalysis {
+  isDraft: boolean;
+  score: number;
+  strongCount: number;
+  needsAttentionCount: number;
+  issues: QualityCheckIssue[];
+  suggestions: string[];
+  draftChecklist: string[];
 }

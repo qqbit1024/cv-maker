@@ -14,6 +14,7 @@ export interface UIText {
   navVacancy: string;
   navPreview: string;
   navControl: string;
+  navQuality: string;
   headerDescription: string;
   summaryDescription: string;
   experienceDescription: string;
@@ -56,6 +57,19 @@ export interface UIText {
   versionUpdatedAt: (value: string) => string;
   noVersionsTitle: string;
   noVersionsDescription: string;
+  versionsCompareTitle: string;
+  versionsCompareDescription: string;
+  compareSourceVersion: string;
+  compareTargetVersion: string;
+  versionDiffChanged: string;
+  versionDiffSkillsAdded: string;
+  versionDiffSkillsRemoved: string;
+  versionDiffChangedSections: string;
+  versionDiffAddedJobs: string;
+  versionDiffRemovedJobs: string;
+  versionDiffUpdatedJobs: string;
+  versionDiffNoChangesTitle: string;
+  versionDiffNoChangesDescription: string;
   fieldProgress: (completed: number, total: number) => string;
   vacancyTitle: string;
   vacancyDescription: string;
@@ -98,12 +112,21 @@ export interface UIText {
   generate: string;
   pdfFileName: string;
   pdfFileNameHint: string;
+  pdfTemplate: string;
+  pdfTemplateHint: string;
+  templateClassic: string;
+  templateClassicDescription: string;
+  templateCompact: string;
+  templateCompactDescription: string;
+  templateMinimal: string;
+  templateMinimalDescription: string;
   generating: string;
   downloadPdf: (languageLabel: string) => string;
   previewTitle: string;
   previewDescription: string;
   previewRefresh: string;
   previewOpenInNewTab: string;
+  previewExpand: string;
   previewRefreshing: string;
   previewUpdatedAt: (value: string) => string;
   previewWaiting: string;
@@ -111,6 +134,47 @@ export interface UIText {
   previewWaitingTitle: string;
   previewWaitingDescription: string;
   previewError: (error: string) => string;
+  qualityTitle: string;
+  qualityDescription: string;
+  qualityScore: string;
+  qualityStrong: string;
+  qualityNeedsAttention: string;
+  qualityIssues: string;
+  qualitySuggestions: string;
+  qualityNoIssuesTitle: string;
+  qualityNoIssuesDescription: string;
+  qualityDraftTitle: string;
+  qualityDraftDescription: string;
+  qualityDraftChecklistTitle: string;
+  qualityDraftHintRole: string;
+  qualityDraftHintSummary: string;
+  qualityDraftHintExperience: string;
+  qualityDraftHintSkills: string;
+  qualityIssueMissingRoleTitle: string;
+  qualityIssueMissingRoleDescription: string;
+  qualityIssueFewContactsTitle: string;
+  qualityIssueFewContactsDescription: string;
+  qualityIssueSummaryShortTitle: string;
+  qualityIssueSummaryShortDescription: string;
+  qualityIssueSummaryLongTitle: string;
+  qualityIssueSummaryLongDescription: string;
+  qualityIssueFewJobsTitle: string;
+  qualityIssueFewJobsDescription: string;
+  qualityIssueMissingMetricsTitle: string;
+  qualityIssueMissingMetricsDescription: string;
+  qualityIssueSkillsOverloadTitle: string;
+  qualityIssueSkillsOverloadDescription: string;
+  qualityIssueSkillsLowTitle: string;
+  qualityIssueSkillsLowDescription: string;
+  qualityIssueEnglishTitle: string;
+  qualityIssueEnglishDescription: string;
+  qualityIssueJobBulletsTitle: (company: string) => string;
+  qualityIssueJobBulletsDescription: string;
+  qualitySuggestionMetrics: string;
+  qualitySuggestionSummary: string;
+  qualitySuggestionSkills: string;
+  qualitySuggestionEnglish: string;
+  qualitySuggestionBullets: string;
   autosave: string;
   autosaveSaved: string;
   lastAction: string;
@@ -206,6 +270,7 @@ export interface UIText {
   pdfDownloaded: (filename: string) => string;
   pdfFailed: (error: string) => string;
   unknownError: string;
+  templateLabel: (templateId: "classic" | "compact" | "minimal") => string;
 }
 
 const ruText: UIText = {
@@ -221,8 +286,9 @@ const ruText: UIText = {
     navEditor: "Редактор",
     navVersions: "Версии",
     navVacancy: "Вакансия",
-    navPreview: "Превью",
+    navPreview: "Просмотр",
     navControl: "Управление",
+    navQuality: "Проверка",
     headerDescription: "Имя, роль и контакты, которые попадут в шапку PDF.",
     summaryDescription: "Короткое позиционирование: стек, опыт, фокус и то, что ищешь.",
     experienceDescription: "Основные места работы, достижения, скрытые пункты и заметки.",
@@ -268,6 +334,21 @@ const ruText: UIText = {
     noVersionsTitle: "Пока нет сохранённых версий",
     noVersionsDescription:
       "Сохрани текущую конфигурацию как пресет и используй её как отправную точку под разные вакансии.",
+    versionsCompareTitle: "Сравнение версий",
+    versionsCompareDescription:
+      "Сравни две сохранённые версии и быстро посмотри, что изменилось в структуре, опыте, навыках и PDF-настройках.",
+    compareSourceVersion: "Исходная версия",
+    compareTargetVersion: "Сравнить с",
+    versionDiffChanged: "Изменилось",
+    versionDiffSkillsAdded: "Добавлено навыков",
+    versionDiffSkillsRemoved: "Убрано навыков",
+    versionDiffChangedSections: "Изменённые секции",
+    versionDiffAddedJobs: "Добавленные места работы",
+    versionDiffRemovedJobs: "Удалённые места работы",
+    versionDiffUpdatedJobs: "Обновлённые места работы",
+    versionDiffNoChangesTitle: "Версии совпадают",
+    versionDiffNoChangesDescription:
+      "Между выбранными версиями пока не видно заметных различий. Попробуй выбрать другую пару.",
     fieldProgress: (completed, total) => `${completed}/${total}`,
     vacancyTitle: "Vacancy mode",
     vacancyDescription:
@@ -321,13 +402,23 @@ const ruText: UIText = {
     generate: "Генерация",
     pdfFileName: "Имя PDF-файла",
     pdfFileNameHint: "Можно изменить имя перед скачиванием. Расширение .pdf добавится автоматически.",
+    pdfTemplate: "PDF-шаблон",
+    pdfTemplateHint:
+      "Классический оставляет текущую плотность. Компактный помогает уместить больше текста. Минималистичный добавляет воздуха и упрощает подачу.",
+    templateClassic: "Классический",
+    templateClassicDescription: "Базовая верстка с привычным балансом плотности и акцентов.",
+    templateCompact: "Компактный",
+    templateCompactDescription: "Более плотная раскладка для длинных версий резюме.",
+    templateMinimal: "Минималистичный",
+    templateMinimalDescription: "Больше воздуха, спокойнее шапка и более чистая подача.",
     generating: "Генерирую PDF...",
     downloadPdf: (languageLabel) => `Скачать PDF (${languageLabel})`,
-    previewTitle: "Live PDF preview",
+    previewTitle: "Просмотр PDF",
     previewDescription:
-      "Отдельная страница для быстрой проверки итоговой вёрстки. Превью обновляется после изменений в текущем резюме.",
+      "Экран для быстрой проверки итоговой вёрстки, выбора шаблона и экспорта текущей версии резюме.",
     previewRefresh: "Обновить сейчас",
     previewOpenInNewTab: "Открыть отдельно",
+    previewExpand: "Развернуть превью",
     previewRefreshing: "Обновляю превью...",
     previewUpdatedAt: (value) => `Последнее обновление: ${value}`,
     previewWaiting: "Ожидаю первый рендер PDF...",
@@ -335,6 +426,66 @@ const ruText: UIText = {
     previewWaitingTitle: "Превью готовится",
     previewWaitingDescription: "После первого рендера здесь появится встраиваемый PDF.",
     previewError: (error) => `Не удалось обновить превью: ${error}`,
+    qualityTitle: "Проверка качества",
+    qualityDescription:
+      "Локальный чек-лист по текущей версии резюме: структура, полнота, глубина bullets и общая рыночная читаемость.",
+    qualityScore: "Общий score",
+    qualityStrong: "Сильные зоны",
+    qualityNeedsAttention: "Нужно усилить",
+    qualityIssues: "Что стоит поправить",
+    qualitySuggestions: "Что бы я усилил дальше",
+    qualityNoIssuesTitle: "Явных проблем не найдено",
+    qualityNoIssuesDescription:
+      "Текущая версия выглядит собранной. Дальше уже имеет смысл адаптировать её под конкретную вакансию.",
+    qualityDraftTitle: "Пока рано оценивать качество",
+    qualityDraftDescription:
+      "Эта версия пока больше похожа на черновик. Сначала заполни базовые блоки, и тогда появится осмысленная проверка качества.",
+    qualityDraftChecklistTitle: "Что стоит заполнить сначала",
+    qualityDraftHintRole: "Укажи роль в шапке.",
+    qualityDraftHintSummary: "Добавь summary на 2-4 строки.",
+    qualityDraftHintExperience: "Заполни хотя бы одно место работы и несколько bullets.",
+    qualityDraftHintSkills: "Добавь ведущие навыки и стек.",
+    qualityIssueMissingRoleTitle: "Не хватает роли в шапке",
+    qualityIssueMissingRoleDescription:
+      "Укажи роль в header, чтобы рекрутер сразу понял позиционирование.",
+    qualityIssueFewContactsTitle: "Слишком мало контактов",
+    qualityIssueFewContactsDescription:
+      "Добавь хотя бы 3 контакта: локацию, почту, мессенджер или LinkedIn/GitHub.",
+    qualityIssueSummaryShortTitle: "Слишком короткий summary",
+    qualityIssueSummaryShortDescription:
+      "Summary должен быстро объяснять стек, опыт, домены и текущий фокус.",
+    qualityIssueSummaryLongTitle: "Summary перегружен",
+    qualityIssueSummaryLongDescription:
+      "Лучше сократить вводный блок и оставить только самые сильные сигналы.",
+    qualityIssueFewJobsTitle: "Слишком мало мест работы",
+    qualityIssueFewJobsDescription:
+      "Старайся показывать хотя бы 2 заметных опыта, чтобы профиль выглядел стабильнее.",
+    qualityIssueMissingMetricsTitle: "В опыте не хватает метрик",
+    qualityIssueMissingMetricsDescription:
+      "Добавь числа, проценты, время или масштаб, чтобы bullets выглядели сильнее.",
+    qualityIssueSkillsOverloadTitle: "Слишком много навыков",
+    qualityIssueSkillsOverloadDescription:
+      "Список навыков лучше держать короче и чище, без визуального шума.",
+    qualityIssueSkillsLowTitle: "Слишком мало навыков",
+    qualityIssueSkillsLowDescription:
+      "Добавь ведущий стек и несколько supporting технологий для ATS и recruiter search.",
+    qualityIssueEnglishTitle: "Неочевиден уровень английского",
+    qualityIssueEnglishDescription:
+      "Добавь English с уровнем хотя бы B2, если планируешь международный рынок.",
+    qualityIssueJobBulletsTitle: (company) =>
+      `Мало сильных bullets${company ? ` в ${company}` : ""}`,
+    qualityIssueJobBulletsDescription:
+      "На каждое заметное место работы лучше показать минимум 3 содержательных результата.",
+    qualitySuggestionMetrics:
+      "Усиль bullets цифрами: скорость, проценты, users, data volume или business impact.",
+    qualitySuggestionSummary:
+      "Перепиши summary так, чтобы за 2-4 строки было понятно, кто ты и что ищешь.",
+    qualitySuggestionSkills:
+      "Почисти стек и оставь только технологии, которые реально усиливают позиционирование.",
+    qualitySuggestionEnglish:
+      "Укажи английский с уровнем, если целишься в международные компании.",
+    qualitySuggestionBullets:
+      "Проверь каждое место работы по формуле: что сделал, зачем, результат, масштаб.",
     autosave: "Автосохранение",
     autosaveSaved: "Сохранено локально",
     lastAction: "Последнее действие",
@@ -431,6 +582,17 @@ const ruText: UIText = {
     pdfDownloaded: (filename) => `PDF сохранён: ${filename}.`,
     pdfFailed: (error) => `Не удалось сгенерировать PDF: ${error}`,
     unknownError: "Неизвестная ошибка",
+    templateLabel: (templateId) => {
+      if (templateId === "compact") {
+        return "Компактный";
+      }
+
+      if (templateId === "minimal") {
+        return "Минималистичный";
+      }
+
+      return "Классический";
+    },
 };
 
 const enText: UIText = {
@@ -448,6 +610,7 @@ const enText: UIText = {
     navVacancy: "Vacancy",
     navPreview: "Preview",
     navControl: "Control",
+    navQuality: "Quality",
     headerDescription: "Name, role, and contacts that will appear in the PDF header.",
     summaryDescription: "Short positioning: stack, experience, focus, and what you are looking for.",
     experienceDescription: "Main jobs, achievement bullets, hidden items, and working notes.",
@@ -493,6 +656,21 @@ const enText: UIText = {
     noVersionsTitle: "No saved versions yet",
     noVersionsDescription:
       "Save the current configuration as a preset and reuse it as a starting point for different roles or companies.",
+    versionsCompareTitle: "Version diff",
+    versionsCompareDescription:
+      "Compare two saved versions and quickly see what changed in structure, experience, skills, and PDF settings.",
+    compareSourceVersion: "Source version",
+    compareTargetVersion: "Compare to",
+    versionDiffChanged: "Changed",
+    versionDiffSkillsAdded: "Skills added",
+    versionDiffSkillsRemoved: "Skills removed",
+    versionDiffChangedSections: "Changed sections",
+    versionDiffAddedJobs: "Jobs added",
+    versionDiffRemovedJobs: "Jobs removed",
+    versionDiffUpdatedJobs: "Jobs updated",
+    versionDiffNoChangesTitle: "No meaningful changes",
+    versionDiffNoChangesDescription:
+      "The selected versions look identical so far. Try another pair to compare.",
     fieldProgress: (completed, total) => `${completed}/${total}`,
     vacancyTitle: "Vacancy mode",
     vacancyDescription:
@@ -546,13 +724,23 @@ const enText: UIText = {
     generate: "Generate",
     pdfFileName: "PDF file name",
     pdfFileNameHint: "You can change the filename before download. The .pdf extension will be added automatically.",
+    pdfTemplate: "PDF template",
+    pdfTemplateHint:
+      "Classic keeps the current density. Compact helps fit more content. Minimal adds more breathing room and simplifies the top section.",
+    templateClassic: "Classic",
+    templateClassicDescription: "Balanced baseline layout with the current visual rhythm.",
+    templateCompact: "Compact",
+    templateCompactDescription: "Tighter layout for longer resume versions.",
+    templateMinimal: "Minimal",
+    templateMinimalDescription: "More whitespace, calmer header, and cleaner presentation.",
     generating: "Generating PDF...",
     downloadPdf: (languageLabel) => `Download PDF (${languageLabel})`,
-    previewTitle: "Live PDF preview",
+    previewTitle: "PDF Preview",
     previewDescription:
-      "A dedicated screen for quickly checking the final layout. The preview refreshes after changes in the current resume.",
+      "A focused screen for checking the final layout, switching templates, and exporting the current resume version.",
     previewRefresh: "Refresh now",
     previewOpenInNewTab: "Open separately",
+    previewExpand: "Expand preview",
     previewRefreshing: "Refreshing preview...",
     previewUpdatedAt: (value) => `Last update: ${value}`,
     previewWaiting: "Waiting for the first PDF render...",
@@ -560,6 +748,66 @@ const enText: UIText = {
     previewWaitingTitle: "Preview is being prepared",
     previewWaitingDescription: "The embedded PDF will appear here after the first render.",
     previewError: (error) => `Failed to refresh preview: ${error}`,
+    qualityTitle: "Quality checks",
+    qualityDescription:
+      "A local checklist for the current resume version: structure, completeness, bullet depth, and overall market readability.",
+    qualityScore: "Overall score",
+    qualityStrong: "Strong areas",
+    qualityNeedsAttention: "Needs attention",
+    qualityIssues: "What should be improved",
+    qualitySuggestions: "What I would strengthen next",
+    qualityNoIssuesTitle: "No obvious problems found",
+    qualityNoIssuesDescription:
+      "The current version already looks fairly solid. The next step is adapting it to a specific vacancy.",
+    qualityDraftTitle: "Too early to assess quality",
+    qualityDraftDescription:
+      "This version still looks more like a draft. Fill in the core sections first, and then the quality check will become meaningful.",
+    qualityDraftChecklistTitle: "What to fill in first",
+    qualityDraftHintRole: "Add a role in the header.",
+    qualityDraftHintSummary: "Write a 2-4 line summary.",
+    qualityDraftHintExperience: "Fill in at least one job and a few bullets.",
+    qualityDraftHintSkills: "Add your leading skills and stack.",
+    qualityIssueMissingRoleTitle: "Missing role in the header",
+    qualityIssueMissingRoleDescription:
+      "Add a clear role so a recruiter understands your positioning immediately.",
+    qualityIssueFewContactsTitle: "Too few contacts",
+    qualityIssueFewContactsDescription:
+      "Add at least 3 contact points: location, email, messenger, or LinkedIn/GitHub.",
+    qualityIssueSummaryShortTitle: "Summary is too short",
+    qualityIssueSummaryShortDescription:
+      "The summary should quickly explain your stack, experience, domains, and current focus.",
+    qualityIssueSummaryLongTitle: "Summary is overloaded",
+    qualityIssueSummaryLongDescription:
+      "Shorten the intro block and leave only the strongest signals.",
+    qualityIssueFewJobsTitle: "Too few job entries",
+    qualityIssueFewJobsDescription:
+      "Try to show at least 2 meaningful roles so the profile looks more stable.",
+    qualityIssueMissingMetricsTitle: "Experience lacks metrics",
+    qualityIssueMissingMetricsDescription:
+      "Add numbers, percentages, time, or scale so the bullets feel stronger.",
+    qualityIssueSkillsOverloadTitle: "Too many skills",
+    qualityIssueSkillsOverloadDescription:
+      "The skills list should stay tighter and cleaner, without unnecessary noise.",
+    qualityIssueSkillsLowTitle: "Too few skills",
+    qualityIssueSkillsLowDescription:
+      "Add your leading stack and a few supporting technologies for ATS and recruiter search.",
+    qualityIssueEnglishTitle: "English level is not obvious",
+    qualityIssueEnglishDescription:
+      "Add English with at least a B2 level if you are targeting the international market.",
+    qualityIssueJobBulletsTitle: (company) =>
+      `Not enough strong bullets${company ? ` for ${company}` : ""}`,
+    qualityIssueJobBulletsDescription:
+      "A meaningful role should usually show at least 3 substantive achievement bullets.",
+    qualitySuggestionMetrics:
+      "Strengthen bullets with numbers: speed, percentages, users, data volume, or business impact.",
+    qualitySuggestionSummary:
+      "Rewrite the summary so it clearly explains who you are and what you are looking for in 2-4 lines.",
+    qualitySuggestionSkills:
+      "Trim the stack and keep only the technologies that reinforce your positioning.",
+    qualitySuggestionEnglish:
+      "Add English with a clear level if you are targeting international companies.",
+    qualitySuggestionBullets:
+      "Review each job with the formula: what you built, why, the outcome, and the scale.",
     autosave: "Autosave",
     autosaveSaved: "Saved locally",
     lastAction: "Last action",
@@ -656,6 +904,17 @@ const enText: UIText = {
     pdfDownloaded: (filename) => `Saved PDF: ${filename}.`,
     pdfFailed: (error) => `Failed to generate PDF: ${error}`,
     unknownError: "Unknown error",
+    templateLabel: (templateId) => {
+      if (templateId === "compact") {
+        return "Compact";
+      }
+
+      if (templateId === "minimal") {
+        return "Minimal";
+      }
+
+      return "Classic";
+    },
 };
 
 const deText: UIText = {
@@ -1683,6 +1942,21 @@ const featureTextOverrides = {
     noVersionsTitle: "Noch keine gespeicherten Versionen",
     noVersionsDescription:
       "Speichere die aktuelle Konfiguration als Preset und verwende sie als Ausgangspunkt für verschiedene Rollen oder Unternehmen.",
+    versionsCompareTitle: "Versionsvergleich",
+    versionsCompareDescription:
+      "Vergleiche zwei gespeicherte Versionen und prüfe schnell, was sich in Struktur, Erfahrung, Skills und PDF-Einstellungen geändert hat.",
+    compareSourceVersion: "Ausgangsversion",
+    compareTargetVersion: "Vergleichen mit",
+    versionDiffChanged: "Geändert",
+    versionDiffSkillsAdded: "Skills hinzugefügt",
+    versionDiffSkillsRemoved: "Skills entfernt",
+    versionDiffChangedSections: "Geänderte Bereiche",
+    versionDiffAddedJobs: "Hinzugefügte Positionen",
+    versionDiffRemovedJobs: "Entfernte Positionen",
+    versionDiffUpdatedJobs: "Aktualisierte Positionen",
+    versionDiffNoChangesTitle: "Keine sichtbaren Unterschiede",
+    versionDiffNoChangesDescription:
+      "Zwischen den ausgewählten Versionen sind bisher keine deutlichen Unterschiede zu sehen.",
     vacancyTitle: "Stellenmodus",
     vacancyDescription:
       "Füge eine Stellenbeschreibung ein und prüfe schnell, welche Schlüsselwörter bereits vom aktuellen Lebenslauf abgedeckt werden und welche noch verstärkt werden sollten.",
@@ -1726,6 +2000,7 @@ const featureTextOverrides = {
       "Eigene Seite für die schnelle Prüfung des finalen Layouts. Die Vorschau wird nach Änderungen im aktuellen Lebenslauf aktualisiert.",
     previewRefresh: "Jetzt aktualisieren",
     previewOpenInNewTab: "Separat öffnen",
+    previewExpand: "Vorschau vergrößern",
     previewRefreshing: "Vorschau wird aktualisiert...",
     previewUpdatedAt: (value: string) => `Letzte Aktualisierung: ${value}`,
     previewWaiting: "Warte auf das erste PDF-Rendering...",
@@ -1776,6 +2051,21 @@ const featureTextOverrides = {
     noVersionsTitle: "Todavía no hay versiones guardadas",
     noVersionsDescription:
       "Guarda la configuración actual como preset y reutilízala como punto de partida para distintos puestos o empresas.",
+    versionsCompareTitle: "Diferencia entre versiones",
+    versionsCompareDescription:
+      "Compara dos versiones guardadas y mira rápido qué cambió en estructura, experiencia, skills y ajustes del PDF.",
+    compareSourceVersion: "Versión base",
+    compareTargetVersion: "Comparar con",
+    versionDiffChanged: "Cambios",
+    versionDiffSkillsAdded: "Skills añadidas",
+    versionDiffSkillsRemoved: "Skills eliminadas",
+    versionDiffChangedSections: "Secciones modificadas",
+    versionDiffAddedJobs: "Experiencias añadidas",
+    versionDiffRemovedJobs: "Experiencias eliminadas",
+    versionDiffUpdatedJobs: "Experiencias actualizadas",
+    versionDiffNoChangesTitle: "No hay cambios visibles",
+    versionDiffNoChangesDescription:
+      "Entre las versiones elegidas todavía no se ven diferencias importantes.",
     vacancyTitle: "Modo vacante",
     vacancyDescription:
       "Pega una vacante y comprueba rápido qué palabras clave ya cubre el CV actual y cuáles conviene reforzar.",
@@ -1819,6 +2109,7 @@ const featureTextOverrides = {
       "Pantalla dedicada para comprobar rápidamente la maquetación final. La vista previa se actualiza después de cambios en el CV actual.",
     previewRefresh: "Actualizar ahora",
     previewOpenInNewTab: "Abrir aparte",
+    previewExpand: "Ampliar vista previa",
     previewRefreshing: "Actualizando vista previa...",
     previewUpdatedAt: (value: string) => `Última actualización: ${value}`,
     previewWaiting: "Esperando el primer render del PDF...",
@@ -1869,6 +2160,21 @@ const featureTextOverrides = {
     noVersionsTitle: "Nessuna versione salvata",
     noVersionsDescription:
       "Salva la configurazione corrente come preset e riusala come punto di partenza per ruoli o aziende diversi.",
+    versionsCompareTitle: "Differenza tra versioni",
+    versionsCompareDescription:
+      "Confronta due versioni salvate e vedi rapidamente cosa è cambiato in struttura, esperienza, skills e impostazioni PDF.",
+    compareSourceVersion: "Versione di partenza",
+    compareTargetVersion: "Confronta con",
+    versionDiffChanged: "Modifiche",
+    versionDiffSkillsAdded: "Skills aggiunte",
+    versionDiffSkillsRemoved: "Skills rimosse",
+    versionDiffChangedSections: "Sezioni modificate",
+    versionDiffAddedJobs: "Esperienze aggiunte",
+    versionDiffRemovedJobs: "Esperienze rimosse",
+    versionDiffUpdatedJobs: "Esperienze aggiornate",
+    versionDiffNoChangesTitle: "Nessuna differenza evidente",
+    versionDiffNoChangesDescription:
+      "Tra le versioni selezionate non si vedono ancora differenze significative.",
     vacancyTitle: "Modalità vacancy",
     vacancyDescription:
       "Incolla una vacancy e controlla rapidamente quali keyword sono già coperte dal CV corrente e quali conviene rafforzare.",
@@ -1912,6 +2218,7 @@ const featureTextOverrides = {
       "Schermata dedicata per controllare rapidamente il layout finale. L'anteprima si aggiorna dopo le modifiche nel CV corrente.",
     previewRefresh: "Aggiorna ora",
     previewOpenInNewTab: "Apri separatamente",
+    previewExpand: "Espandi anteprima",
     previewRefreshing: "Aggiornamento anteprima...",
     previewUpdatedAt: (value: string) => `Ultimo aggiornamento: ${value}`,
     previewWaiting: "In attesa del primo render del PDF...",
@@ -1962,6 +2269,21 @@ const featureTextOverrides = {
     noVersionsTitle: "Ainda não há versões guardadas",
     noVersionsDescription:
       "Guarda a configuração atual como preset e reutiliza-a como ponto de partida para diferentes funções ou empresas.",
+    versionsCompareTitle: "Diferença entre versões",
+    versionsCompareDescription:
+      "Compara duas versões guardadas e vê rapidamente o que mudou em estrutura, experiência, skills e definições do PDF.",
+    compareSourceVersion: "Versão base",
+    compareTargetVersion: "Comparar com",
+    versionDiffChanged: "Alterações",
+    versionDiffSkillsAdded: "Skills adicionadas",
+    versionDiffSkillsRemoved: "Skills removidas",
+    versionDiffChangedSections: "Secções alteradas",
+    versionDiffAddedJobs: "Experiências adicionadas",
+    versionDiffRemovedJobs: "Experiências removidas",
+    versionDiffUpdatedJobs: "Experiências atualizadas",
+    versionDiffNoChangesTitle: "Sem diferenças visíveis",
+    versionDiffNoChangesDescription:
+      "Ainda não há diferenças significativas entre as versões selecionadas.",
     vacancyTitle: "Modo vaga",
     vacancyDescription:
       "Cola uma vaga e vê rapidamente que palavras-chave já estão cobertas pelo currículo atual e quais ainda vale a pena reforçar.",
@@ -2005,6 +2327,7 @@ const featureTextOverrides = {
       "Ecrã dedicado para verificar rapidamente o layout final. A pré-visualização é atualizada após alterações no currículo atual.",
     previewRefresh: "Atualizar agora",
     previewOpenInNewTab: "Abrir em separado",
+    previewExpand: "Expandir pré-visualização",
     previewRefreshing: "A atualizar a pré-visualização...",
     previewUpdatedAt: (value: string) => `Última atualização: ${value}`,
     previewWaiting: "À espera do primeiro render do PDF...",
@@ -2055,6 +2378,21 @@ const featureTextOverrides = {
     noVersionsTitle: "Још нема сачуваних верзија",
     noVersionsDescription:
       "Сачувај тренутну конфигурацију као пресет и користи је као полазну тачку за различите улоге или компаније.",
+    versionsCompareTitle: "Разлика између верзија",
+    versionsCompareDescription:
+      "Упореди две сачуване верзије и брзо види шта се променило у структури, искуству, вештинама и PDF подешавањима.",
+    compareSourceVersion: "Полазна верзија",
+    compareTargetVersion: "Упореди са",
+    versionDiffChanged: "Промењено",
+    versionDiffSkillsAdded: "Додате вештине",
+    versionDiffSkillsRemoved: "Уклоњене вештине",
+    versionDiffChangedSections: "Промењене секције",
+    versionDiffAddedJobs: "Додата радна места",
+    versionDiffRemovedJobs: "Уклоњена радна места",
+    versionDiffUpdatedJobs: "Ажурирана радна места",
+    versionDiffNoChangesTitle: "Нема видљивих разлика",
+    versionDiffNoChangesDescription:
+      "Између изабраних верзија још нема значајних разлика.",
     vacancyTitle: "Режим огласа",
     vacancyDescription:
       "Налепи текст огласа и брзо провери које кључне речи су већ покривене у тренутном резимеу, а које треба појачати.",
@@ -2098,6 +2436,7 @@ const featureTextOverrides = {
       "Посебан екран за брзу проверу финалног распореда. Преглед се освежава после измена у тренутном резимеу.",
     previewRefresh: "Освежи сада",
     previewOpenInNewTab: "Отвори одвојено",
+    previewExpand: "Прошири преглед",
     previewRefreshing: "Освежавам преглед...",
     previewUpdatedAt: (value: string) => `Последње ажурирање: ${value}`,
     previewWaiting: "Чекам први PDF render...",
@@ -2141,6 +2480,21 @@ const featureTextOverrides = {
     noVersionsTitle: "Aucune version enregistrée pour l'instant",
     noVersionsDescription:
       "Enregistre la configuration actuelle comme preset et réutilise-la comme point de départ pour différents rôles ou entreprises.",
+    versionsCompareTitle: "Diff entre versions",
+    versionsCompareDescription:
+      "Compare deux versions enregistrées et vois rapidement ce qui a changé dans la structure, l'expérience, les skills et les réglages PDF.",
+    compareSourceVersion: "Version source",
+    compareTargetVersion: "Comparer à",
+    versionDiffChanged: "Changements",
+    versionDiffSkillsAdded: "Skills ajoutées",
+    versionDiffSkillsRemoved: "Skills retirées",
+    versionDiffChangedSections: "Sections modifiées",
+    versionDiffAddedJobs: "Postes ajoutés",
+    versionDiffRemovedJobs: "Postes supprimés",
+    versionDiffUpdatedJobs: "Postes mis à jour",
+    versionDiffNoChangesTitle: "Aucune différence visible",
+    versionDiffNoChangesDescription:
+      "Aucune différence importante n'apparaît encore entre les versions sélectionnées.",
     vacancyTitle: "Mode offre",
     vacancyDescription:
       "Colle une offre d'emploi et vois rapidement quels mots-clés sont déjà couverts par le CV actuel et lesquels devraient être renforcés.",
@@ -2184,6 +2538,7 @@ const featureTextOverrides = {
       "Écran dédié pour vérifier rapidement la mise en page finale. L'aperçu se met à jour après les modifications du CV actuel.",
     previewRefresh: "Actualiser maintenant",
     previewOpenInNewTab: "Ouvrir séparément",
+    previewExpand: "Agrandir l’aperçu",
     previewRefreshing: "Actualisation de l'aperçu...",
     previewUpdatedAt: (value: string) => `Dernière mise à jour : ${value}`,
     previewWaiting: "En attente du premier rendu PDF...",
@@ -2227,6 +2582,21 @@ const featureTextOverrides = {
     noVersionsTitle: "Brak zapisanych wersji",
     noVersionsDescription:
       "Zapisz bieżącą konfigurację jako preset i używaj jej jako punktu startowego dla różnych ról lub firm.",
+    versionsCompareTitle: "Różnice między wersjami",
+    versionsCompareDescription:
+      "Porównaj dwie zapisane wersje i szybko zobacz, co zmieniło się w strukturze, doświadczeniu, umiejętnościach i ustawieniach PDF.",
+    compareSourceVersion: "Wersja bazowa",
+    compareTargetVersion: "Porównaj z",
+    versionDiffChanged: "Zmiany",
+    versionDiffSkillsAdded: "Dodane umiejętności",
+    versionDiffSkillsRemoved: "Usunięte umiejętności",
+    versionDiffChangedSections: "Zmienione sekcje",
+    versionDiffAddedJobs: "Dodane miejsca pracy",
+    versionDiffRemovedJobs: "Usunięte miejsca pracy",
+    versionDiffUpdatedJobs: "Zaktualizowane miejsca pracy",
+    versionDiffNoChangesTitle: "Brak widocznych różnic",
+    versionDiffNoChangesDescription:
+      "Między wybranymi wersjami nie widać jeszcze istotnych zmian.",
     vacancyTitle: "Tryb oferty",
     vacancyDescription:
       "Wklej ofertę pracy i szybko sprawdź, które słowa kluczowe są już pokryte przez aktualne CV, a które warto wzmocnić.",
@@ -2270,6 +2640,7 @@ const featureTextOverrides = {
       "Osobny ekran do szybkiego sprawdzania końcowego układu. Podgląd odświeża się po zmianach w aktualnym CV.",
     previewRefresh: "Odśwież teraz",
     previewOpenInNewTab: "Otwórz osobno",
+    previewExpand: "Powiększ podgląd",
     previewRefreshing: "Odświeżam podgląd...",
     previewUpdatedAt: (value: string) => `Ostatnia aktualizacja: ${value}`,
     previewWaiting: "Czekam na pierwszy render PDF...",
@@ -2313,6 +2684,21 @@ const featureTextOverrides = {
     noVersionsTitle: "Ще немає збережених версій",
     noVersionsDescription:
       "Збережи поточну конфігурацію як пресет і використовуй її як стартову точку для різних ролей або компаній.",
+    versionsCompareTitle: "Різниця між версіями",
+    versionsCompareDescription:
+      "Порівняй дві збережені версії й швидко побач, що змінилося у структурі, досвіді, навичках і PDF-налаштуваннях.",
+    compareSourceVersion: "Базова версія",
+    compareTargetVersion: "Порівняти з",
+    versionDiffChanged: "Змінено",
+    versionDiffSkillsAdded: "Додані навички",
+    versionDiffSkillsRemoved: "Прибрані навички",
+    versionDiffChangedSections: "Змінені секції",
+    versionDiffAddedJobs: "Додані місця роботи",
+    versionDiffRemovedJobs: "Видалені місця роботи",
+    versionDiffUpdatedJobs: "Оновлені місця роботи",
+    versionDiffNoChangesTitle: "Немає помітних відмінностей",
+    versionDiffNoChangesDescription:
+      "Між вибраними версіями поки що не видно суттєвих змін.",
     vacancyTitle: "Режим вакансії",
     vacancyDescription:
       "Встав текст вакансії й швидко подивись, які ключові слова вже покриті поточним резюме, а які варто підсилити.",
@@ -2356,6 +2742,7 @@ const featureTextOverrides = {
       "Окремий екран для швидкої перевірки фінальної верстки. Прев’ю оновлюється після змін у поточному резюме.",
     previewRefresh: "Оновити зараз",
     previewOpenInNewTab: "Відкрити окремо",
+    previewExpand: "Розгорнути прев’ю",
     previewRefreshing: "Оновлюю прев’ю...",
     previewUpdatedAt: (value: string) => `Останнє оновлення: ${value}`,
     previewWaiting: "Чекаю на перший рендер PDF...",

@@ -11,6 +11,7 @@ import {
   savePresets,
   updatePresetSnapshot,
 } from "../utils/presets";
+import { compareVersions } from "../utils/versionDiff";
 
 type PresetsRecord = Record<string, ResumePreset[]>;
 
@@ -22,6 +23,8 @@ export default function VersionsPage() {
   const [renameState, setRenameState] = useState<{ id: string; value: string } | null>(null);
   const [deletePresetId, setDeletePresetId] = useState<string | null>(null);
   const [overwritePresetId, setOverwritePresetId] = useState<string | null>(null);
+  const [compareLeftId, setCompareLeftId] = useState<string | null>(null);
+  const [compareRightId, setCompareRightId] = useState<string | null>(null);
   const [notice, setNotice] = useState("");
 
   useEffect(() => {
@@ -29,6 +32,25 @@ export default function VersionsPage() {
   }, [presetsByLanguage]);
 
   const presets = presetsByLanguage[studio.activeLanguage] ?? [];
+  useEffect(() => {
+    if (!presets.length) {
+      setCompareLeftId(null);
+      setCompareRightId(null);
+      return;
+    }
+
+    setCompareLeftId((current) =>
+      current && presets.some((preset) => preset.id === current) ? current : presets[0]?.id ?? null
+    );
+    setCompareRightId((current) => {
+      if (current && presets.some((preset) => preset.id === current)) {
+        return current;
+      }
+
+      return presets[1]?.id ?? presets[0]?.id ?? null;
+    });
+  }, [presets]);
+
   const deletePreset = deletePresetId
     ? presets.find((preset) => preset.id === deletePresetId) ?? null
     : null;
@@ -44,6 +66,61 @@ export default function VersionsPage() {
       }),
     [studio.uiLanguage]
   );
+  const compareLeft = compareLeftId
+    ? presets.find((preset) => preset.id === compareLeftId) ?? null
+    : null;
+  const compareRight = compareRightId
+    ? presets.find((preset) => preset.id === compareRightId) ?? null
+    : null;
+  const versionDiff =
+    compareLeft && compareRight && compareLeft.id !== compareRight.id
+      ? compareVersions(compareLeft, compareRight)
+      : null;
+  const diffSectionLabels = useMemo(() => {
+    if (!versionDiff) {
+      return [];
+    }
+
+    return versionDiff.changedSections.map((section) => {
+      if (section === "header") {
+        return studio.t.header;
+      }
+
+      if (section === "summary") {
+        return studio.t.summary;
+      }
+
+      if (section === "experience") {
+        return studio.t.experience;
+      }
+
+      if (section === "education") {
+        return studio.t.education;
+      }
+
+      if (section === "certificates") {
+        return studio.t.certificates;
+      }
+
+      if (section === "languages") {
+        return studio.t.languages;
+      }
+
+      if (section === "skills") {
+        return studio.t.skills;
+      }
+
+      if (section === "template") {
+        return studio.t.pdfTemplate;
+      }
+
+      if (section === "pdf") {
+        return studio.t.pdfFileName;
+      }
+
+      return section;
+    });
+  }, [studio.t, versionDiff]);
 
   const saveCurrentVersion = () => {
     const nextName = createName.trim();
@@ -58,6 +135,7 @@ export default function VersionsPage() {
       resume: studio.resume,
       skills: studio.skills,
       pdfFileName: studio.pdfFileName,
+      templateId: studio.activeResumeTemplate,
     });
 
     setPresetsByLanguage((current) => ({
@@ -130,6 +208,7 @@ export default function VersionsPage() {
           resume: studio.resume,
           skills: studio.skills,
           pdfFileName: studio.pdfFileName,
+          templateId: studio.activeResumeTemplate,
         });
       }),
     }));
@@ -168,6 +247,173 @@ export default function VersionsPage() {
           </div>
 
           {notice ? <p className="page-note">{notice}</p> : null}
+
+          {presets.length > 1 ? (
+            <section className="insight-card version-diff">
+              <div className="version-diff__header">
+                <div>
+                  <h3>{studio.t.versionsCompareTitle}</h3>
+                  <p>{studio.t.versionsCompareDescription}</p>
+                </div>
+              </div>
+
+              <div className="version-diff__selector-grid">
+                <div className="version-diff__selector">
+                  <span className="status-caption">{studio.t.compareSourceVersion}</span>
+                  <div className="version-diff__option-list">
+                    {presets.map((preset) => (
+                      <button
+                        key={`left-${preset.id}`}
+                        type="button"
+                        className={`version-diff__option${
+                          compareLeftId === preset.id ? " version-diff__option--active" : ""
+                        }`}
+                        onClick={() => setCompareLeftId(preset.id)}
+                      >
+                        <strong>{preset.name}</strong>
+                        <span>{formatter.format(new Date(preset.updatedAt))}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="version-diff__selector">
+                  <span className="status-caption">{studio.t.compareTargetVersion}</span>
+                  <div className="version-diff__option-list">
+                    {presets.map((preset) => (
+                      <button
+                        key={`right-${preset.id}`}
+                        type="button"
+                        className={`version-diff__option${
+                          compareRightId === preset.id ? " version-diff__option--active" : ""
+                        }`}
+                        onClick={() => setCompareRightId(preset.id)}
+                      >
+                        <strong>{preset.name}</strong>
+                        <span>{formatter.format(new Date(preset.updatedAt))}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {versionDiff ? (
+                <>
+                  <div className="vacancy-grid version-diff__metrics">
+                    <div className="vacancy-score-card">
+                      <span className="vacancy-score-card__label">{studio.t.versionDiffChanged}</span>
+                      <strong>{versionDiff.changedCount}</strong>
+                    </div>
+                    <div className="vacancy-score-card">
+                      <span className="vacancy-score-card__label">{studio.t.versionDiffSkillsAdded}</span>
+                      <strong>{versionDiff.skillsAdded.length}</strong>
+                    </div>
+                    <div className="vacancy-score-card">
+                      <span className="vacancy-score-card__label">{studio.t.versionDiffSkillsRemoved}</span>
+                      <strong>{versionDiff.skillsRemoved.length}</strong>
+                    </div>
+                  </div>
+
+                  <div className="page-card-grid version-diff__cards">
+                    <div className="insight-card">
+                      <h3>{studio.t.versionDiffChangedSections}</h3>
+                      <div className="tag-list">
+                        {diffSectionLabels.length ? (
+                          diffSectionLabels.map((label) => (
+                            <span key={label} className="tag">
+                              {label}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="tag tag--success">{studio.t.versionDiffNoChangesTitle}</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="insight-card">
+                      <h3>{studio.t.versionDiffAddedJobs}</h3>
+                      <div className="tag-list">
+                        {versionDiff.jobsAdded.length ? (
+                          versionDiff.jobsAdded.map((job) => (
+                            <span key={job} className="tag tag--success">
+                              {job}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="tag">{studio.t.versionDiffNoChangesTitle}</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="insight-card">
+                      <h3>{studio.t.versionDiffRemovedJobs}</h3>
+                      <div className="tag-list">
+                        {versionDiff.jobsRemoved.length ? (
+                          versionDiff.jobsRemoved.map((job) => (
+                            <span key={job} className="tag tag--error">
+                              {job}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="tag">{studio.t.versionDiffNoChangesTitle}</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="insight-card">
+                      <h3>{studio.t.versionDiffUpdatedJobs}</h3>
+                      <div className="tag-list">
+                        {versionDiff.jobsUpdated.length ? (
+                          versionDiff.jobsUpdated.map((job) => (
+                            <span key={job} className="tag tag--warning">
+                              {job}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="tag">{studio.t.versionDiffNoChangesTitle}</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="insight-card">
+                      <h3>{studio.t.versionDiffSkillsAdded}</h3>
+                      <div className="tag-list">
+                        {versionDiff.skillsAdded.length ? (
+                          versionDiff.skillsAdded.map((skill) => (
+                            <span key={skill} className="tag tag--success">
+                              {skill}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="tag">{studio.t.versionDiffNoChangesTitle}</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="insight-card">
+                      <h3>{studio.t.versionDiffSkillsRemoved}</h3>
+                      <div className="tag-list">
+                        {versionDiff.skillsRemoved.length ? (
+                          versionDiff.skillsRemoved.map((skill) => (
+                            <span key={skill} className="tag tag--error">
+                              {skill}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="tag">{studio.t.versionDiffNoChangesTitle}</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="empty-state">
+                  <h3>{studio.t.versionDiffNoChangesTitle}</h3>
+                  <p>{studio.t.versionDiffNoChangesDescription}</p>
+                </div>
+              )}
+            </section>
+          ) : null}
 
           {presets.length ? (
             <div className="version-list">
@@ -220,6 +466,10 @@ export default function VersionsPage() {
                     <div>
                       <dt>{studio.t.pdfFileName}</dt>
                       <dd>{preset.pdfFileName}</dd>
+                    </div>
+                    <div>
+                      <dt>{studio.t.pdfTemplate}</dt>
+                      <dd>{studio.t.templateLabel(preset.templateId)}</dd>
                     </div>
                   </dl>
                 </article>

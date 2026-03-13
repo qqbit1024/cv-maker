@@ -21,12 +21,14 @@ import type {
   ResumeData,
   ResumeProgressItem,
   ResumeLanguageCode,
+  ResumeTemplateId,
   ResumeStudioState,
   SkillsData,
 } from "../types/resume";
 
 export const STORAGE_KEY = "resume-studio-state-v1";
 export const BUILT_IN_RESUME_LANGUAGES: BuiltInResumeLanguageCode[] = ["ru", "en"];
+export const DEFAULT_TEMPLATE_ID: ResumeTemplateId = "classic";
 
 type MaybeRecord = Record<string, unknown>;
 
@@ -234,6 +236,10 @@ export function normalizeSkills(skills: unknown): SkillsData {
   };
 }
 
+export function normalizeResumeTemplate(value: unknown): ResumeTemplateId {
+  return value === "compact" || value === "minimal" ? value : DEFAULT_TEMPLATE_ID;
+}
+
 export function normalizeResume(resume: unknown): ResumeData {
   const source = clone((resume ?? {}) as ResumeData & {
     header?: MaybeRecord;
@@ -373,12 +379,20 @@ export function normalizeState(state?: Partial<ResumeStudioState>): ResumeStudio
     }),
     {}
   );
+  const resumeTemplates = Object.keys(resumes).reduce<Record<ResumeLanguageCode, ResumeTemplateId>>(
+    (result, language) => ({
+      ...result,
+      [language]: normalizeResumeTemplate(state?.resumeTemplates?.[language]),
+    }),
+    {}
+  );
 
   return {
     resumes,
     skills: normalizeSkills(state?.skills ?? skillsExample),
     pdfFileNames,
     resumeLanguageLabels,
+    resumeTemplates,
   };
 }
 

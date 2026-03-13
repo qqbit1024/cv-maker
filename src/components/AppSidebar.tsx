@@ -9,6 +9,7 @@ import {
   Pencil,
   PenSquare,
   Plus,
+  ShieldCheck,
   Sun,
   Target,
   Trash2,
@@ -58,9 +59,12 @@ export default function AppSidebar({
   onDeleteResumeLanguage,
 }: AppSidebarProps) {
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
+  const [isResumeLanguageModalOpen, setIsResumeLanguageModalOpen] = useState(false);
   const activeInterfaceLanguageOption =
     interfaceLanguageOptions.find((option) => option.code === uiLanguage) ??
     interfaceLanguageOptions[0];
+  const activeResumeItem =
+    resumeProgressItems.find((item) => item.language === activeLanguage) ?? resumeProgressItems[0];
 
   return (
     <aside className="sidebar">
@@ -161,6 +165,13 @@ export default function AppSidebar({
             <Gauge className="button__icon" strokeWidth={2} />
             <span>{t.navControl}</span>
           </NavLink>
+          <NavLink
+            to="/quality"
+            className={({ isActive }) => `sidebar-nav__link${isActive ? " sidebar-nav__link--active" : ""}`}
+          >
+            <ShieldCheck className="button__icon" strokeWidth={2} />
+            <span>{t.navQuality}</span>
+          </NavLink>
         </div>
       </nav>
 
@@ -175,66 +186,138 @@ export default function AppSidebar({
           />
         </div>
         <p className="status">{t.resumeLanguageHint}</p>
-        <div className="resume-progress">
-          {resumeProgressItems.map((item) => (
-            <div
-              key={item.language}
-              className={`resume-progress__item${
-                activeLanguage === item.language ? " resume-progress__item--active" : ""
-              }`}
+        {activeResumeItem ? (
+          <div className="resume-progress">
+            <button
+              type="button"
+              className="resume-progress__item resume-progress__item--active resume-progress__item--single"
+              onClick={() => setIsResumeLanguageModalOpen(true)}
             >
-              <button
-                type="button"
-                className="resume-progress__main"
-                onClick={() => onChangeResumeLanguage(item.language)}
-              >
-                <div className="resume-progress__row">
-                  <strong>{item.label}</strong>
-                </div>
-                <div className="resume-progress__meta">
-                  {t.fieldProgress(item.completed, item.total)}
-                </div>
-                <div className="resume-progress__bar" aria-hidden="true">
-                  <span style={{ width: `${item.percent}%` }} />
-                </div>
-              </button>
+              <span className="resume-progress__main">
+                <span className="resume-progress__row">
+                  <strong>{activeResumeItem.label}</strong>
+                  <ChevronDown className="resume-progress__caret" strokeWidth={2} />
+                </span>
+                <span className="resume-progress__meta">
+                  {t.fieldProgress(activeResumeItem.completed, activeResumeItem.total)}
+                </span>
+                <span className="resume-progress__bar" aria-hidden="true">
+                  <span style={{ width: `${activeResumeItem.percent}%` }} />
+                </span>
+              </span>
+            </button>
+          </div>
+        ) : null}
+      </div>
 
-              <div className="resume-progress__actions">
+      {isResumeLanguageModalOpen ? (
+        <div
+          className="modal-backdrop"
+          onClick={() => setIsResumeLanguageModalOpen(false)}
+          role="presentation"
+        >
+          <div
+            className="modal-card modal-card--wide"
+            onClick={(event) => event.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label={t.resumeLanguage}
+          >
+            <div className="modal-card__header">
+              <div className="modal-card__title-block">
+                <h3>{t.resumeLanguage}</h3>
+                <p className="status">{t.resumeLanguageHint}</p>
+              </div>
+              <div className="modal-card__header-actions">
                 <IconButton
-                  icon={Copy}
-                  label={t.duplicateResumeLanguage}
-                  className="resume-progress__action"
+                  icon={Plus}
+                  label={t.addResumeLanguage}
                   tone="ghost"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    onDuplicateResumeLanguage(item.language);
+                  onClick={() => {
+                    setIsResumeLanguageModalOpen(false);
+                    onOpenCreateResumeLanguage();
                   }}
                 />
-                <IconButton
-                  icon={Pencil}
-                  label={t.renameResumeLanguage}
-                  className="resume-progress__action"
-                  tone="ghost"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    onRenameResumeLanguage(item.language);
-                  }}
-                />
-                <IconButton
-                  icon={Trash2}
-                  label={t.deleteResumeLanguage}
-                  className="resume-progress__action"
-                  tone="ghost"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    onDeleteResumeLanguage(item.language);
-                  }}
-                />
+                <button
+                  type="button"
+                  className="button--ghost button--small"
+                  onClick={() => setIsResumeLanguageModalOpen(false)}
+                >
+                  {t.closeModal}
+                </button>
               </div>
             </div>
-          ))}
+
+            <div className="modal-card__body">
+              <div className="resume-language-modal__list">
+                {resumeProgressItems.map((item) => (
+                  <div
+                    key={item.language}
+                    className={`resume-progress__item${
+                      activeLanguage === item.language ? " resume-progress__item--active" : ""
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      className="resume-progress__main"
+                      onClick={() => {
+                        onChangeResumeLanguage(item.language);
+                        setIsResumeLanguageModalOpen(false);
+                      }}
+                    >
+                      <div className="resume-progress__row">
+                        <strong>{item.label}</strong>
+                      </div>
+                      <div className="resume-progress__meta">
+                        {t.fieldProgress(item.completed, item.total)}
+                      </div>
+                      <div className="resume-progress__bar" aria-hidden="true">
+                        <span style={{ width: `${item.percent}%` }} />
+                      </div>
+                    </button>
+
+                    <div className="resume-progress__actions resume-progress__actions--visible">
+                      <IconButton
+                        icon={Copy}
+                        label={t.duplicateResumeLanguage}
+                        className="resume-progress__action"
+                        tone="ghost"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setIsResumeLanguageModalOpen(false);
+                          onDuplicateResumeLanguage(item.language);
+                        }}
+                      />
+                      <IconButton
+                        icon={Pencil}
+                        label={t.renameResumeLanguage}
+                        className="resume-progress__action"
+                        tone="ghost"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setIsResumeLanguageModalOpen(false);
+                          onRenameResumeLanguage(item.language);
+                        }}
+                      />
+                      <IconButton
+                        icon={Trash2}
+                        label={t.deleteResumeLanguage}
+                        className="resume-progress__action"
+                        tone="ghost"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setIsResumeLanguageModalOpen(false);
+                          onDeleteResumeLanguage(item.language);
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      ) : null}
     </aside>
   );
 }

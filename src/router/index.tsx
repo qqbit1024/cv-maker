@@ -3,6 +3,7 @@ import RootLayout from "../layouts/RootLayout";
 import ControlPage from "../pages/ControlPage";
 import HomePage from "../pages/HomePage";
 import PreviewPage from "../pages/PreviewPage";
+import QualityPage from "../pages/QualityPage";
 import VacancyPage from "../pages/VacancyPage";
 import VersionsPage from "../pages/VersionsPage";
 
@@ -34,6 +35,10 @@ export const router = createBrowserRouter(
         {
           path: "control",
           element: <ControlPage />,
+        },
+        {
+          path: "quality",
+          element: <QualityPage />,
         },
       ],
     },

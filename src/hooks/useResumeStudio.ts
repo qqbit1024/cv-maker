@@ -19,6 +19,7 @@ import type {
   ResumeData,
   ResumeLanguageCode,
   ResumeProgressItem,
+  ResumeTemplateId,
   SkillsData,
   ThemeMode,
 } from "../types/resume";
@@ -30,6 +31,7 @@ import {
   createEmptyJob,
   createEmptyJobTask,
   createEmptyLanguageItem,
+  DEFAULT_TEMPLATE_ID,
   ensurePdfFileName,
   getDefaultResumeForLanguage,
   getDefaultPdfFileName,
@@ -42,6 +44,7 @@ import {
   moveItem,
   normalizeResume,
   normalizeSkills,
+  normalizeResumeTemplate,
   STORAGE_KEY,
 } from "../utils/resumeState";
 
@@ -160,6 +163,7 @@ export function useResumeStudio() {
   const [resumeLanguageLabels, setResumeLanguageLabels] = useState(
     initialState.resumeLanguageLabels
   );
+  const [resumeTemplates, setResumeTemplates] = useState(initialState.resumeTemplates);
   const [status, setStatus] = useState(uiText.ru.statusReady);
   const [isGenerating, setIsGenerating] = useState(false);
   const [modalType, setModalType] = useState<ModalType>(null);
@@ -187,6 +191,7 @@ export function useResumeStudio() {
           skills,
           pdfFileNames,
           resumeLanguageLabels,
+          resumeTemplates,
         })
     );
 
@@ -198,7 +203,7 @@ export function useResumeStudio() {
     setDidAutoSave(true);
     const timeoutId = window.setTimeout(() => setDidAutoSave(false), 1400);
     return () => window.clearTimeout(timeoutId);
-  }, [resumes, skills, pdfFileNames, resumeLanguageLabels]);
+  }, [resumes, skills, pdfFileNames, resumeLanguageLabels, resumeTemplates]);
 
   useEffect(() => {
     document.title = "cv-maker";
@@ -232,6 +237,7 @@ export function useResumeStudio() {
     uiLanguage,
     resumeLanguageLabels
   );
+  const activeResumeTemplate = normalizeResumeTemplate(resumeTemplates[activeLanguage]);
   const pdfFileName = pdfFileNames[activeLanguage] ?? getDefaultPdfFileName(activeLanguage);
   const languageLevelOptions = getLanguageLevelOptions(uiLanguage);
   const totalContacts = contactItems.filter((item) => String(item ?? "").trim()).length;
@@ -1181,6 +1187,7 @@ export function useResumeStudio() {
     resume: ResumeData;
     skills: SkillsData;
     pdfFileName: string;
+    templateId: ResumeTemplateId;
   }) => {
     const normalizedResume = normalizeResume(snapshot.resume);
     const normalizedSkills = normalizeSkills(snapshot.skills);
@@ -1198,6 +1205,17 @@ export function useResumeStudio() {
     setPdfFileNames((current) => ({
       ...current,
       [activeLanguage]: normalizedFileName,
+    }));
+    setResumeTemplates((current) => ({
+      ...current,
+      [activeLanguage]: normalizeResumeTemplate(snapshot.templateId),
+    }));
+  };
+
+  const updateResumeTemplate = (templateId: ResumeTemplateId) => {
+    setResumeTemplates((current) => ({
+      ...current,
+      [activeLanguage]: normalizeResumeTemplate(templateId),
     }));
   };
 
@@ -1316,6 +1334,10 @@ export function useResumeStudio() {
       ...current,
       [nextLanguageCode]: nextLabel,
     }));
+    setResumeTemplates((current) => ({
+      ...current,
+      [nextLanguageCode]: DEFAULT_TEMPLATE_ID,
+    }));
     setActiveLanguage(nextLanguageCode);
     setIsCreateResumeLanguageModalOpen(false);
     setNewResumeLanguageName("");
@@ -1364,6 +1386,10 @@ export function useResumeStudio() {
     setResumeLanguageLabels((current) => ({
       ...current,
       [nextLanguageCode]: nextLabel,
+    }));
+    setResumeTemplates((current) => ({
+      ...current,
+      [nextLanguageCode]: activeResumeTemplate,
     }));
     setActiveLanguage(nextLanguageCode);
     setDuplicateResumeLanguageName("");
@@ -1449,6 +1475,10 @@ export function useResumeStudio() {
       const { [languageToDelete]: _removed, ...nextLabels } = current;
       return nextLabels;
     });
+    setResumeTemplates((current) => {
+      const { [languageToDelete]: _removed, ...nextTemplates } = current;
+      return nextTemplates;
+    });
 
     if (activeLanguage === languageToDelete) {
       setActiveLanguage(nextLanguageCode);
@@ -1468,6 +1498,7 @@ export function useResumeStudio() {
         resumeData: resume,
         skillsData: skills,
         fontBytes,
+        templateId: activeResumeTemplate,
       });
       const resolvedFileName = ensurePdfFileName(pdfFileName, activeLanguage, resume);
       const pdfBuffer =
@@ -1509,6 +1540,7 @@ export function useResumeStudio() {
     status,
     isGenerating,
     pdfFileName,
+    activeResumeTemplate,
     activeResumeLanguageLabel,
     modalType,
     setModalType,
@@ -1554,6 +1586,7 @@ export function useResumeStudio() {
     updateHeader,
     updateSummary,
     updatePdfFileName,
+    updateResumeTemplate,
     updateSectionTitle,
     updateContactItem,
     addContactItem,
