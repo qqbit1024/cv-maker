@@ -47,14 +47,14 @@ export default function RootLayout() {
   }
 
   if (isAuthRoute) {
-    if (studio.authStatus === "authenticated") {
+    if (studio.authStatus === "authenticated" || studio.authStatus === "guest") {
       return <Navigate to="/" replace />;
     }
 
     return <Outlet context={studio} />;
   }
 
-  if (studio.authStatus !== "authenticated") {
+  if (studio.authStatus !== "authenticated" && studio.authStatus !== "guest") {
     return <Navigate to="/auth" replace />;
   }
 

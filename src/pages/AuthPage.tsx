@@ -186,6 +186,33 @@ export default function AuthPage() {
           >
             {mode === "login" ? studio.t.authSwitchToRegister : studio.t.authSwitchToLogin}
           </button>
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              margin: "8px 0",
+              color: "var(--muted)",
+              fontSize: "0.85rem",
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+            }}
+          >
+            <div style={{ flex: 1, height: "1px", background: "var(--line)" }} />
+            <span>{studio.t.authOrSeparator}</span>
+            <div style={{ flex: 1, height: "1px", background: "var(--line)" }} />
+          </div>
+
+          <button
+            type="button"
+            className="button--secondary"
+            onClick={() => {
+              studio.continueAsGuest();
+            }}
+          >
+            {studio.t.authContinueAsGuest}
+          </button>
         </div>
       </div>
     </div>

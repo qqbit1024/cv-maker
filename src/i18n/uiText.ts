@@ -14,8 +14,9 @@ export interface UIText {
   authRegisterTab: string;
   authEmail: string;
   authPassword: string;
-  authSubmitLogin: string;
   authSubmitRegister: string;
+  authContinueAsGuest: string;
+  authOrSeparator: string;
   authSwitchToRegister: string;
   authSwitchToLogin: string;
   authLogout: string;
@@ -297,13 +298,15 @@ const ruText: UIText = {
     switchToLightTheme: "Включить светлую тему",
     authTitle: "Вход в аккаунт",
     authDescription:
-      "Войди или зарегистрируйся, чтобы открыть доступ к редактору и хранить рабочее состояние через backend.",
+      "Войди или создай аккаунт, чтобы сохранять свои резюме и иметь к ним доступ с любого устройства.",
     authLoginTab: "Вход",
     authRegisterTab: "Регистрация",
     authEmail: "Email",
     authPassword: "Пароль",
     authSubmitLogin: "Войти",
     authSubmitRegister: "Создать аккаунт",
+    authContinueAsGuest: "Продолжить без аккаунта",
+    authOrSeparator: "ИЛИ",
     authSwitchToRegister: "Нет аккаунта? Зарегистрироваться",
     authSwitchToLogin: "Уже есть аккаунт? Войти",
     authLogout: "Выйти",
@@ -633,13 +636,15 @@ const enText: UIText = {
     switchToLightTheme: "Switch to light theme",
     authTitle: "Sign in to your account",
     authDescription:
-      "Sign in or register to unlock the editor and keep your workspace synced through the backend.",
+      "Sign in or create an account to securely save your resumes and access them from any device.",
     authLoginTab: "Login",
     authRegisterTab: "Register",
     authEmail: "Email",
     authPassword: "Password",
     authSubmitLogin: "Sign in",
     authSubmitRegister: "Create account",
+    authContinueAsGuest: "Continue as guest",
+    authOrSeparator: "OR",
     authSwitchToRegister: "No account yet? Register",
     authSwitchToLogin: "Already have an account? Sign in",
     authLogout: "Log out",

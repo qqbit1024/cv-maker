@@ -199,7 +199,7 @@ export function useResumeStudio() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [authToken, setAuthToken] = useState<string | null>(getInitialAuthToken);
   const [authUser, setAuthUser] = useState<ApiUser | null>(getInitialAuthUser);
-  const [authStatus, setAuthStatus] = useState<"checking" | "authenticated" | "anonymous">(
+  const [authStatus, setAuthStatus] = useState<"checking" | "authenticated" | "guest" | "anonymous">(
     getInitialAuthToken() ? "checking" : "anonymous"
   );
   const [authError, setAuthError] = useState("");
@@ -495,6 +495,10 @@ export function useResumeStudio() {
     } finally {
       setIsAuthenticating(false);
     }
+  };
+
+  const continueAsGuest = () => {
+    setAuthStatus("guest");
   };
 
   const logout = () => {
@@ -1729,6 +1733,7 @@ export function useResumeStudio() {
     authStatus,
     authError,
     isAuthenticating,
+    continueAsGuest,
     register,
     login,
     logout,
