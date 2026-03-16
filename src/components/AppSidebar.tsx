@@ -13,6 +13,7 @@ import {
   Sun,
   Target,
   Trash2,
+  UserRound,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import IconButton from "./IconButton";
@@ -171,6 +172,13 @@ export default function AppSidebar({
           >
             <ShieldCheck className="button__icon" strokeWidth={2} />
             <span>{t.navQuality}</span>
+          </NavLink>
+          <NavLink
+            to="/profile"
+            className={({ isActive }) => `sidebar-nav__link${isActive ? " sidebar-nav__link--active" : ""}`}
+          >
+            <UserRound className="button__icon" strokeWidth={2} />
+            <span>{t.navProfile}</span>
           </NavLink>
         </div>
       </nav>

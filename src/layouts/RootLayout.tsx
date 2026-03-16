@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import ActionModal from "../components/ActionModal";
 import AppSidebar from "../components/AppSidebar";
 import ConfirmModal from "../components/ConfirmModal";
@@ -9,6 +9,7 @@ export default function RootLayout() {
   const studio = useResumeStudio();
   const location = useLocation();
   const isPreviewRoute = location.pathname === "/preview";
+  const isAuthRoute = location.pathname === "/auth";
   const importItems = [
     ...studio.resumeProgressItems.map((item) => ({
       key: item.language,
@@ -33,6 +34,29 @@ export default function RootLayout() {
       onClick: () => studio.handleExportSelection("skills"),
     },
   ];
+
+  if (studio.authStatus === "checking") {
+    return (
+      <div className="auth-shell">
+        <div className="auth-card auth-card--loading">
+          <p className="page-panel__eyebrow">{studio.t.appName}</p>
+          <h1 className="auth-card__title">{studio.t.authLoading}</h1>
+        </div>
+      </div>
+    );
+  }
+
+  if (isAuthRoute) {
+    if (studio.authStatus === "authenticated") {
+      return <Navigate to="/" replace />;
+    }
+
+    return <Outlet context={studio} />;
+  }
+
+  if (studio.authStatus !== "authenticated") {
+    return <Navigate to="/auth" replace />;
+  }
 
   return (
     <>

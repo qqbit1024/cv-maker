@@ -1,8 +1,10 @@
 import { createBrowserRouter } from "react-router-dom";
 import RootLayout from "../layouts/RootLayout";
+import AuthPage from "../pages/AuthPage";
 import ControlPage from "../pages/ControlPage";
 import HomePage from "../pages/HomePage";
 import PreviewPage from "../pages/PreviewPage";
+import ProfilePage from "../pages/ProfilePage";
 import QualityPage from "../pages/QualityPage";
 import VacancyPage from "../pages/VacancyPage";
 import VersionsPage from "../pages/VersionsPage";
@@ -16,6 +18,10 @@ export const router = createBrowserRouter(
       path: "/",
       element: <RootLayout />,
       children: [
+        {
+          path: "auth",
+          element: <AuthPage />,
+        },
         {
           index: true,
           element: <HomePage />,
@@ -39,6 +45,10 @@ export const router = createBrowserRouter(
         {
           path: "quality",
           element: <QualityPage />,
+        },
+        {
+          path: "profile",
+          element: <ProfilePage />,
         },
       ],
     },

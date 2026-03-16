@@ -8,6 +8,18 @@ export interface UIText {
   interfaceLanguageMenuLabel: string;
   switchToDarkTheme: string;
   switchToLightTheme: string;
+  authTitle: string;
+  authDescription: string;
+  authLoginTab: string;
+  authRegisterTab: string;
+  authEmail: string;
+  authPassword: string;
+  authSubmitLogin: string;
+  authSubmitRegister: string;
+  authSwitchToRegister: string;
+  authSwitchToLogin: string;
+  authLogout: string;
+  authLoading: string;
   workspace: string;
   navEditor: string;
   navVersions: string;
@@ -15,6 +27,7 @@ export interface UIText {
   navPreview: string;
   navControl: string;
   navQuality: string;
+  navProfile: string;
   headerDescription: string;
   summaryDescription: string;
   experienceDescription: string;
@@ -282,13 +295,27 @@ const ruText: UIText = {
     interfaceLanguageMenuLabel: "Выбрать язык приложения",
     switchToDarkTheme: "Включить тёмную тему",
     switchToLightTheme: "Включить светлую тему",
-    workspace: "Режимы",
+    authTitle: "Вход в аккаунт",
+    authDescription:
+      "Войди или зарегистрируйся, чтобы открыть доступ к редактору и хранить рабочее состояние через backend.",
+    authLoginTab: "Вход",
+    authRegisterTab: "Регистрация",
+    authEmail: "Email",
+    authPassword: "Пароль",
+    authSubmitLogin: "Войти",
+    authSubmitRegister: "Создать аккаунт",
+    authSwitchToRegister: "Нет аккаунта? Зарегистрироваться",
+    authSwitchToLogin: "Уже есть аккаунт? Войти",
+    authLogout: "Выйти",
+    authLoading: "Загружаю аккаунт...",
+    workspace: "Меню",
     navEditor: "Редактор",
     navVersions: "Версии",
     navVacancy: "Вакансия",
     navPreview: "Просмотр",
     navControl: "Управление",
     navQuality: "Проверка",
+    navProfile: "Профиль",
     headerDescription: "Имя, роль и контакты, которые попадут в шапку PDF.",
     summaryDescription: "Короткое позиционирование: стек, опыт, фокус и то, что ищешь.",
     experienceDescription: "Основные места работы, достижения, скрытые пункты и заметки.",
@@ -604,13 +631,27 @@ const enText: UIText = {
     interfaceLanguageMenuLabel: "Choose interface language",
     switchToDarkTheme: "Switch to dark theme",
     switchToLightTheme: "Switch to light theme",
-    workspace: "Workspace",
+    authTitle: "Sign in to your account",
+    authDescription:
+      "Sign in or register to unlock the editor and keep your workspace synced through the backend.",
+    authLoginTab: "Login",
+    authRegisterTab: "Register",
+    authEmail: "Email",
+    authPassword: "Password",
+    authSubmitLogin: "Sign in",
+    authSubmitRegister: "Create account",
+    authSwitchToRegister: "No account yet? Register",
+    authSwitchToLogin: "Already have an account? Sign in",
+    authLogout: "Log out",
+    authLoading: "Loading account...",
+    workspace: "Menu",
     navEditor: "Editor",
     navVersions: "Versions",
     navVacancy: "Vacancy",
     navPreview: "Preview",
     navControl: "Control",
     navQuality: "Quality",
+    navProfile: "Profile",
     headerDescription: "Name, role, and contacts that will appear in the PDF header.",
     summaryDescription: "Short positioning: stack, experience, focus, and what you are looking for.",
     experienceDescription: "Main jobs, achievement bullets, hidden items, and working notes.",
@@ -923,6 +964,19 @@ const deText: UIText = {
   interfaceLanguageMenuLabel: "Sprache der Anwendung wählen",
   switchToDarkTheme: "Dunkles Design aktivieren",
   switchToLightTheme: "Helles Design aktivieren",
+  authTitle: "Im Konto anmelden",
+  authDescription:
+    "Melde dich an oder registriere dich, um den Editor freizuschalten und den Workspace über das Backend zu synchronisieren.",
+  authLoginTab: "Login",
+  authRegisterTab: "Registrieren",
+  authEmail: "E-Mail",
+  authPassword: "Passwort",
+  authSubmitLogin: "Anmelden",
+  authSubmitRegister: "Konto erstellen",
+  authSwitchToRegister: "Noch kein Konto? Registrieren",
+  authSwitchToLogin: "Bereits ein Konto? Anmelden",
+  authLogout: "Abmelden",
+  authLoading: "Konto wird geladen...",
   headerDescription: "Name, Rolle und Kontakte, die in den PDF-Kopfbereich übernommen werden.",
   summaryDescription:
     "Kurze Positionierung: Stack, Erfahrung, Fokus und wonach du suchst.",
@@ -1064,6 +1118,19 @@ const esText: UIText = {
   interfaceLanguageMenuLabel: "Elegir idioma de la aplicación",
   switchToDarkTheme: "Activar tema oscuro",
   switchToLightTheme: "Activar tema claro",
+  authTitle: "Inicia sesión",
+  authDescription:
+    "Inicia sesión o regístrate para abrir el editor y sincronizar tu workspace a través del backend.",
+  authLoginTab: "Entrar",
+  authRegisterTab: "Registro",
+  authEmail: "Email",
+  authPassword: "Contraseña",
+  authSubmitLogin: "Entrar",
+  authSubmitRegister: "Crear cuenta",
+  authSwitchToRegister: "¿No tienes cuenta? Regístrate",
+  authSwitchToLogin: "¿Ya tienes cuenta? Entra",
+  authLogout: "Cerrar sesión",
+  authLoading: "Cargando cuenta...",
   headerDescription: "Nombre, rol y contactos que aparecerán en la cabecera del PDF.",
   summaryDescription:
     "Posicionamiento corto: stack, experiencia, foco y lo que estás buscando.",
@@ -1204,6 +1271,19 @@ const itText: UIText = {
   interfaceLanguageMenuLabel: "Scegli la lingua dell'applicazione",
   switchToDarkTheme: "Attiva tema scuro",
   switchToLightTheme: "Attiva tema chiaro",
+  authTitle: "Accedi al tuo account",
+  authDescription:
+    "Accedi o registrati per aprire l'editor e sincronizzare il workspace tramite il backend.",
+  authLoginTab: "Accesso",
+  authRegisterTab: "Registrazione",
+  authEmail: "Email",
+  authPassword: "Password",
+  authSubmitLogin: "Accedi",
+  authSubmitRegister: "Crea account",
+  authSwitchToRegister: "Non hai un account? Registrati",
+  authSwitchToLogin: "Hai già un account? Accedi",
+  authLogout: "Esci",
+  authLoading: "Caricamento account...",
   headerDescription: "Nome, ruolo e contatti che compariranno nell'intestazione del PDF.",
   summaryDescription:
     "Posizionamento breve: stack, esperienza, focus e ciò che stai cercando.",
@@ -1344,6 +1424,19 @@ const ptText: UIText = {
   interfaceLanguageMenuLabel: "Escolher idioma da aplicação",
   switchToDarkTheme: "Ativar tema escuro",
   switchToLightTheme: "Ativar tema claro",
+  authTitle: "Entrar na conta",
+  authDescription:
+    "Entra ou regista-te para abrir o editor e sincronizar o workspace através do backend.",
+  authLoginTab: "Entrar",
+  authRegisterTab: "Registar",
+  authEmail: "Email",
+  authPassword: "Palavra-passe",
+  authSubmitLogin: "Entrar",
+  authSubmitRegister: "Criar conta",
+  authSwitchToRegister: "Ainda não tens conta? Regista-te",
+  authSwitchToLogin: "Já tens conta? Entrar",
+  authLogout: "Terminar sessão",
+  authLoading: "A carregar conta...",
   headerDescription:
     "Nome, função e contactos que vão aparecer no cabeçalho do PDF.",
   summaryDescription:
@@ -1485,6 +1578,19 @@ const srText: UIText = {
   interfaceLanguageMenuLabel: "Изабери језик апликације",
   switchToDarkTheme: "Укључи тамну тему",
   switchToLightTheme: "Укључи светлу тему",
+  authTitle: "Пријави се на налог",
+  authDescription:
+    "Пријави се или се региструј да откључаш едитор и синхронизујеш workspace преко backend-а.",
+  authLoginTab: "Пријава",
+  authRegisterTab: "Регистрација",
+  authEmail: "Email",
+  authPassword: "Лозинка",
+  authSubmitLogin: "Пријави се",
+  authSubmitRegister: "Направи налог",
+  authSwitchToRegister: "Немаш налог? Региструј се",
+  authSwitchToLogin: "Већ имаш налог? Пријави се",
+  authLogout: "Одјави се",
+  authLoading: "Учитавам налог...",
   headerDescription: "Име, улога и контакти који ће ући у заглавље PDF-а.",
   summaryDescription:
     "Кратко позиционирање: стек, искуство, фокус и оно што тражиш.",
@@ -1627,6 +1733,19 @@ const frText: UIText = {
   interfaceLanguageMenuLabel: "Choisir la langue de l'application",
   switchToDarkTheme: "Activer le thème sombre",
   switchToLightTheme: "Activer le thème clair",
+  authTitle: "Se connecter",
+  authDescription:
+    "Connecte-toi ou inscris-toi pour ouvrir l'éditeur et synchroniser l'espace de travail via le backend.",
+  authLoginTab: "Connexion",
+  authRegisterTab: "Inscription",
+  authEmail: "Email",
+  authPassword: "Mot de passe",
+  authSubmitLogin: "Se connecter",
+  authSubmitRegister: "Créer un compte",
+  authSwitchToRegister: "Pas encore de compte ? Inscris-toi",
+  authSwitchToLogin: "Tu as déjà un compte ? Connecte-toi",
+  authLogout: "Se déconnecter",
+  authLoading: "Chargement du compte...",
   headerDescription: "Nom, rôle et contacts qui seront affichés dans l'en-tête du PDF.",
   summaryDescription:
     "Positionnement court : stack, expérience, focus et ce que tu recherches.",
@@ -1777,6 +1896,19 @@ const plText: UIText = {
   interfaceLanguageMenuLabel: "Wybierz język aplikacji",
   switchToDarkTheme: "Włącz ciemny motyw",
   switchToLightTheme: "Włącz jasny motyw",
+  authTitle: "Zaloguj się",
+  authDescription:
+    "Zaloguj się lub zarejestruj, aby otworzyć edytor i synchronizować workspace przez backend.",
+  authLoginTab: "Logowanie",
+  authRegisterTab: "Rejestracja",
+  authEmail: "Email",
+  authPassword: "Hasło",
+  authSubmitLogin: "Zaloguj się",
+  authSubmitRegister: "Utwórz konto",
+  authSwitchToRegister: "Nie masz konta? Zarejestruj się",
+  authSwitchToLogin: "Masz już konto? Zaloguj się",
+  authLogout: "Wyloguj się",
+  authLoading: "Ładowanie konta...",
   headerDescription: "Imię, rola i kontakty, które trafią do nagłówka PDF.",
   summaryDescription: "Krótki opis: stack, doświadczenie, fokus i to, czego szukasz.",
   experienceDescription: "Główne miejsca pracy, osiągnięcia, ukryte elementy i notatki.",
@@ -1922,6 +2054,19 @@ const ukText: UIText = {
   interfaceLanguageMenuLabel: "Вибрати мову застосунку",
   switchToDarkTheme: "Увімкнути темну тему",
   switchToLightTheme: "Увімкнути світлу тему",
+  authTitle: "Увійти в акаунт",
+  authDescription:
+    "Увійди або зареєструйся, щоб відкрити редактор і синхронізувати workspace через backend.",
+  authLoginTab: "Вхід",
+  authRegisterTab: "Реєстрація",
+  authEmail: "Email",
+  authPassword: "Пароль",
+  authSubmitLogin: "Увійти",
+  authSubmitRegister: "Створити акаунт",
+  authSwitchToRegister: "Немає акаунта? Зареєструйся",
+  authSwitchToLogin: "Уже є акаунт? Увійти",
+  authLogout: "Вийти",
+  authLoading: "Завантаження акаунта...",
   headerDescription: "Ім’я, роль і контакти, які потраплять у шапку PDF.",
   summaryDescription: "Коротке позиціонування: стек, досвід, фокус і те, що ти шукаєш.",
   experienceDescription: "Основні місця роботи, досягнення, приховані пункти та нотатки.",
@@ -2063,12 +2208,13 @@ const ukText: UIText = {
 
 const featureTextOverrides = {
   de: {
-    workspace: "Modi",
+    workspace: "Menü",
     navEditor: "Editor",
     navVersions: "Versionen",
     navVacancy: "Stelle",
     navPreview: "Vorschau",
     navControl: "Verwaltung",
+    navProfile: "Profil",
     duplicateResumeLanguage: "Sprache des Lebenslaufs duplizieren",
     renameResumeLanguage: "Sprache des Lebenslaufs umbenennen",
     duplicateResumeLanguageTitle: "Sprache des Lebenslaufs duplizieren",
@@ -2172,12 +2318,13 @@ const featureTextOverrides = {
     versionOverwritten: (label: string) => `Version aktualisiert: ${label}.`,
   },
   es: {
-    workspace: "Modos",
+    workspace: "Menú",
     navEditor: "Editor",
     navVersions: "Versiones",
     navVacancy: "Vacante",
     navPreview: "Vista previa",
     navControl: "Control",
+    navProfile: "Perfil",
     duplicateResumeLanguage: "Duplicar idioma del CV",
     renameResumeLanguage: "Renombrar idioma del CV",
     duplicateResumeLanguageTitle: "Duplicar idioma del CV",
@@ -2281,12 +2428,13 @@ const featureTextOverrides = {
     versionOverwritten: (label: string) => `Versión actualizada: ${label}.`,
   },
   it: {
-    workspace: "Modalità",
+    workspace: "Menu",
     navEditor: "Editor",
     navVersions: "Versioni",
     navVacancy: "Vacancy",
     navPreview: "Anteprima",
     navControl: "Controllo",
+    navProfile: "Profilo",
     duplicateResumeLanguage: "Duplica lingua del CV",
     renameResumeLanguage: "Rinomina lingua del CV",
     duplicateResumeLanguageTitle: "Duplica lingua del CV",
@@ -2390,12 +2538,13 @@ const featureTextOverrides = {
     versionOverwritten: (label: string) => `Versione aggiornata: ${label}.`,
   },
   pt: {
-    workspace: "Modos",
+    workspace: "Menu",
     navEditor: "Editor",
     navVersions: "Versões",
     navVacancy: "Vaga",
     navPreview: "Pré-visualização",
     navControl: "Controlo",
+    navProfile: "Perfil",
     duplicateResumeLanguage: "Duplicar idioma do currículo",
     renameResumeLanguage: "Renomear idioma do currículo",
     duplicateResumeLanguageTitle: "Duplicar idioma do currículo",
@@ -2499,12 +2648,13 @@ const featureTextOverrides = {
     versionOverwritten: (label: string) => `Versão atualizada: ${label}.`,
   },
   sr: {
-    workspace: "Режими",
+    workspace: "Мени",
     navEditor: "Едитор",
     navVersions: "Верзије",
     navVacancy: "Оглас",
     navPreview: "Преглед",
     navControl: "Контрола",
+    navProfile: "Профил",
     duplicateResumeLanguage: "Дуплирај језик резимеа",
     renameResumeLanguage: "Преименуј језик резимеа",
     duplicateResumeLanguageTitle: "Дуплирај језик резимеа",
@@ -2608,12 +2758,13 @@ const featureTextOverrides = {
     versionOverwritten: (label: string) => `Ажурирана верзија: ${label}.`,
   },
   fr: {
-    workspace: "Modes",
+    workspace: "Menu",
     navEditor: "Éditeur",
     navVersions: "Versions",
     navVacancy: "Offre",
     navPreview: "Aperçu",
     navControl: "Contrôle",
+    navProfile: "Profil",
     versionsTitle: "Versions et presets",
     versionsDescription:
       "Enregistre des snapshots nommés du CV actuel pour passer rapidement entre la version de base et des adaptations pour des offres précises.",
@@ -2710,12 +2861,13 @@ const featureTextOverrides = {
     versionOverwritten: (label: string) => `Version mise à jour : ${label}.`,
   },
   pl: {
-    workspace: "Tryby",
+    workspace: "Menu",
     navEditor: "Edytor",
     navVersions: "Wersje",
     navVacancy: "Oferta",
     navPreview: "Podgląd",
     navControl: "Sterowanie",
+    navProfile: "Profil",
     versionsTitle: "Wersje i presety",
     versionsDescription:
       "Zapisuj nazwane snapshoty aktualnego CV, aby szybko przełączać się między wersją bazową a wariantami pod konkretne oferty.",
@@ -2812,12 +2964,13 @@ const featureTextOverrides = {
     versionOverwritten: (label: string) => `Zaktualizowano wersję: ${label}.`,
   },
   uk: {
-    workspace: "Режими",
+    workspace: "Меню",
     navEditor: "Редактор",
     navVersions: "Версії",
     navVacancy: "Вакансія",
     navPreview: "Прев’ю",
     navControl: "Керування",
+    navProfile: "Профіль",
     versionsTitle: "Версії та пресети",
     versionsDescription:
       "Зберігай іменовані snapshots поточного резюме, щоб швидко перемикатися між базовою версією та адаптаціями під конкретні вакансії.",

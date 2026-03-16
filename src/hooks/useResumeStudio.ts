@@ -6,6 +6,7 @@ import {
   getResumeLanguageLabel,
   uiText,
 } from "../i18n/uiText";
+import { ApiError, authApi, type ApiUser, workspaceApi } from "../lib/api";
 import { createResumePdf } from "../lib/pdfTemplate";
 import type {
   CourseEntry,
@@ -43,12 +44,15 @@ import {
   loadState,
   moveItem,
   normalizeResume,
+  normalizeState,
   normalizeSkills,
   normalizeResumeTemplate,
   STORAGE_KEY,
 } from "../utils/resumeState";
 
 const THEME_STORAGE_KEY = "resume-studio-theme-v1";
+const AUTH_TOKEN_STORAGE_KEY = "resume-studio-auth-token-v1";
+const AUTH_USER_STORAGE_KEY = "resume-studio-auth-user-v1";
 
 function getInitialTheme(): ThemeMode {
   if (typeof window === "undefined") {
@@ -62,6 +66,33 @@ function getInitialTheme(): ThemeMode {
   }
 
   return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+function getInitialAuthToken(): string | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const token = window.localStorage.getItem(AUTH_TOKEN_STORAGE_KEY)?.trim();
+  return token ? token : null;
+}
+
+function getInitialAuthUser(): ApiUser | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const raw = window.localStorage.getItem(AUTH_USER_STORAGE_KEY);
+
+  if (!raw) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(raw) as ApiUser;
+  } catch {
+    return null;
+  }
 }
 
 type JobCollectionKey = "jobs" | "_commentedJobs";
@@ -166,6 +197,14 @@ export function useResumeStudio() {
   const [resumeTemplates, setResumeTemplates] = useState(initialState.resumeTemplates);
   const [status, setStatus] = useState(uiText.ru.statusReady);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [authToken, setAuthToken] = useState<string | null>(getInitialAuthToken);
+  const [authUser, setAuthUser] = useState<ApiUser | null>(getInitialAuthUser);
+  const [authStatus, setAuthStatus] = useState<"checking" | "authenticated" | "anonymous">(
+    getInitialAuthToken() ? "checking" : "anonymous"
+  );
+  const [authError, setAuthError] = useState("");
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [isWorkspaceHydrated, setIsWorkspaceHydrated] = useState(false);
   const [modalType, setModalType] = useState<ModalType>(null);
   const [pendingImportTarget, setPendingImportTarget] = useState<ImportTarget | null>(null);
   const [isCreateResumeLanguageModalOpen, setIsCreateResumeLanguageModalOpen] = useState(false);
@@ -181,7 +220,25 @@ export function useResumeStudio() {
   const [didAutoSave, setDidAutoSave] = useState(false);
   const importInputRef = useRef<HTMLInputElement | null>(null);
   const hasInitializedAutoSaveRef = useRef(false);
+  const workspaceSignatureRef = useRef<string | null>(null);
   const t = uiText[uiLanguage];
+
+  const createWorkspaceSnapshot = () => ({
+    resumes,
+    skills,
+    pdfFileNames,
+    resumeLanguageLabels,
+    resumeTemplates,
+  });
+
+  const clearAuthSession = () => {
+    setAuthToken(null);
+    setAuthUser(null);
+    setAuthStatus("anonymous");
+    setAuthError("");
+    setIsWorkspaceHydrated(false);
+    workspaceSignatureRef.current = null;
+  };
 
   useEffect(() => {
     window.localStorage.setItem(
@@ -206,6 +263,20 @@ export function useResumeStudio() {
   }, [resumes, skills, pdfFileNames, resumeLanguageLabels, resumeTemplates]);
 
   useEffect(() => {
+    if (authToken) {
+      window.localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, authToken);
+    } else {
+      window.localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
+    }
+
+    if (authUser) {
+      window.localStorage.setItem(AUTH_USER_STORAGE_KEY, JSON.stringify(authUser));
+    } else {
+      window.localStorage.removeItem(AUTH_USER_STORAGE_KEY);
+    }
+  }, [authToken, authUser]);
+
+  useEffect(() => {
     document.title = "cv-maker";
     document.documentElement.lang = uiLanguage;
   }, [uiLanguage]);
@@ -221,6 +292,97 @@ export function useResumeStudio() {
       setActiveLanguage(Object.keys(resumes)[0] ?? "ru");
     }
   }, [activeLanguage, resumes]);
+
+  useEffect(() => {
+    if (!authToken) {
+      setAuthStatus("anonymous");
+      setIsWorkspaceHydrated(false);
+      return;
+    }
+
+    let isCancelled = false;
+
+    const hydrateWorkspace = async () => {
+      setAuthStatus("checking");
+      setAuthError("");
+
+      try {
+        const [{ user }, { workspace }] = await Promise.all([
+          authApi.me(authToken),
+          workspaceApi.get(authToken),
+        ]);
+
+        if (isCancelled) {
+          return;
+        }
+
+        const nextState = normalizeState(workspace?.data);
+        setAuthUser(user);
+        setResumes(nextState.resumes);
+        setSkills(nextState.skills);
+        setPdfFileNames(nextState.pdfFileNames);
+        setResumeLanguageLabels(nextState.resumeLanguageLabels);
+        setResumeTemplates(nextState.resumeTemplates);
+        setActiveLanguage(nextState.resumes.ru ? "ru" : (Object.keys(nextState.resumes)[0] ?? "ru"));
+        workspaceSignatureRef.current = JSON.stringify(nextState);
+        setAuthStatus("authenticated");
+        setIsWorkspaceHydrated(true);
+      } catch (error) {
+        if (isCancelled) {
+          return;
+        }
+
+        clearAuthSession();
+        setAuthError(error instanceof Error ? error.message : uiText.en.unknownError);
+      }
+    };
+
+    void hydrateWorkspace();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [authToken]);
+
+  useEffect(() => {
+    if (!authToken || authStatus !== "authenticated" || !isWorkspaceHydrated) {
+      return;
+    }
+
+    const workspaceSnapshot = createWorkspaceSnapshot();
+    const nextSignature = JSON.stringify(workspaceSnapshot);
+
+    if (workspaceSignatureRef.current === nextSignature) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      void workspaceApi
+        .save(authToken, workspaceSnapshot)
+        .then(() => {
+          workspaceSignatureRef.current = nextSignature;
+        })
+        .catch((error) => {
+          if (error instanceof ApiError && error.status === 401) {
+            clearAuthSession();
+            return;
+          }
+
+          setStatus(error instanceof Error ? error.message : uiText.en.unknownError);
+        });
+    }, 700);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [
+    authStatus,
+    authToken,
+    isWorkspaceHydrated,
+    pdfFileNames,
+    resumeLanguageLabels,
+    resumeTemplates,
+    resumes,
+    skills,
+  ]);
 
   const resume = resumes[activeLanguage] ?? getDefaultResumeForLanguage("ru");
   const defaultResume = getDefaultResumeForLanguage(activeLanguage);
@@ -303,6 +465,40 @@ export function useResumeStudio() {
 
   const toggleTheme = () => {
     setTheme((current) => (current === "light" ? "dark" : "light"));
+  };
+
+  const register = async (input: { email: string; password: string; name?: string }) => {
+    setIsAuthenticating(true);
+    setAuthError("");
+
+    try {
+      const { token, user } = await authApi.register(input);
+      setAuthUser(user);
+      setAuthToken(token);
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : uiText.en.unknownError);
+    } finally {
+      setIsAuthenticating(false);
+    }
+  };
+
+  const login = async (input: { email: string; password: string }) => {
+    setIsAuthenticating(true);
+    setAuthError("");
+
+    try {
+      const { token, user } = await authApi.login(input);
+      setAuthUser(user);
+      setAuthToken(token);
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : uiText.en.unknownError);
+    } finally {
+      setIsAuthenticating(false);
+    }
+  };
+
+  const logout = () => {
+    clearAuthSession();
   };
 
   const updateHeader = (field: "name" | "title", value: string) => {
@@ -1529,6 +1725,13 @@ export function useResumeStudio() {
     setUiLanguage,
     theme,
     toggleTheme,
+    authUser,
+    authStatus,
+    authError,
+    isAuthenticating,
+    register,
+    login,
+    logout,
     activeLanguage,
     setActiveLanguage,
     resumes,
