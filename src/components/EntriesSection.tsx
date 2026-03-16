@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import {
   DndContext,
   DragOverlay,
@@ -134,6 +135,7 @@ function SortableEntryRow(
         transition,
       }}
       className={`entry-row-sortable${isDragging ? " entry-row-sortable--dragging" : ""}`}
+      data-id={`entry-${sortableId}`}
     >
       <EntryRow
         {...entryRowProps}
@@ -184,6 +186,8 @@ export default function EntriesSection({
 }: EntriesSectionProps) {
   const [activeVisibleDragIndex, setActiveVisibleDragIndex] = useState<number | null>(null);
   const [activeHiddenDragIndex, setActiveHiddenDragIndex] = useState<number | null>(null);
+  const [dragNodeWidth, setDragNodeWidth] = useState<number | null>(null);
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -200,11 +204,16 @@ export default function EntriesSection({
 
     if (!Number.isNaN(index)) {
       setActiveVisibleDragIndex(index);
+      const node = document.querySelector(`[data-id="entry-${index}"]`);
+      if (node) {
+        setDragNodeWidth(node.getBoundingClientRect().width);
+      }
     }
   };
 
   const handleVisibleDragEnd = ({ active, over }: DragEndEvent) => {
     setActiveVisibleDragIndex(null);
+    setDragNodeWidth(null);
 
     if (!over || active.id === over.id) {
       return;
@@ -225,11 +234,16 @@ export default function EntriesSection({
 
     if (!Number.isNaN(index)) {
       setActiveHiddenDragIndex(index);
+      const node = document.querySelector(`[data-id="entry-${index}"]`);
+      if (node) {
+        setDragNodeWidth(node.getBoundingClientRect().width);
+      }
     }
   };
 
   const handleHiddenDragEnd = ({ active, over }: DragEndEvent) => {
     setActiveHiddenDragIndex(null);
+    setDragNodeWidth(null);
 
     if (!over || active.id === over.id) {
       return;
@@ -282,7 +296,10 @@ export default function EntriesSection({
           collisionDetection={closestCenter}
           onDragStart={handleVisibleDragStart}
           onDragEnd={handleVisibleDragEnd}
-          onDragCancel={() => setActiveVisibleDragIndex(null)}
+          onDragCancel={() => {
+            setActiveVisibleDragIndex(null);
+            setDragNodeWidth(null);
+          }}
         >
           <SortableContext
             items={visibleEntries.map((_, index) => index)}
@@ -309,27 +326,44 @@ export default function EntriesSection({
               ))}
             </div>
           </SortableContext>
-          <DragOverlay zIndex={120}>
-            {activeVisibleDragEntry ? (
-              <div className="drag-overlay">
-                <EntryRow
-                  t={t}
-                  entryLabel={entryLabel}
-                  entry={activeVisibleDragEntry}
-                  exampleEntry={exampleVisibleEntries[activeVisibleDragIndex ?? 0]}
-                  index={activeVisibleDragIndex ?? 0}
-                  collectionKey={visibleCollectionKey}
-                  isHidden={false}
-                  hiddenDeleteLabel={hiddenDeleteLabel}
-                  onUpdateEntry={onUpdateEntry}
-                  onRemoveEntry={onRemoveEntry}
-                  onHideEntry={onHideEntry}
-                  onRestoreEntry={onRestoreEntry}
-                  isDragging
-                />
-              </div>
-            ) : null}
-          </DragOverlay>
+          {typeof document !== "undefined"
+            ? createPortal(
+                <DragOverlay zIndex={120}>
+                  {activeVisibleDragEntry ? (
+                    <div
+                      className="drag-overlay"
+                      style={{ width: dragNodeWidth ? `${dragNodeWidth}px` : undefined }}
+                    >
+                      <EntryRow
+                        t={t}
+                        entryLabel={entryLabel}
+                        entry={activeVisibleDragEntry}
+                        exampleEntry={exampleVisibleEntries[activeVisibleDragIndex ?? 0]}
+                        index={activeVisibleDragIndex ?? 0}
+                        collectionKey={visibleCollectionKey}
+                        isHidden={false}
+                        hiddenDeleteLabel={hiddenDeleteLabel}
+                        onUpdateEntry={onUpdateEntry}
+                        onRemoveEntry={onRemoveEntry}
+                        onHideEntry={onHideEntry}
+                        onRestoreEntry={onRestoreEntry}
+                        isDragging
+                        dragHandle={
+                          <button
+                            type="button"
+                            className="entry-row-card__drag-handle"
+                            disabled
+                          >
+                            <GripVertical strokeWidth={2} />
+                          </button>
+                        }
+                      />
+                    </div>
+                  ) : null}
+                </DragOverlay>,
+                document.body
+              )
+            : null}
         </DndContext>
       ) : (
         <div className="stack">
@@ -374,7 +408,10 @@ export default function EntriesSection({
           collisionDetection={closestCenter}
           onDragStart={handleHiddenDragStart}
           onDragEnd={handleHiddenDragEnd}
-          onDragCancel={() => setActiveHiddenDragIndex(null)}
+          onDragCancel={() => {
+            setActiveHiddenDragIndex(null);
+            setDragNodeWidth(null);
+          }}
         >
           <SortableContext
             items={hiddenEntries.map((_, index) => index)}
@@ -401,27 +438,44 @@ export default function EntriesSection({
               ))}
             </div>
           </SortableContext>
-          <DragOverlay zIndex={120}>
-            {activeHiddenDragEntry ? (
-              <div className="drag-overlay">
-                <EntryRow
-                  t={t}
-                  entryLabel={entryLabel}
-                  entry={activeHiddenDragEntry}
-                  exampleEntry={exampleHiddenEntries[activeHiddenDragIndex ?? 0]}
-                  index={activeHiddenDragIndex ?? 0}
-                  collectionKey={hiddenCollectionKey}
-                  isHidden
-                  hiddenDeleteLabel={hiddenDeleteLabel}
-                  onUpdateEntry={onUpdateEntry}
-                  onRemoveEntry={onRemoveEntry}
-                  onHideEntry={onHideEntry}
-                  onRestoreEntry={onRestoreEntry}
-                  isDragging
-                />
-              </div>
-            ) : null}
-          </DragOverlay>
+          {typeof document !== "undefined"
+            ? createPortal(
+                <DragOverlay zIndex={120}>
+                  {activeHiddenDragEntry ? (
+                    <div
+                      className="drag-overlay"
+                      style={{ width: dragNodeWidth ? `${dragNodeWidth}px` : undefined }}
+                    >
+                      <EntryRow
+                        t={t}
+                        entryLabel={entryLabel}
+                        entry={activeHiddenDragEntry}
+                        exampleEntry={exampleHiddenEntries[activeHiddenDragIndex ?? 0]}
+                        index={activeHiddenDragIndex ?? 0}
+                        collectionKey={hiddenCollectionKey}
+                        isHidden
+                        hiddenDeleteLabel={hiddenDeleteLabel}
+                        onUpdateEntry={onUpdateEntry}
+                        onRemoveEntry={onRemoveEntry}
+                        onHideEntry={onHideEntry}
+                        onRestoreEntry={onRestoreEntry}
+                        isDragging
+                        dragHandle={
+                          <button
+                            type="button"
+                            className="entry-row-card__drag-handle"
+                            disabled
+                          >
+                            <GripVertical strokeWidth={2} />
+                          </button>
+                        }
+                      />
+                    </div>
+                  ) : null}
+                </DragOverlay>,
+                document.body
+              )
+            : null}
         </DndContext>
       ) : (
         <div className="stack">

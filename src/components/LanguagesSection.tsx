@@ -1,4 +1,5 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import {
   DndContext,
   KeyboardSensor,
@@ -7,6 +8,8 @@ import {
   useSensor,
   useSensors,
   type DragEndEvent,
+  type DragStartEvent,
+  DragOverlay,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -112,6 +115,7 @@ function SortableLanguageRow({
         transition,
       }}
       className={`language-row-sortable${isDragging ? " language-row-sortable--dragging" : ""}`}
+      data-id={`language-${index}`}
     >
       <LanguageRow
         t={t}
@@ -152,6 +156,9 @@ export default function LanguagesSection({
   onRemoveLanguage,
   onReorderLanguages,
 }: LanguagesSectionProps) {
+  const [activeDragIndex, setActiveDragIndex] = useState<number | null>(null);
+  const [dragNodeWidth, setDragNodeWidth] = useState<number | null>(null);
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -163,7 +170,22 @@ export default function LanguagesSection({
     })
   );
 
+  const handleDragStart = ({ active }: DragStartEvent) => {
+    const index = Number(active.id);
+
+    if (!Number.isNaN(index)) {
+      setActiveDragIndex(index);
+      const node = document.querySelector(`[data-id="language-${index}"]`);
+      if (node) {
+        setDragNodeWidth(node.getBoundingClientRect().width);
+      }
+    }
+  };
+
   const handleDragEnd = ({ active, over }: DragEndEvent) => {
+    setActiveDragIndex(null);
+    setDragNodeWidth(null);
+
     if (!over || active.id === over.id) {
       return;
     }
@@ -179,6 +201,7 @@ export default function LanguagesSection({
   };
 
   const canReorderLanguages = items.length > 1;
+  const activeDragLanguage = activeDragIndex !== null ? items[activeDragIndex] : undefined;
 
   return (
     <SectionCard
@@ -201,7 +224,16 @@ export default function LanguagesSection({
       </div>
 
       {canReorderLanguages ? (
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          onDragCancel={() => {
+            setActiveDragIndex(null);
+            setDragNodeWidth(null);
+          }}
+        >
           <SortableContext items={items.map((_, index) => index)} strategy={verticalListSortingStrategy}>
             <div className="stack">
               {items.map((item, index) => (
@@ -218,6 +250,39 @@ export default function LanguagesSection({
               ))}
             </div>
           </SortableContext>
+          {typeof document !== "undefined"
+            ? createPortal(
+                <DragOverlay zIndex={120}>
+                  {activeDragLanguage ? (
+                    <div
+                      className="drag-overlay"
+                      style={{ width: dragNodeWidth ? `${dragNodeWidth}px` : undefined }}
+                    >
+                      <LanguageRow
+                        t={t}
+                        item={activeDragLanguage}
+                        exampleItem={exampleItems[activeDragIndex ?? 0]}
+                        index={activeDragIndex ?? 0}
+                        levelOptions={levelOptions}
+                        onUpdateLanguage={() => {}}
+                        onRemoveLanguage={() => {}}
+                        isDragging
+                        dragHandle={
+                          <button
+                            type="button"
+                            className="language-row-card__drag-handle"
+                            disabled
+                          >
+                            <GripVertical strokeWidth={2} />
+                          </button>
+                        }
+                      />
+                    </div>
+                  ) : null}
+                </DragOverlay>,
+                document.body
+              )
+            : null}
         </DndContext>
       ) : (
         <div className="stack">

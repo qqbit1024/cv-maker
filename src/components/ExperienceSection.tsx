@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import {
   DndContext,
   DragOverlay,
@@ -163,6 +164,7 @@ function SortableTaskRow({
         transition,
       }}
       className={`entry-row-sortable${isDragging ? " entry-row-sortable--dragging" : ""}`}
+      data-id={`${sortableId}`}
     >
       <TaskRow
         t={t}
@@ -265,6 +267,7 @@ function JobCard({
 }) {
   const [activeVisibleTaskDragIndex, setActiveVisibleTaskDragIndex] = useState<number | null>(null);
   const [activeHiddenTaskDragIndex, setActiveHiddenTaskDragIndex] = useState<number | null>(null);
+  const [dragNodeWidth, setDragNodeWidth] = useState<number | null>(null);
   const taskSensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -352,7 +355,7 @@ function JobCard({
           </div>
 
           {canReorderVisibleTasks ? (
-            <DndContext
+              <DndContext
               sensors={taskSensors}
               collisionDetection={closestCenter}
               onDragStart={({ active }: DragStartEvent) => {
@@ -360,10 +363,16 @@ function JobCard({
 
                 if (!Number.isNaN(taskIndex)) {
                   setActiveVisibleTaskDragIndex(taskIndex);
+                  // Grab element width before dragging makes it invisible or shifts it
+                  const node = document.querySelector(`[data-id="${taskIndex}"]`);
+                  if (node) {
+                    setDragNodeWidth(node.getBoundingClientRect().width);
+                  }
                 }
               }}
               onDragEnd={({ active, over }: DragEndEvent) => {
                 setActiveVisibleTaskDragIndex(null);
+                setDragNodeWidth(null);
 
                 if (!over || active.id === over.id) {
                   return;
@@ -378,7 +387,10 @@ function JobCard({
 
                 onReorderTask(collectionKey, index, "tasks", fromIndex, toIndex);
               }}
-              onDragCancel={() => setActiveVisibleTaskDragIndex(null)}
+              onDragCancel={() => {
+                setActiveVisibleTaskDragIndex(null);
+                setDragNodeWidth(null);
+              }}
             >
               <SortableContext
                 items={visibleTasks.map((_, taskIndex) => taskIndex)}
@@ -404,24 +416,37 @@ function JobCard({
                   ))}
                 </div>
               </SortableContext>
-              <DragOverlay zIndex={120}>
-                {activeVisibleTask ? (
-                  <div className="drag-overlay">
-                    <TaskRow
-                      t={t}
-                      task={activeVisibleTask}
-                      exampleTask={exampleVisibleTasks[activeVisibleTaskDragIndex ?? 0]}
-                      index={activeVisibleTaskDragIndex ?? 0}
-                      isHidden={false}
-                      onUpdateTask={() => {}}
-                      onRemoveTask={() => {}}
-                      onHideTask={() => {}}
-                      onRestoreTask={() => {}}
-                      isDragging
-                    />
-                  </div>
-                ) : null}
-              </DragOverlay>
+              {typeof document !== "undefined"
+                ? createPortal(
+                    <DragOverlay zIndex={120}>
+                      {activeVisibleTask ? (
+                        <div
+                          className="drag-overlay"
+                          style={{ width: dragNodeWidth ? `${dragNodeWidth}px` : undefined }}
+                        >
+                          <TaskRow
+                            t={t}
+                            task={activeVisibleTask}
+                            exampleTask={exampleVisibleTasks[activeVisibleTaskDragIndex ?? 0]}
+                            index={activeVisibleTaskDragIndex ?? 0}
+                            isHidden={false}
+                            onUpdateTask={() => {}}
+                            onRemoveTask={() => {}}
+                            onHideTask={() => {}}
+                            onRestoreTask={() => {}}
+                            isDragging
+                            dragHandle={
+                              <button type="button" className="entry-row-card__drag-handle" disabled>
+                                <GripVertical strokeWidth={2} />
+                              </button>
+                            }
+                          />
+                        </div>
+                      ) : null}
+                    </DragOverlay>,
+                    document.body
+                  )
+                : null}
             </DndContext>
           ) : (
             <div className="stack">
@@ -469,7 +494,7 @@ function JobCard({
           </div>
 
           {canReorderHiddenTasks ? (
-            <DndContext
+              <DndContext
               sensors={taskSensors}
               collisionDetection={closestCenter}
               onDragStart={({ active }: DragStartEvent) => {
@@ -477,10 +502,15 @@ function JobCard({
 
                 if (!Number.isNaN(taskIndex)) {
                   setActiveHiddenTaskDragIndex(taskIndex);
+                  const node = document.querySelector(`[data-id="${taskIndex}"]`);
+                  if (node) {
+                    setDragNodeWidth(node.getBoundingClientRect().width);
+                  }
                 }
               }}
               onDragEnd={({ active, over }: DragEndEvent) => {
                 setActiveHiddenTaskDragIndex(null);
+                setDragNodeWidth(null);
 
                 if (!over || active.id === over.id) {
                   return;
@@ -495,7 +525,10 @@ function JobCard({
 
                 onReorderTask(collectionKey, index, "_commentedTasks", fromIndex, toIndex);
               }}
-              onDragCancel={() => setActiveHiddenTaskDragIndex(null)}
+              onDragCancel={() => {
+                setActiveHiddenTaskDragIndex(null);
+                setDragNodeWidth(null);
+              }}
             >
               <SortableContext
                 items={hiddenTasks.map((_, taskIndex) => taskIndex)}
@@ -523,24 +556,37 @@ function JobCard({
                   ))}
                 </div>
               </SortableContext>
-              <DragOverlay zIndex={120}>
-                {activeHiddenTask ? (
-                  <div className="drag-overlay">
-                    <TaskRow
-                      t={t}
-                      task={activeHiddenTask}
-                      exampleTask={exampleHiddenTasks[activeHiddenTaskDragIndex ?? 0]}
-                      index={activeHiddenTaskDragIndex ?? 0}
-                      isHidden
-                      onUpdateTask={() => {}}
-                      onRemoveTask={() => {}}
-                      onHideTask={() => {}}
-                      onRestoreTask={() => {}}
-                      isDragging
-                    />
-                  </div>
-                ) : null}
-              </DragOverlay>
+              {typeof document !== "undefined"
+                ? createPortal(
+                    <DragOverlay zIndex={120}>
+                      {activeHiddenTask ? (
+                        <div
+                          className="drag-overlay"
+                          style={{ width: dragNodeWidth ? `${dragNodeWidth}px` : undefined }}
+                        >
+                          <TaskRow
+                            t={t}
+                            task={activeHiddenTask}
+                            exampleTask={exampleHiddenTasks[activeHiddenTaskDragIndex ?? 0]}
+                            index={activeHiddenTaskDragIndex ?? 0}
+                            isHidden
+                            onUpdateTask={() => {}}
+                            onRemoveTask={() => {}}
+                            onHideTask={() => {}}
+                            onRestoreTask={() => {}}
+                            isDragging
+                            dragHandle={
+                              <button type="button" className="entry-row-card__drag-handle" disabled>
+                                <GripVertical strokeWidth={2} />
+                              </button>
+                            }
+                          />
+                        </div>
+                      ) : null}
+                    </DragOverlay>,
+                    document.body
+                  )
+                : null}
             </DndContext>
           ) : (
             <div className="stack">
@@ -592,6 +638,7 @@ function SortableJobCard(
   return (
     <div
       ref={setNodeRef}
+      data-id={`job-${sortableId}`}
       style={{
         transform: CSS.Transform.toString(transform),
         transition,
@@ -645,6 +692,8 @@ export default function ExperienceSection({
   const [collapsedCards, setCollapsedCards] = useState<Record<string, boolean>>({});
   const [activeVisibleDragIndex, setActiveVisibleDragIndex] = useState<number | null>(null);
   const [activeHiddenDragIndex, setActiveHiddenDragIndex] = useState<number | null>(null);
+  const [dragNodeWidth, setDragNodeWidth] = useState<number | null>(null);
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -669,11 +718,16 @@ export default function ExperienceSection({
 
     if (!Number.isNaN(index)) {
       setActiveVisibleDragIndex(index);
+      const node = document.querySelector(`[data-id="job-${index}"]`);
+      if (node) {
+        setDragNodeWidth(node.getBoundingClientRect().width);
+      }
     }
   };
 
   const handleVisibleDragEnd = ({ active, over }: DragEndEvent) => {
     setActiveVisibleDragIndex(null);
+    setDragNodeWidth(null);
 
     if (!over || active.id === over.id) {
       return;
@@ -694,11 +748,16 @@ export default function ExperienceSection({
 
     if (!Number.isNaN(index)) {
       setActiveHiddenDragIndex(index);
+      const node = document.querySelector(`[data-id="job-${index}"]`);
+      if (node) {
+        setDragNodeWidth(node.getBoundingClientRect().width);
+      }
     }
   };
 
   const handleHiddenDragEnd = ({ active, over }: DragEndEvent) => {
     setActiveHiddenDragIndex(null);
+    setDragNodeWidth(null);
 
     if (!over || active.id === over.id) {
       return;
@@ -747,7 +806,10 @@ export default function ExperienceSection({
           collisionDetection={closestCenter}
           onDragStart={handleVisibleDragStart}
           onDragEnd={handleVisibleDragEnd}
-          onDragCancel={() => setActiveVisibleDragIndex(null)}
+          onDragCancel={() => {
+            setActiveVisibleDragIndex(null);
+            setDragNodeWidth(null);
+          }}
         >
           <SortableContext items={jobs.map((_, index) => index)} strategy={verticalListSortingStrategy}>
             <div className="stack">
@@ -778,34 +840,47 @@ export default function ExperienceSection({
               ))}
             </div>
           </SortableContext>
-          <DragOverlay zIndex={120}>
-            {activeVisibleDragJob ? (
-              <div className="drag-overlay">
-                <JobCard
-                  t={t}
-                  job={activeVisibleDragJob}
-                  exampleJob={exampleJobs[activeVisibleDragIndex ?? 0]}
-                  index={activeVisibleDragIndex ?? 0}
-                  collectionKey="jobs"
-                  isHidden={false}
-                  onHideJob={onHideJob}
-                  onRestoreJob={onRestoreJob}
-                  onRemoveJob={onRemoveJob}
-                  onUpdateJobField={onUpdateJobField}
-                  onUpdateTask={onUpdateTask}
-                  onAddTask={onAddTask}
-                  onRemoveTask={onRemoveTask}
-                  onReorderTask={onReorderTask}
-                  onHideTask={onHideTask}
-                  onRestoreTask={onRestoreTask}
-                  onUpdateNotes={onUpdateNotes}
-                  isCollapsed={Boolean(collapsedCards[`jobs:${activeVisibleDragIndex}`])}
-                  onToggleCollapsed={() => {}}
-                  isDragging
-                />
-              </div>
-            ) : null}
-          </DragOverlay>
+          {typeof document !== "undefined"
+            ? createPortal(
+                <DragOverlay zIndex={120}>
+                  {activeVisibleDragJob ? (
+                    <div
+                      className="drag-overlay"
+                      style={{ width: dragNodeWidth ? `${dragNodeWidth}px` : undefined }}
+                    >
+                      <JobCard
+                        t={t}
+                        job={activeVisibleDragJob}
+                        exampleJob={exampleJobs[activeVisibleDragIndex ?? 0]}
+                        index={activeVisibleDragIndex ?? 0}
+                        collectionKey="jobs"
+                        isHidden={false}
+                        onHideJob={onHideJob}
+                        onRestoreJob={onRestoreJob}
+                        onRemoveJob={onRemoveJob}
+                        onUpdateJobField={onUpdateJobField}
+                        onUpdateTask={onUpdateTask}
+                        onAddTask={onAddTask}
+                        onRemoveTask={onRemoveTask}
+                        onReorderTask={onReorderTask}
+                        onHideTask={onHideTask}
+                        onRestoreTask={onRestoreTask}
+                        onUpdateNotes={onUpdateNotes}
+                        isCollapsed={Boolean(collapsedCards[`jobs:${activeVisibleDragIndex}`])}
+                        onToggleCollapsed={() => {}}
+                        isDragging
+                        dragHandle={
+                          <button type="button" className="job-card__drag-handle" disabled>
+                            <GripVertical strokeWidth={2} />
+                          </button>
+                        }
+                      />
+                    </div>
+                  ) : null}
+                </DragOverlay>,
+                document.body
+              )
+            : null}
         </DndContext>
       ) : (
         <div className="stack">
@@ -888,34 +963,47 @@ export default function ExperienceSection({
               ))}
             </div>
           </SortableContext>
-          <DragOverlay zIndex={120}>
-            {activeHiddenDragJob ? (
-              <div className="drag-overlay">
-                <JobCard
-                  t={t}
-                  job={activeHiddenDragJob}
-                  exampleJob={exampleHiddenJobs[activeHiddenDragIndex ?? 0]}
-                  index={activeHiddenDragIndex ?? 0}
-                  collectionKey="_commentedJobs"
-                  isHidden
-                  onHideJob={onHideJob}
-                  onRestoreJob={onRestoreJob}
-                  onRemoveJob={onRemoveJob}
-                  onUpdateJobField={onUpdateJobField}
-                  onUpdateTask={onUpdateTask}
-                  onAddTask={onAddTask}
-                  onRemoveTask={onRemoveTask}
-                  onReorderTask={onReorderTask}
-                  onHideTask={onHideTask}
-                  onRestoreTask={onRestoreTask}
-                  onUpdateNotes={onUpdateNotes}
-                  isCollapsed={Boolean(collapsedCards[`_commentedJobs:${activeHiddenDragIndex}`])}
-                  onToggleCollapsed={() => {}}
-                  isDragging
-                />
-              </div>
-            ) : null}
-          </DragOverlay>
+          {typeof document !== "undefined"
+            ? createPortal(
+                <DragOverlay zIndex={120}>
+                  {activeHiddenDragJob ? (
+                    <div
+                      className="drag-overlay"
+                      style={{ width: dragNodeWidth ? `${dragNodeWidth}px` : undefined }}
+                    >
+                      <JobCard
+                        t={t}
+                        job={activeHiddenDragJob}
+                        exampleJob={exampleHiddenJobs[activeHiddenDragIndex ?? 0]}
+                        index={activeHiddenDragIndex ?? 0}
+                        collectionKey="_commentedJobs"
+                        isHidden
+                        onHideJob={onHideJob}
+                        onRestoreJob={onRestoreJob}
+                        onRemoveJob={onRemoveJob}
+                        onUpdateJobField={onUpdateJobField}
+                        onUpdateTask={onUpdateTask}
+                        onAddTask={onAddTask}
+                        onRemoveTask={onRemoveTask}
+                        onReorderTask={onReorderTask}
+                        onHideTask={onHideTask}
+                        onRestoreTask={onRestoreTask}
+                        onUpdateNotes={onUpdateNotes}
+                        isCollapsed={Boolean(collapsedCards[`_commentedJobs:${activeHiddenDragIndex}`])}
+                        onToggleCollapsed={() => {}}
+                        isDragging
+                        dragHandle={
+                          <button type="button" className="job-card__drag-handle" disabled>
+                            <GripVertical strokeWidth={2} />
+                          </button>
+                        }
+                      />
+                    </div>
+                  ) : null}
+                </DragOverlay>,
+                document.body
+              )
+            : null}
         </DndContext>
       ) : (
         <div className="stack">

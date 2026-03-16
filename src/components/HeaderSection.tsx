@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import {
   DndContext,
   DragOverlay,
@@ -98,6 +99,7 @@ function SortableContactRow({
         transition,
       }}
       className={`entry-row-sortable${isDragging ? " entry-row-sortable--dragging" : ""}`}
+      data-id={`contact-${index}`}
     >
       <ContactRow
         t={t}
@@ -140,6 +142,8 @@ export default function HeaderSection({
   onReorderContacts,
 }: HeaderSectionProps) {
   const [activeDragIndex, setActiveDragIndex] = useState<number | null>(null);
+  const [dragNodeWidth, setDragNodeWidth] = useState<number | null>(null);
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -151,8 +155,21 @@ export default function HeaderSection({
     })
   );
 
+  const handleDragStart = ({ active }: DragStartEvent) => {
+    const index = Number(active.id);
+
+    if (!Number.isNaN(index)) {
+      setActiveDragIndex(index);
+      const node = document.querySelector(`[data-id="contact-${index}"]`);
+      if (node) {
+        setDragNodeWidth(node.getBoundingClientRect().width);
+      }
+    }
+  };
+
   const handleDragEnd = ({ active, over }: DragEndEvent) => {
     setActiveDragIndex(null);
+    setDragNodeWidth(null);
 
     if (!over || active.id === over.id) {
       return;
@@ -187,15 +204,12 @@ export default function HeaderSection({
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
-          onDragStart={({ active }: DragStartEvent) => {
-            const index = Number(active.id);
-
-            if (!Number.isNaN(index)) {
-              setActiveDragIndex(index);
-            }
-          }}
+          onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
-          onDragCancel={() => setActiveDragIndex(null)}
+          onDragCancel={() => {
+            setActiveDragIndex(null);
+            setDragNodeWidth(null);
+          }}
         >
           <SortableContext items={contacts.map((_, index) => index)} strategy={verticalListSortingStrategy}>
             <div className="stack">
@@ -212,21 +226,38 @@ export default function HeaderSection({
               ))}
             </div>
           </SortableContext>
-          <DragOverlay zIndex={120}>
-            {activeDragContact ? (
-              <div className="drag-overlay">
-                <ContactRow
-                  t={t}
-                  value={activeDragContact}
-                  exampleValue={exampleContacts[activeDragIndex ?? 0]}
-                  index={activeDragIndex ?? 0}
-                  onChange={() => {}}
-                  onRemove={() => {}}
-                  isDragging
-                />
-              </div>
-            ) : null}
-          </DragOverlay>
+          {typeof document !== "undefined"
+            ? createPortal(
+                <DragOverlay zIndex={120}>
+                  {activeDragContact ? (
+                    <div
+                      className="drag-overlay"
+                      style={{ width: dragNodeWidth ? `${dragNodeWidth}px` : undefined }}
+                    >
+                      <ContactRow
+                        t={t}
+                        value={activeDragContact}
+                        exampleValue={exampleContacts[activeDragIndex ?? 0]}
+                        index={activeDragIndex ?? 0}
+                        onChange={() => {}}
+                        onRemove={() => {}}
+                        isDragging
+                        dragHandle={
+                          <button
+                            type="button"
+                            className="entry-row-card__drag-handle"
+                            disabled
+                          >
+                            <GripVertical strokeWidth={2} />
+                          </button>
+                        }
+                      />
+                    </div>
+                  ) : null}
+                </DragOverlay>,
+                document.body
+              )
+            : null}
         </DndContext>
       ) : (
         <div className="stack">
