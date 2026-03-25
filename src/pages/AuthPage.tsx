@@ -22,7 +22,7 @@ export default function AuthPage() {
     }
 
     await studio.register({
-      name,
+      firstName: name,
       email,
       password,
     });

@@ -1,4 +1,3 @@
-import type { ResumeStudioState } from "../types/resume";
 
 const API_BASE_URL = String(import.meta.env.VITE_API_URL ?? "http://127.0.0.1:4000").replace(
   /\/$/,
@@ -8,7 +7,9 @@ const API_BASE_URL = String(import.meta.env.VITE_API_URL ?? "http://127.0.0.1:40
 export interface ApiUser {
   id: string;
   email: string;
-  name: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  nickname: string | null;
   createdAt: string;
 }
 
@@ -17,13 +18,6 @@ export interface AuthResponse {
   user: ApiUser;
 }
 
-export interface WorkspacePayload {
-  id: string;
-  userId: string;
-  data: Partial<ResumeStudioState>;
-  createdAt: string;
-  updatedAt: string;
-}
 
 export class ApiError extends Error {
   status: number;
@@ -73,8 +67,8 @@ async function request<T>(
 }
 
 export const authApi = {
-  register(input: { email: string; password: string; name?: string }) {
-    return request<AuthResponse>("/auth/register", {
+  register(input: { email: string; password: string; firstName?: string; lastName?: string; nickname?: string }) {
+    return request<AuthResponse>("/register", {
       method: "POST",
       body: input,
     });
@@ -90,20 +84,99 @@ export const authApi = {
       token,
     });
   },
-};
-
-export const workspaceApi = {
-  get(token: string) {
-    return request<{ workspace: WorkspacePayload }>("/workspace", {
-      token,
-    });
-  },
-  save(token: string, data: ResumeStudioState) {
-    return request<{ workspace: WorkspacePayload }>("/workspace", {
+  updateProfile(token: string, input: { firstName?: string; lastName?: string; nickname?: string }) {
+    return request<{ user: ApiUser }>("/me", {
       method: "PUT",
       token,
-      body: { data },
+      body: input,
+    });
+  },
+  updatePassword(token: string, input: { currentPassword: string; newPassword: string }) {
+    return request<{ success: boolean }>("/me/password", {
+      method: "PUT",
+      token,
+      body: input,
     });
   },
 };
 
+export interface ResumePayload {
+  id: string;
+  userId: string;
+  title: string;
+  language: string;
+  templateId: string;
+  pdfName: string | null;
+  header: Record<string, unknown>;
+  summary: Record<string, unknown>;
+  experience: Record<string, unknown>;
+  education: Record<string, unknown>;
+  languagesData: Record<string, unknown>;
+  certificates: Record<string, unknown>;
+  skillsData: Record<string, unknown>;
+  isActive: boolean;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const resumeApi = {
+  list(token: string) {
+    return request<{ resumes: ResumePayload[] }>("/resumes", { token });
+  },
+  get(token: string, id: string) {
+    return request<{ resume: ResumePayload }>(`/resumes/${id}`, { token });
+  },
+  create(token: string, input: { 
+    title?: string; 
+    language?: string; 
+    templateId?: string; 
+    pdfName?: string; 
+    header?: Record<string, unknown>; 
+    summary?: Record<string, unknown>; 
+    experience?: Record<string, unknown>; 
+    education?: Record<string, unknown>; 
+    languagesData?: Record<string, unknown>; 
+    certificates?: Record<string, unknown>; 
+    skillsData?: Record<string, unknown> 
+  }) {
+    return request<{ resume: ResumePayload }>("/resumes", {
+      method: "POST",
+      token,
+      body: input,
+    });
+  },
+  update(token: string, id: string, input: { 
+    title?: string; 
+    language?: string; 
+    templateId?: string; 
+    pdfName?: string | null; 
+    header?: Record<string, unknown>; 
+    summary?: Record<string, unknown>; 
+    experience?: Record<string, unknown>; 
+    education?: Record<string, unknown>; 
+    languagesData?: Record<string, unknown>; 
+    certificates?: Record<string, unknown>; 
+    skillsData?: Record<string, unknown>;
+    isActive?: boolean;
+    sortOrder?: number;
+  }) {
+    return request<{ resume: ResumePayload }>(`/resumes/${id}`, {
+      method: "PUT",
+      token,
+      body: input,
+    });
+  },
+  delete(token: string, id: string) {
+    return request<{ success: boolean }>(`/resumes/${id}`, {
+      method: "DELETE",
+      token,
+    });
+  },
+  clone(token: string, id: string) {
+    return request<{ resume: ResumePayload }>(`/resumes/${id}/clone`, {
+      method: "POST",
+      token,
+    });
+  },
+};

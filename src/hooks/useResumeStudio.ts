@@ -6,7 +6,7 @@ import {
   getResumeLanguageLabel,
   uiText,
 } from "../i18n/uiText";
-import { ApiError, authApi, type ApiUser, workspaceApi } from "../lib/api";
+import { ApiError, authApi, type ApiUser, resumeApi, type ResumePayload } from "../lib/api";
 import { createResumePdf } from "../lib/pdfTemplate";
 import type {
   CourseEntry,
@@ -20,6 +20,7 @@ import type {
   ResumeData,
   ResumeLanguageCode,
   ResumeProgressItem,
+  ResumeStudioState,
   ResumeTemplateId,
   SkillsData,
   ThemeMode,
@@ -218,6 +219,8 @@ export function useResumeStudio() {
   const [pendingResumeLanguageDeletion, setPendingResumeLanguageDeletion] =
     useState<ResumeLanguageCode | null>(null);
   const [didAutoSave, setDidAutoSave] = useState(false);
+  const [savedResumes, setSavedResumes] = useState<ResumePayload[]>([]);
+  const [activeResumeId, setActiveResumeId] = useState<string | null>(null);
   const importInputRef = useRef<HTMLInputElement | null>(null);
   const hasInitializedAutoSaveRef = useRef(false);
   const workspaceSignatureRef = useRef<string | null>(null);
@@ -252,15 +255,50 @@ export function useResumeStudio() {
         })
     );
 
+    if (authStatus === "authenticated" && authToken && activeResumeId) {
+      const currentSignature = JSON.stringify({
+        resumes,
+        skills,
+        pdfFileNames,
+        resumeLanguageLabels,
+        resumeTemplates,
+      });
+
+      if (workspaceSignatureRef.current !== currentSignature) {
+        workspaceSignatureRef.current = currentSignature;
+        const saveTimeout = setTimeout(() => {
+          const lang = resumeLanguageLabels[activeResumeId] === "English" ? "en" : "ru";
+          const resumeOfLang = resumes[lang] || Object.values(resumes)[0] || {};
+          const sections = resumeOfLang.sections || {};
+
+          resumeApi.update(authToken, activeResumeId, {
+            title: resumeOfLang.header?.title || "My Resume",
+            language: lang,
+            templateId: resumeTemplates[lang] || "classic",
+            pdfName: pdfFileNames[lang] || null,
+            header: resumeOfLang.header as any,
+            summary: sections.summary as any,
+            experience: sections.experience as any,
+            education: sections.education as any,
+            languagesData: sections.languages as any,
+            certificates: sections.certificates as any,
+            skillsData: skills as unknown as Record<string, unknown>,
+          }).catch(console.error);
+        }, 1000);
+
+        return () => clearTimeout(saveTimeout);
+      }
+    }
+
     if (!hasInitializedAutoSaveRef.current) {
       hasInitializedAutoSaveRef.current = true;
       return;
     }
 
     setDidAutoSave(true);
-    const timeoutId = window.setTimeout(() => setDidAutoSave(false), 1400);
-    return () => window.clearTimeout(timeoutId);
-  }, [resumes, skills, pdfFileNames, resumeLanguageLabels, resumeTemplates]);
+    const timeout = setTimeout(() => setDidAutoSave(false), 2000);
+    return () => clearTimeout(timeout);
+  }, [resumes, skills, pdfFileNames, resumeLanguageLabels, resumeTemplates, authStatus, authToken, activeResumeId]);
 
   useEffect(() => {
     if (authToken) {
@@ -294,58 +332,112 @@ export function useResumeStudio() {
   }, [activeLanguage, resumes]);
 
   useEffect(() => {
-    if (!authToken) {
-      setAuthStatus("anonymous");
-      setIsWorkspaceHydrated(false);
+    if (!authToken || authStatus !== "checking") {
       return;
     }
 
-    let isCancelled = false;
+    let isMounted = true;
 
-    const hydrateWorkspace = async () => {
-      setAuthStatus("checking");
-      setAuthError("");
-
+    async function hydrateWorkspace() {
       try {
-        const [{ user }, { workspace }] = await Promise.all([
-          authApi.me(authToken),
-          workspaceApi.get(authToken),
-        ]);
-
-        if (isCancelled) {
-          return;
-        }
-
-        const nextState = normalizeState(workspace?.data);
+        const { user } = await authApi.me(authToken!);
         setAuthUser(user);
-        setResumes(nextState.resumes);
-        setSkills(nextState.skills);
-        setPdfFileNames(nextState.pdfFileNames);
-        setResumeLanguageLabels(nextState.resumeLanguageLabels);
-        setResumeTemplates(nextState.resumeTemplates);
-        setActiveLanguage(nextState.resumes.ru ? "ru" : (Object.keys(nextState.resumes)[0] ?? "ru"));
-        workspaceSignatureRef.current = JSON.stringify(nextState);
-        setAuthStatus("authenticated");
-        setIsWorkspaceHydrated(true);
-      } catch (error) {
-        if (isCancelled) {
-          return;
+        
+        try {
+          const { resumes: remoteResumes } = await resumeApi.list(authToken!);
+          if (isMounted) {
+            if (remoteResumes.length > 0) {
+              // We have saved resumes — load the active one
+              setSavedResumes(remoteResumes);
+              const active = remoteResumes.find(r => r.isActive) ?? remoteResumes[0];
+              setActiveResumeId(active.id);
+              const lang = active.language || "ru";
+              const parsedState = {
+                resumes: {
+                  [lang]: {
+                    header: active.header,
+                    sections: {
+                      summary: active.summary,
+                      experience: active.experience,
+                      education: active.education,
+                      languages: active.languagesData,
+                      certificates: active.certificates,
+                    }
+                  }
+                },
+                pdfFileNames: active.pdfName ? { [lang]: active.pdfName } : {},
+                resumeLanguageLabels: { [lang]: lang === "ru" ? "Русский" : "English" },
+                resumeTemplates: { [lang]: active.templateId },
+              };
+              
+              setResumes(parsedState.resumes as any);
+              setPdfFileNames(parsedState.pdfFileNames);
+              setResumeLanguageLabels(parsedState.resumeLanguageLabels);
+              setResumeTemplates(parsedState.resumeTemplates as any);
+
+              const sd = active.skillsData as Record<string, unknown> ?? {};
+              if (sd.items) {
+                setSkills(normalizeSkills(sd as Partial<SkillsData>));
+              }
+              
+              workspaceSignatureRef.current = JSON.stringify({
+                resumes: parsedState.resumes,
+                skills: sd,
+                pdfFileNames: parsedState.pdfFileNames,
+                resumeLanguageLabels: parsedState.resumeLanguageLabels,
+                resumeTemplates: parsedState.resumeTemplates,
+              });
+            } else {
+              // No resumes yet — create the first one with current editor state
+              const currentState = createWorkspaceSnapshot();
+              const lang = "ru";
+              const resumeOfLang = currentState.resumes[lang] || Object.values(currentState.resumes)[0] || {};
+              const sections = resumeOfLang.sections || {};
+
+              const { resume: newResume } = await resumeApi.create(authToken!, {
+                title: "My Resume",
+                language: lang,
+                templateId: currentState.resumeTemplates[lang] || "classic",
+                pdfName: currentState.pdfFileNames[lang] || undefined,
+                header: resumeOfLang.header as any,
+                summary: sections.summary as any,
+                experience: sections.experience as any,
+                education: sections.education as any,
+                languagesData: sections.languages as any,
+                certificates: sections.certificates as any,
+                skillsData: currentState.skills as any,
+              });
+
+              setSavedResumes([newResume]);
+              setActiveResumeId(newResume.id);
+
+              workspaceSignatureRef.current = JSON.stringify(currentState);
+            }
+          }
+        } catch (err) {
+          console.error("Failed to load resumes", err);
         }
 
-        clearAuthSession();
-        setAuthError(error instanceof Error ? error.message : uiText.en.unknownError);
+        if (isMounted) {
+          setAuthStatus("authenticated");
+          setIsWorkspaceHydrated(true);
+        }
+      } catch (err) {
+        if (isMounted) {
+          clearAuthSession();
+        }
       }
-    };
+    }
 
     void hydrateWorkspace();
 
     return () => {
-      isCancelled = true;
+      isMounted = false;
     };
-  }, [authToken]);
+  }, [authToken, authStatus]);
 
   useEffect(() => {
-    if (!authToken || authStatus !== "authenticated" || !isWorkspaceHydrated) {
+    if (!authToken || authStatus !== "authenticated" || !isWorkspaceHydrated || !activeResumeId) {
       return;
     }
 
@@ -357,8 +449,24 @@ export function useResumeStudio() {
     }
 
     const timeoutId = window.setTimeout(() => {
-      void workspaceApi
-        .save(authToken, workspaceSnapshot)
+      const lang = activeResumeLanguageLabel === "English" ? "en" : "ru";
+      const resumeOfLang = resumes[lang] || Object.values(resumes)[0] || {};
+      const sections = resumeOfLang.sections || {};
+
+      void resumeApi
+        .update(authToken, activeResumeId, {
+          title: resumeOfLang.header?.title || "My Resume",
+          language: lang,
+          templateId: resumeTemplates[lang] || "classic",
+          pdfName: pdfFileNames[lang] || null,
+          header: resumeOfLang.header as any,
+          summary: sections.summary as any,
+          experience: sections.experience as any,
+          education: sections.education as any,
+          languagesData: sections.languages as any,
+          certificates: sections.certificates as any,
+          skillsData: skills as unknown as Record<string, unknown>,
+        })
         .then(() => {
           workspaceSignatureRef.current = nextSignature;
         })
@@ -377,6 +485,7 @@ export function useResumeStudio() {
     authStatus,
     authToken,
     isWorkspaceHydrated,
+    activeResumeId,
     pdfFileNames,
     resumeLanguageLabels,
     resumeTemplates,
@@ -467,7 +576,7 @@ export function useResumeStudio() {
     setTheme((current) => (current === "light" ? "dark" : "light"));
   };
 
-  const register = async (input: { email: string; password: string; name?: string }) => {
+  const register = async (input: { email: string; password: string; firstName?: string; lastName?: string; nickname?: string }) => {
     setIsAuthenticating(true);
     setAuthError("");
 
@@ -475,8 +584,39 @@ export function useResumeStudio() {
       const { token, user } = await authApi.register(input);
       setAuthUser(user);
       setAuthToken(token);
+      setAuthStatus("checking");
     } catch (error) {
       setAuthError(error instanceof Error ? error.message : uiText.en.unknownError);
+    } finally {
+      setIsAuthenticating(false);
+    }
+  };
+
+  const updateProfile = async (input: { firstName?: string; lastName?: string; nickname?: string }) => {
+    if (!authToken) return;
+    setIsAuthenticating(true);
+    setAuthError("");
+
+    try {
+      const { user } = await authApi.updateProfile(authToken, input);
+      setAuthUser(user);
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : uiText.en.unknownError);
+    } finally {
+      setIsAuthenticating(false);
+    }
+  };
+
+  const updatePassword = async (input: { currentPassword: string; newPassword: string }) => {
+    if (!authToken) return;
+    setIsAuthenticating(true);
+    setAuthError("");
+
+    try {
+      await authApi.updatePassword(authToken, input);
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : uiText.en.unknownError);
+      throw error;
     } finally {
       setIsAuthenticating(false);
     }
@@ -490,6 +630,7 @@ export function useResumeStudio() {
       const { token, user } = await authApi.login(input);
       setAuthUser(user);
       setAuthToken(token);
+      setAuthStatus("checking");
     } catch (error) {
       setAuthError(error instanceof Error ? error.message : uiText.en.unknownError);
     } finally {
@@ -499,6 +640,114 @@ export function useResumeStudio() {
 
   const continueAsGuest = () => {
     setAuthStatus("guest");
+  };
+
+  // ——— Resume CRUD ———
+  const createNewResume = async (title?: string) => {
+    if (!authToken) return;
+    try {
+      const { resume } = await resumeApi.create(authToken, {
+        title: title || "Untitled",
+        language: activeLanguage,
+        templateId: DEFAULT_TEMPLATE_ID,
+      });
+      setSavedResumes((prev) => [...prev, resume]);
+      setActiveResumeId(resume.id);
+      
+      // Reset editor to empty state for the new resume
+      const defaultState = getDefaultState();
+      setResumes(defaultState.resumes);
+      setSkills(defaultState.skills);
+      setPdfFileNames(defaultState.pdfFileNames);
+      setResumeLanguageLabels(defaultState.resumeLanguageLabels);
+      setResumeTemplates(defaultState.resumeTemplates);
+      workspaceSignatureRef.current = null;
+    } catch (error) {
+      console.error("Failed to create resume", error);
+    }
+  };
+
+  const deleteSavedResume = async (id: string) => {
+    if (!authToken) return;
+    try {
+      await resumeApi.delete(authToken, id);
+      setSavedResumes((prev) => prev.filter((r) => r.id !== id));
+      if (activeResumeId === id) {
+        setActiveResumeId(null);
+      }
+    } catch (error) {
+      console.error("Failed to delete resume", error);
+    }
+  };
+
+  const cloneSavedResume = async (id: string) => {
+    if (!authToken) return;
+    try {
+      const { resume } = await resumeApi.clone(authToken, id);
+      setSavedResumes((prev) => [...prev, resume]);
+    } catch (error) {
+      console.error("Failed to clone resume", error);
+    }
+  };
+
+  const switchResume = async (id: string) => {
+    if (!authToken) return;
+    try {
+      const { resume } = await resumeApi.get(authToken, id);
+      setActiveResumeId(resume.id);
+      
+      const lang = resume.language || "ru";
+      const parsedState = {
+        resumes: {
+          [lang]: {
+            header: resume.header,
+            sections: {
+              summary: resume.summary,
+              experience: resume.experience,
+              education: resume.education,
+              languages: resume.languagesData,
+              certificates: resume.certificates,
+            }
+          }
+        },
+        pdfFileNames: resume.pdfName ? { [lang]: resume.pdfName } : {},
+        resumeLanguageLabels: { [lang]: lang === "ru" ? "Русский" : "English" },
+        resumeTemplates: { [lang]: resume.templateId },
+      };
+
+      setActiveResumeId(id);
+      setResumes(parsedState.resumes as any);
+      setPdfFileNames(parsedState.pdfFileNames);
+      setResumeLanguageLabels(parsedState.resumeLanguageLabels);
+      setResumeTemplates(parsedState.resumeTemplates as any);
+      
+      const sd = resume.skillsData as Record<string, unknown> ?? {};
+      if (sd.items) {
+        setSkills(normalizeSkills(sd as Partial<SkillsData>));
+      } else {
+        setSkills(getDefaultSkills());
+      }
+      
+      workspaceSignatureRef.current = JSON.stringify({
+        resumes: parsedState.resumes,
+        skills: sd,
+        pdfFileNames: parsedState.pdfFileNames,
+        resumeLanguageLabels: parsedState.resumeLanguageLabels,
+        resumeTemplates: parsedState.resumeTemplates,
+      });
+    } catch (error) {
+      console.error("Failed to switch resume", error);
+    }
+  };
+
+  const renameSavedResume = async (id: string, title: string) => {
+    if (!authToken) return;
+    try {
+      const { resume } = await resumeApi.update(authToken, id, { title });
+      setSavedResumes((prev) => prev.map((r) => (r.id === id ? resume : r)));
+    } catch (error) {
+      console.error("Failed to rename resume", error);
+    }
   };
 
   const logout = () => {
@@ -1736,6 +1985,8 @@ export function useResumeStudio() {
     continueAsGuest,
     register,
     login,
+    updateProfile,
+    updatePassword,
     logout,
     activeLanguage,
     setActiveLanguage,
@@ -1842,6 +2093,13 @@ export function useResumeStudio() {
     resetToExamples,
     applyActiveWorkspaceSnapshot,
     downloadPdf,
+    savedResumes,
+    activeResumeId,
+    createNewResume,
+    deleteSavedResume,
+    cloneSavedResume,
+    switchResume,
+    renameSavedResume,
   };
 }
 

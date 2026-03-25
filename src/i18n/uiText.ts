@@ -22,6 +22,47 @@ export interface UIText {
   authSwitchToLogin: string;
   authLogout: string;
   authLoading: string;
+
+  // Profile Settings
+  personalInfo: string;
+  security: string;
+  namePlaceholder: string;
+  saveChanges: string;
+  firstName: string;
+  lastName: string;
+  nickname: string;
+  firstNamePlaceholder: string;
+  lastNamePlaceholder: string;
+  nicknamePlaceholder: string;
+  // Resume Management
+  myResumes: string;
+  myResumesDescription: string;
+  createResume: string;
+  createResumeTitle: string;
+  createResumeConfirm: string;
+  resumeName: string;
+  resumeNamePlaceholder: string;
+  renameResume: string;
+  renameResumeTitle: string;
+  renameResumeConfirm: string;
+  deleteResume: string;
+  deleteResumeConfirm: (title: string) => string;
+  cloneResume: string;
+  openResume: string;
+  activeLabel: string;
+  noResumesTitle: string;
+  noResumesDescription: string;
+  loginToSaveTitle: string;
+  loginToSaveDescription: string;
+  profileUpdated: string;
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+  updatePassword: string;
+  passwordUpdated: string;
+  passwordsDoNotMatch: string;
+  passwordTooShort: string;
+  guestMode: string;
   workspace: string;
   navEditor: string;
   navVersions: string;
@@ -312,6 +353,45 @@ const ruText: UIText = {
   authSwitchToLogin: "Уже есть аккаунт? Войти",
   authLogout: "Выйти",
   authLoading: "Загружаю аккаунт...",
+  // Profile Settings
+  personalInfo: "Личные данные",
+  security: "Безопасность",
+  namePlaceholder: "Иван Иванов",
+  saveChanges: "Сохранить изменения",
+  profileUpdated: "Профиль успешно обновлен",
+  currentPassword: "Текущий пароль",
+  newPassword: "Новый пароль",
+  confirmNewPassword: "Подтвердите новый пароль",
+  updatePassword: "Обновить пароль",
+  passwordUpdated: "Пароль успешно обновлен",
+  passwordsDoNotMatch: "Пароли не совпадают",
+  passwordTooShort: "Длина пароля должна быть не менее 6 символов",
+  guestMode: "Гостевой режим",
+  firstName: "Имя",
+  lastName: "Фамилия",
+  nickname: "Никнейм",
+  firstNamePlaceholder: "Иван",
+  lastNamePlaceholder: "Иванов",
+  nicknamePlaceholder: "ivan_the_dev",
+  myResumes: "Мои резюме",
+  myResumesDescription: "Ваши резюме, сохранённые в облаке",
+  createResume: "Новое резюме",
+  createResumeTitle: "Создать резюме",
+  createResumeConfirm: "Создать",
+  resumeName: "Название резюме",
+  resumeNamePlaceholder: "Например, Frontend разработчик",
+  renameResume: "Переименовать",
+  renameResumeTitle: "Переименовать резюме",
+  renameResumeConfirm: "Переименовать",
+  deleteResume: "Удалить",
+  deleteResumeConfirm: (title) => `Вы уверены, что хотите удалить "${title}"?`,
+  cloneResume: "Клонировать",
+  openResume: "Открыть",
+  activeLabel: "активно",
+  noResumesTitle: "Нет резюме",
+  noResumesDescription: "Создайте первое резюме, чтобы начать сохранять в облаке.",
+  loginToSaveTitle: "Войдите, чтобы сохранять резюме",
+  loginToSaveDescription: "Авторизуйтесь или создайте аккаунт, чтобы сохранять резюме в облаке.",
   workspace: "Меню",
   navEditor: "Редактор",
   navVersions: "Версии",
@@ -650,6 +730,45 @@ const enText: UIText = {
   authSwitchToLogin: "Already have an account? Sign in",
   authLogout: "Log out",
   authLoading: "Loading account...",
+  // Profile Settings
+  personalInfo: "Personal Information",
+  security: "Security",
+  namePlaceholder: "John Doe",
+  saveChanges: "Save Changes",
+  profileUpdated: "Profile updated successfully",
+  currentPassword: "Current Password",
+  newPassword: "New Password",
+  confirmNewPassword: "Confirm New Password",
+  updatePassword: "Update Password",
+  passwordUpdated: "Password updated successfully",
+  passwordsDoNotMatch: "Passwords do not match",
+  passwordTooShort: "Password must be at least 6 characters",
+  guestMode: "Guest Mode",
+  firstName: "First Name",
+  lastName: "Last Name",
+  nickname: "Nickname",
+  firstNamePlaceholder: "John",
+  lastNamePlaceholder: "Doe",
+  nicknamePlaceholder: "john_the_dev",
+  myResumes: "My Resumes",
+  myResumesDescription: "Your resumes saved in the cloud",
+  createResume: "New Resume",
+  createResumeTitle: "Create Resume",
+  createResumeConfirm: "Create",
+  resumeName: "Resume title",
+  resumeNamePlaceholder: "e.g. Frontend Developer CV",
+  renameResume: "Rename",
+  renameResumeTitle: "Rename Resume",
+  renameResumeConfirm: "Rename",
+  deleteResume: "Delete",
+  deleteResumeConfirm: (title) => `Are you sure you want to delete "${title}"?`,
+  cloneResume: "Clone",
+  openResume: "Open",
+  activeLabel: "active",
+  noResumesTitle: "No resumes yet",
+  noResumesDescription: "Create your first resume to start saving in the cloud.",
+  loginToSaveTitle: "Sign in to save resumes",
+  loginToSaveDescription: "Log in or create an account to save your resumes in the cloud.",
   workspace: "Menu",
   navEditor: "Editor",
   navVersions: "Versions",
@@ -2230,7 +2349,29 @@ const ukText: UIText = {
 
 const featureTextOverrides = {
   de: {
-    workspace: "Menü",
+    authContinueAsGuest: "Continue as guest",
+
+  // Profile Settings
+  personalInfo: "Personal Information",
+  security: "Security",
+  namePlaceholder: "John Doe",
+  saveChanges: "Save Changes",
+  profileUpdated: "Profile updated successfully",
+  currentPassword: "Current Password",
+  newPassword: "New Password",
+  confirmNewPassword: "Confirm New Password",
+  updatePassword: "Update Password",
+  passwordUpdated: "Password updated successfully",
+  passwordsDoNotMatch: "Passwords do not match",
+  passwordTooShort: "Password must be at least 6 characters",
+  guestMode: "Guest Mode",
+  firstName: "First Name",
+  lastName: "Last Name",
+  nickname: "Nickname",
+  firstNamePlaceholder: "John",
+  lastNamePlaceholder: "Doe",
+  nicknamePlaceholder: "john_the_dev",
+  workspace: "Menü",
     navEditor: "Editor",
     navVersions: "Versionen",
     navVacancy: "Stelle",
